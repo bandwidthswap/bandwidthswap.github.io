@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$title$</title>
+<meta name="description" content="Bandwidth Swap: A Peer-to-Peer Bandwidth Exchange. Version $version$.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/latex.css@1.10.0/style.min.css">
+<style>
+body{max-width:80ch;padding-top:1.5rem}
+.toolbar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;align-items:baseline;justify-content:flex-end;font-family:"Latin Modern Sans","Computer Modern Sans",sans-serif;font-size:.85rem;background:var(--bg,#fff);padding:.5rem 0 .6rem;border-bottom:1px solid currentColor;margin-bottom:2rem}
+.toolbar a{text-decoration:none;border-bottom:1px solid currentColor}
+.toolbar a:hover{border-bottom-width:2px}
+.toolbar .lead{margin-right:auto;opacity:.75}
+header.titleblock{text-align:center;margin-bottom:2.2rem}
+header.titleblock h1{font-size:1.9rem;margin:0 0 1rem;line-height:1.2}
+header.titleblock .authors{font-size:1.15rem;margin:0 0 .4rem}
+header.titleblock .affil,header.titleblock .date{font-size:.95rem;margin:0 0 .2rem}
+header.titleblock .affil a{text-decoration:none}
+.revnote{font-size:.9rem;font-style:italic;max-width:62ch;margin:0 auto 2rem;text-align:center}
+.abstract{margin:0 auto 2rem;max-width:62ch;font-size:.95rem}
+.abstract p:first-child::before{content:"Abstract. ";font-weight:bold;font-style:normal}
+.abstract p{text-align:justify;margin:0 0 .6rem}
+h2{font-size:1.25rem;margin-top:2.2rem}
+h3{font-size:1.05rem}
+blockquote{margin:1rem 2rem;font-size:.95rem}
+pre{font-size:.85rem;overflow-x:auto}
+figure,pre{max-width:100%}
+.footnotes{font-size:.85rem}
+.footnotes::before{content:"Notes";display:block;font-weight:bold;font-size:1.05rem;margin:0 0 .6rem}
+.footnotes hr{display:none}
+.footnotes ol{padding-left:1.4rem}
+.footnotes li{margin-bottom:.5rem}
+sup{font-size:.7em}
+@media (prefers-color-scheme: dark){.toolbar{background:#1a1a1a}}
+@media (max-width:600px){body{padding-left:1rem;padding-right:1rem}}
+</style>
+</head>
+<body>
+<nav class="toolbar" aria-label="Paper tools">
+  <span class="lead">Rendered from Markdown</span>
+  <a href="BANDWIDTH-whitepaper-v0.2.md" download>Download .md</a>
+  <a href="BANDWIDTH-whitepaper-v0.2.txt" download>Download .txt</a>
+  <a href="BANDWIDTH-whitepaper-v0.1-original.pdf">Original 2021 PDF</a>
+  <a href="../">bandwidthswap.com</a>
+</nav>
+<article>
+<header class="titleblock">
+  <h1>$title$</h1>
+  <p class="authors">$authors$</p>
+  <p class="affil"><a href="mailto:$email$">$email$</a></p>
+  <p class="date">$date$ · Version $version$</p>
+</header>
+$body$
+</article>
+</body>
+</html>
