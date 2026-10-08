@@ -17,6 +17,7 @@ Site: https://bandwidthswap.com, served by GitHub Pages from `main` of this repo
 | `paper/BANDWIDTH-whitepaper-v0.2.md` | **The paper's source of truth.** Edit this. |
 | `paper/BANDWIDTH-whitepaper-v0.1.md` | Faithful Markdown clone of the 2021 PDF. Never edit; it is the diff baseline. |
 | `paper/whitepaper-spelling-diff.html` | Record of the copyedit pass on v0.2. Historical. |
+| `SHOPPING-LIST.md` | Parts to turn the three Pi 3 boards into nodes, by phase, with budget. |
 | `OPEN-QUESTIONS.md` | **The build backlog.** 22 open questions, each with options, what a build reveals, and a default. Section E defines the pilot. |
 | `tools/build.sh` | Regenerates `docs/` from `paper/` and `OPEN-QUESTIONS.md`. Needs pandoc and python3. |
 | `tools/paper.tmpl` | Pandoc template for the LaTeX-style paper page (latex.css, Latin Modern). |
