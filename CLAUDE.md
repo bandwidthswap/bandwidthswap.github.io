@@ -18,6 +18,7 @@ Site: https://bandwidthswap.com, served by GitHub Pages from `main` of this repo
 | `paper/BANDWIDTH-whitepaper-v0.1.md` | Faithful Markdown clone of the 2021 PDF. Never edit; it is the diff baseline. |
 | `paper/whitepaper-spelling-diff.html` | Record of the copyedit pass on v0.2. Historical. |
 | `SHOPPING-LIST.md` | Parts to turn the three Pi 3 boards into nodes, by phase, with budget. |
+| `PHASE0-SETUP.md` | **The hands-on handoff for Phase 0**: what is already set up on the Mac, how to flash the three cards, how to check the nodes, and the exact work the next session does over SSH. |
 | `OPEN-QUESTIONS.md` | **The build backlog.** 22 open questions, each with options, what a build reveals, and a default. Section E defines the pilot. |
 | `tools/build.sh` | Regenerates `docs/` from `paper/` and `OPEN-QUESTIONS.md`. Needs pandoc and python3. |
 | `tools/paper.tmpl` | Pandoc template for the LaTeX-style paper page (latex.css, Latin Modern). |
@@ -43,15 +44,18 @@ The build is deterministic: running it on an unchanged source produces no git di
 - **Page design:** IBM Plex Serif body, Plex Sans Condensed headings, Plex Mono for data. Light and dark themes via tokens on `:root`. Plain tone, says what is unproven. Don't add hype.
 - **Attribution on commits:** end commit messages with `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>` when an agent wrote them.
 
-## State as of Oct 8, 2026
+## State as of Oct 12, 2026
 
 - Site live with the project page, the LaTeX-style paper, the diff, and the backlog.
-- The author has three Pi 3 Model B boards on the desk, no radios yet, no SD cards flashed.
+- The author has three Pi 3 Model B boards on the desk, no radios yet. SD cards are on order, expected Thursday or Friday, Oct 15 or 16. The boards were powered and wired to the LAN once on Oct 12 and nothing booted, as expected without cards.
+- The Mac side is ready: an SSH key for the nodes, an SSH config block for the three hostnames, and this repo cloned. Detail and the flashing recipe: `PHASE0-SETUP.md`.
 - No code exists for the receipt daemon or the Mint. The phase 0 steps on the site describe what to build.
 
 ## Next step
 
-Phase 0 (OPEN-QUESTIONS.md section E, and the "Build phase 0" section of the site):
+**Flash the three cards when they arrive, then start a session and say the Pis are up.** The recipe, the hostnames (`bw-house`, `bw-forest`, `bw-mint`), the username (`bw`) and the key are all in `PHASE0-SETUP.md`; do not improvise them.
+
+Phase 0 (OPEN-QUESTIONS.md section E, the "Build phase 0" section of the site, and step by step in `PHASE0-SETUP.md`):
 
 1. Three Pis on the home LAN, hostnames `bw-house`, `bw-forest`, `bw-mint`, Raspberry Pi OS Lite 64-bit.
 2. chrony with `bw-house` as the local time source; WireGuard `bw-house` to `bw-forest`; logs to RAM.

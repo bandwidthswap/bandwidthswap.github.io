@@ -9,4 +9,4 @@ Source for the Bandwidth Swap project site and whitepaper. Served by GitHub Page
 
 Edit `paper/BANDWIDTH-whitepaper-v0.2.md` or `OPEN-QUESTIONS.md`, run `tools/build.sh`, push. Needs pandoc and python3.
 
-For the full handoff (layout, conventions, decisions, next step) read [CLAUDE.md](CLAUDE.md).
+For the full handoff (layout, conventions, decisions, next step) read [CLAUDE.md](CLAUDE.md). To flash the cards and bring up the three Pis, read [PHASE0-SETUP.md](PHASE0-SETUP.md).
