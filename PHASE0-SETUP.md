@@ -12,22 +12,22 @@ This is the handoff for whoever flashes the cards and whichever agent session pi
 
 ## What is already on the Mac
 
-Done on October 12 so the only thing left when the cards arrive is the flashing itself.
+Set up on October 12 under some other account, and again on October 16 in the `Grace` account, which is where all of it is now.
 
 | Thing | Where | Why |
 |---|---|---|
-| SSH key for the Pis | `~/.ssh/bandwidthswap_ed25519` (private) and `~/.ssh/bandwidthswap_ed25519.pub` (public), comment `bandwidthswap-pis`, no passphrase | So an agent can SSH into the nodes non-interactively. The public line goes into every card at flash time. |
+| SSH key for the Pis | `~/.ssh/bandwidthswap_ed25519` (private) and `~/.ssh/bandwidthswap_ed25519.pub` (public), comment `bandwidthswap-pis-grace`, no passphrase, made October 16 in the `Grace` account | So an agent can SSH into the nodes non-interactively. The public line goes into every card at flash time. |
 | SSH config block | `~/.ssh/config`, the block headed `# bandwidthswap pis (phase 0 lab)` | `ssh bw-house`, `ssh bw-forest`, `ssh bw-mint` resolve to `<name>.local`, user `bw`, that key. |
 | Cloned repo | `~/Documents/GitHub/bandwidthswap.github.io` | This repo. `tools/build.sh` runs clean there (pandoc 3.6.4 and python3 are installed). |
 
-**Check that the key exists.** Everything in the table was set up under `~` of whichever account the October 12 session ran as. On October 16 a session running as `Grace` on this Mac (which has several accounts; `robertdouglas` is another) found none of it: no `~/.ssh` folder, no SSH config, no Imager. Grace's clone at this path is the one that made the October 8 commits, but it got 856c25e only by fast-forward on October 16, so the October 12 session worked from another clone, since removed. Whether the key is in another account's home or was never made cannot be told from here. So before flashing: `ls ~/.ssh/bandwidthswap_ed25519*`. If nothing is there, make a key as the next paragraph says and paste its public line into the Imager; the line printed below is only useful if the private key that goes with it turns up. `tools/build.sh` runs clean in Grace's clone (pandoc 3.6.4, Python 3.13).
+**The key is the `Grace` account's, made October 16.** The October 12 session ran as some other account on this Mac (it has several; `robertdouglas` is one) or never made its key: on the morning of October 16 the `Grace` account had no `~/.ssh` at all. That afternoon a new key was made there (`ssh-keygen -t ed25519 -f ~/.ssh/bandwidthswap_ed25519 -N "" -C bandwidthswap-pis-grace`, fingerprint `SHA256:Hy16u0AB6IJXDqwqMRsQ8q0IjVWR5Hua8+RMq3HBQ64`) with the config block, and its public line is the one printed below. The October 12 line (comment `bandwidthswap-pis`) is retired: no private key for it was ever found, so a card flashed with it cannot be reached from here. `ls ~/.ssh/bandwidthswap_ed25519*` still tells you whether you are in the right account. `tools/build.sh` runs clean in Grace's clone (pandoc 3.6.4, Python 3.13).
 
-Not done: the Raspberry Pi Imager is not installed (still true on October 16; Spotlight finds no copy). Homebrew on this Mac is broken (an Intel-prefix install under `/usr/local`, owned by the `robertdouglas` account and running under Rosetta on an arm64 machine, with ownership errors) and fixing it needs the owner's password, so install the Imager by download: https://www.raspberrypi.com/software/ , macOS, drag to Applications.
+The Raspberry Pi Imager v2.0.12 is in `~/Applications` of the `Grace` account since October 16, installed by download (Homebrew on this Mac is broken: an Intel-prefix install under `/usr/local`, owned by `robertdouglas`, running under Rosetta), and has the Lite 64-bit image cached. Writing a card needs an administrator's name and password in the Imager's prompt, and `Grace` is not an administrator: use the `robertdouglas` account's. The Imager's `--cli` mode is no shortcut, since it needs root and takes only cloud-init files for the settings.
 
-**If a different person on a different machine does the flashing**, they need their own key. Make one with `ssh-keygen -t ed25519 -f ~/.ssh/bandwidthswap_ed25519 -N ""` and paste BOTH public keys into the Imager's authorized-keys box, one per line, so both machines can reach the nodes. The Mac's public key is:
+**If a different person on a different machine does the flashing**, they need their own key. Make one with `ssh-keygen -t ed25519 -f ~/.ssh/bandwidthswap_ed25519 -N ""` and paste BOTH public keys into the Imager's authorized-keys box, one per line, so both machines can reach the nodes. The Mac's public key (the `Grace` account's) is:
 
 ```
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAKk23Do9bRHosHC25wICJsvk8eAhVzFm07LzMUjZ/KG bandwidthswap-pis
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINDFPITNoFgV/4TU9lDvdyRmeO9eOuuDfx3B07LuTyLB bandwidthswap-pis-grace
 ```
 
 ## Flashing the three cards (about 5 minutes per card)
