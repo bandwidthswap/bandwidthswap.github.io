@@ -1,13 +1,14 @@
 # Phase 0 setup: from three bare Pi 3 B boards to three nodes on the LAN
 
-This is the handoff for whoever flashes the cards and whichever agent session picks up after. Written Monday, October 12, 2026. The cards are expected Thursday or Friday, October 15 or 16. Read `CLAUDE.md` first for what the project is; this file is only the "what do I do now" for Phase 0.
+This is the handoff for whoever flashes the cards and whichever agent session picks up after. Written Monday, October 12, 2026; checked again Friday, October 16, see the last bullet under "Where things stand". The cards are expected Thursday or Friday, October 15 or 16. Read `CLAUDE.md` first for what the project is; this file is only the "what do I do now" for Phase 0.
 
 ## Where things stand
 
 - Three Raspberry Pi 3 Model B boards, bare, powered off, on the desk. They have been plugged into the home network and powered once; nothing booted because there were no SD cards.
 - Three microSD cards are on order (32 GB, A1 or A2 rated, per `SHOPPING-LIST.md` Phase 0). Power supplies: use 2.5 A ones. A phone charger under 2 A makes a Pi 3 reboot at random and looks exactly like a software bug.
 - No code exists yet for the receipt daemon or the Mint. That is the next session's job, after the Pis are reachable.
-- The work machine is the author's Apple-silicon Mac (hostname-independent; the relevant state is listed under "What is already on the Mac").
+- The work machine is the author's Apple-silicon Mac (hostname-independent; the relevant state is listed under "What is already on the Mac"). It has several macOS accounts, and on October 16 none of that state was found in the `Grace` account; see "Check that the key exists" below.
+- Checked October 16 from the `Grace` account: none of the three hostnames answered on the LAN (the Mac was on 192.168.0.x, as on October 12) and no Pi MAC was in the ARP table, so no card had been flashed and booted. Nothing under "What the next agent session does" has started. Whether the cards have arrived is not recorded here.
 
 ## What is already on the Mac
 
@@ -19,7 +20,9 @@ Done on October 12 so the only thing left when the cards arrive is the flashing 
 | SSH config block | `~/.ssh/config`, the block headed `# bandwidthswap pis (phase 0 lab)` | `ssh bw-house`, `ssh bw-forest`, `ssh bw-mint` resolve to `<name>.local`, user `bw`, that key. |
 | Cloned repo | `~/Documents/GitHub/bandwidthswap.github.io` | This repo. `tools/build.sh` runs clean there (pandoc 3.6.4 and python3 are installed). |
 
-Not done: the Raspberry Pi Imager is not installed. Homebrew on this Mac is broken (an Intel-prefix install on an arm64 machine with ownership errors) and fixing it needs the owner's password, so install the Imager by download: https://www.raspberrypi.com/software/ , macOS, drag to Applications.
+**Check that the key exists.** Everything in the table was set up under `~` of whichever account the October 12 session ran as. On October 16 a session running as `Grace` on this Mac (which has several accounts; `robertdouglas` is another) found none of it: no `~/.ssh` folder, no SSH config, no Imager. Grace's clone at this path is the one that made the October 8 commits, but it got 856c25e only by fast-forward on October 16, so the October 12 session worked from another clone, since removed. Whether the key is in another account's home or was never made cannot be told from here. So before flashing: `ls ~/.ssh/bandwidthswap_ed25519*`. If nothing is there, make a key as the next paragraph says and paste its public line into the Imager; the line printed below is only useful if the private key that goes with it turns up. `tools/build.sh` runs clean in Grace's clone (pandoc 3.6.4, Python 3.13).
+
+Not done: the Raspberry Pi Imager is not installed (still true on October 16; Spotlight finds no copy). Homebrew on this Mac is broken (an Intel-prefix install under `/usr/local`, owned by the `robertdouglas` account and running under Rosetta on an arm64 machine, with ownership errors) and fixing it needs the owner's password, so install the Imager by download: https://www.raspberrypi.com/software/ , macOS, drag to Applications.
 
 **If a different person on a different machine does the flashing**, they need their own key. Make one with `ssh-keygen -t ed25519 -f ~/.ssh/bandwidthswap_ed25519 -N ""` and paste BOTH public keys into the Imager's authorized-keys box, one per line, so both machines can reach the nodes. The Mac's public key is:
 

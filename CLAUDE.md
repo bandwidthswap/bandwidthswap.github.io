@@ -19,7 +19,7 @@ Site: https://bandwidthswap.com, served by GitHub Pages from `main` of this repo
 | `paper/whitepaper-spelling-diff.html` | Record of the copyedit pass on v0.2. Historical. |
 | `SHOPPING-LIST.md` | Parts to turn the three Pi 3 boards into nodes, by phase, with budget. |
 | `PHASE0-SETUP.md` | **The hands-on handoff for Phase 0**: what is already set up on the Mac, how to flash the three cards, how to check the nodes, and the exact work the next session does over SSH. |
-| `OPEN-QUESTIONS.md` | **The build backlog.** 22 open questions, each with options, what a build reveals, and a default. Section E defines the pilot. |
+| `OPEN-QUESTIONS.md` | **The build backlog.** 20 numbered questions (A1 to A6, B1 to B10, C1 to C4), each with options, what a build reveals, and a default. Section D is what the copyedit left open; section E defines the pilot. |
 | `tools/build.sh` | Regenerates `docs/` from `paper/` and `OPEN-QUESTIONS.md`. Needs pandoc and python3. |
 | `tools/paper.tmpl` | Pandoc template for the LaTeX-style paper page (latex.css, Latin Modern). |
 | `tools/mkdiff.py` | Side-by-side Markdown diff renderer. |
@@ -28,7 +28,7 @@ Site: https://bandwidthswap.com, served by GitHub Pages from `main` of this repo
 ## Workflow
 
 1. Edit `paper/BANDWIDTH-whitepaper-v0.2.md`, `OPEN-QUESTIONS.md`, or `index.html`.
-2. Run `tools/build.sh` if you touched the paper or the backlog.
+2. Run `tools/build.sh` if you touched the paper or the backlog. The paper page's title block (authors, email, date, version) and the diff page's "Before" and "After" labels are arguments inside the script, not read from the Markdown header, which the build drops; a new paper date or version is set there too.
 3. Commit and push to `main`. Pages deploys in about 30 seconds. Verify with `curl -sI https://bandwidthswap.com/docs/paper.html`.
 
 The build is deterministic: running it on an unchanged source produces no git diff. If it does, something changed in the tools, not the content.
@@ -40,20 +40,21 @@ The build is deterministic: running it on an unchanged source produces no git di
 - **The pilot has no token and no chain.** Dollars, one Mint, signed receipts, hourly prepaid windows, monthly invoice. See OPEN-QUESTIONS.md section E. Token and DAO questions are deferred until there is paying traffic.
 - **The decisive open questions are A1, A2, A3** (unrecoverable fee, subsidy bound m < b, emissions). Do not design around them; the pilot is scoped so they can be simulated alongside.
 - **Hostile-jurisdiction deployment is a north star, not a roadmap item.** Receipts prove delivery, not location. No bounty is posted for it without a location proof, legal review, and an incentive design that never pays for a border crossing. The site says this in Phase 4 without naming a country. Keep it that way.
-- **Hardware baseline is the Raspberry Pi 3 Model B**, because the author has several. LoRa is the control plane (receipts, liveness, announcements), a second radio is the data plane. The site's kit table is written around this.
+- **Hardware baseline is the Raspberry Pi 3 Model B**, because the author has several. LoRa is the control plane (receipts, liveness, announcements), a second radio is the data plane. The site's kit table is written around this. The shopping list picks USB LoRa boards (Heltec WiFi LoRa 32 V3 or LILYGO T-Beam, 915 MHz, Meshtastic firmware) over a HAT so the GPIO header stays free for a HaLow HAT if the forest link has to go through trees; the site's table still offers both.
 - **Page design:** IBM Plex Serif body, Plex Sans Condensed headings, Plex Mono for data. Light and dark themes via tokens on `:root`. Plain tone, says what is unproven. Don't add hype.
 - **Attribution on commits:** end commit messages with `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>` when an agent wrote them.
+- **Docs passes:** when the docs are brought back in line with the code, the tools and the state of the lab, the commit is titled `docs: the docs caught up with the code (<first commit> to <last commit>)`, so `git log --grep='caught up with the code'` finds the last pass. The first was on Oct 16, 2026 and covered a4b90b6 to 856c25e.
 
-## State as of Oct 12, 2026
+## State as of Oct 16, 2026
 
-- Site live with the project page, the LaTeX-style paper, the diff, and the backlog.
-- The author has three Pi 3 Model B boards on the desk, no radios yet. SD cards are on order, expected Thursday or Friday, Oct 15 or 16. The boards were powered and wired to the LAN once on Oct 12 and nothing booted, as expected without cards.
-- The Mac side is ready: an SSH key for the nodes, an SSH config block for the three hostnames, and this repo cloned. Detail and the flashing recipe: `PHASE0-SETUP.md`.
-- No code exists for the receipt daemon or the Mint. The phase 0 steps on the site describe what to build.
+- Site live with the project page, the LaTeX-style paper, the diff, and the backlog. Pages last built from 856c25e (Oct 12); the live page matches the checkout and `tools/build.sh` produces no diff.
+- The author has three Pi 3 Model B boards on the desk, no radios yet. SD cards were ordered on Oct 12, expected Thursday or Friday, Oct 15 or 16. The boards were powered and wired to the LAN once on Oct 12 and nothing booted, as expected without cards. On Oct 16 none of `bw-house`, `bw-forest`, `bw-mint` answered on the LAN and no Pi MAC (`b8:27:eb`) was in the ARP table, so no card had been flashed and booted yet.
+- The Mac side is not confirmed ready. `PHASE0-SETUP.md` says an SSH key, an SSH config block and a clone were set up on Oct 12 under `~`. On Oct 16 the `Grace` account on this Mac had no `~/.ssh` at all and no Imager. Its clone at the same path made the Oct 8 commits but received 856c25e only by fast-forward on Oct 16, so the Oct 12 session worked from another clone, since removed; the Mac also has other accounts (`robertdouglas` and more), so the key may be in one of their homes, or may never have been made. Before flashing, run `ls ~/.ssh/bandwidthswap_ed25519*`; if nothing is there, make a key as `PHASE0-SETUP.md` says and put its public line on the cards. The build runs clean in Grace's clone.
+- No code exists for the receipt daemon or the Mint. The phase 0 steps on the site describe what to build. The `bandwidthswap/kit` repo does not exist yet; the org still has only this repo.
 
 ## Next step
 
-**Flash the three cards when they arrive, then start a session and say the Pis are up.** The recipe, the hostnames (`bw-house`, `bw-forest`, `bw-mint`), the username (`bw`) and the key are all in `PHASE0-SETUP.md`; do not improvise them.
+**Flash the three cards when they arrive, then start a session and say the Pis are up.** The recipe, the hostnames (`bw-house`, `bw-forest`, `bw-mint`), the username (`bw`) and the key are all in `PHASE0-SETUP.md`; do not improvise them. Check that the key exists before flashing (see the state above); if it does not, make one first and use its public line.
 
 Phase 0 (OPEN-QUESTIONS.md section E, the "Build phase 0" section of the site, and step by step in `PHASE0-SETUP.md`):
 
