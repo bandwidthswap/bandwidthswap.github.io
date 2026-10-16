@@ -1,0 +1,19 @@
+# status.bandwidthswap.com: the Phase 0 lab's status, posted by the Mint, read by the page.
+# Deploy from this directory with `npx -y wrangler@3 deploy` (local Node is v20). See README.md.
+name = "bandwidthswap-status"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+workers_dev = false
+
+routes = [
+  { pattern = "status.bandwidthswap.com", custom_domain = true }
+]
+
+# One key ("status") holds the latest report. Made once with
+#   npx -y wrangler@3 kv namespace create STATUS
+[[kv_namespaces]]
+binding = "STATUS"
+id = "53d62fede0824ac3b0d4828352e6c82f"
+
+# Secret (never committed): STATUS_TOKEN, the bearer token the Mint posts with.
+#   printf '%s' "$tok" | npx -y wrangler@3 secret put STATUS_TOKEN

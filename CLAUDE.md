@@ -24,6 +24,7 @@ Site: https://bandwidthswap.com, served by GitHub Pages from `main` of this repo
 | `tools/paper.tmpl` | Pandoc template for the LaTeX-style paper page (latex.css, Latin Modern). |
 | `tools/mkdiff.py` | Side-by-side Markdown diff renderer. |
 | `tools/card/` | `apply-card.sh`: customises a Pi OS card on the Mac (cloud-init files, the `ssh` switch, a one-shot `firstrun.sh`) when the Imager's settings do not apply, as happened on Oct 16. |
+| `worker/` | The status feed at `status.bandwidthswap.com`: a Cloudflare Worker with one KV key, posted to by the Mint, read by the page's Lab status section. `node worker/test.mjs` tests it; its README has the deploy steps and the token handling. |
 | `CNAME`, `.nojekyll` | Pages config. Leave alone. |
 
 ## Workflow
@@ -31,6 +32,7 @@ Site: https://bandwidthswap.com, served by GitHub Pages from `main` of this repo
 1. Edit `paper/BANDWIDTH-whitepaper-v0.2.md`, `OPEN-QUESTIONS.md`, or `index.html`.
 2. Run `tools/build.sh` if you touched the paper or the backlog. The paper page's title block (authors, email, date, version) and the diff page's "Before" and "After" labels are arguments inside the script, not read from the Markdown header, which the build drops; a new paper date or version is set there too.
 3. Commit and push to `main`. Pages deploys in about 30 seconds. Verify with `curl -sI https://bandwidthswap.com/docs/paper.html`.
+4. If you touched `worker/`, run `node worker/test.mjs`, then deploy from that directory with `npx -y wrangler@3 deploy` (a public action: Grace's call). The Worker is not part of Pages; a push does not deploy it.
 
 The build is deterministic: running it on an unchanged source produces no git diff. If it does, something changed in the tools, not the content.
 
@@ -46,6 +48,7 @@ The build is deterministic: running it on an unchanged source produces no git di
 - **Phase 0 lab decisions (Oct 16, 2026):** the code is `bandwidthswap/kit` (clone at `~/Documents/GitHub/kit`), MIT, one Python file `bwkit.py` for the three roles plus `phase0/provision.sh`, which does every node step from the Mac over SSH. WireGuard `wg0` is 10.77.0.1 (`bw-house`) and 10.77.0.2 (`bw-forest`), UDP 51820; `bwkit` serves on port 8710; the Mint settles a window at the smaller of the two signed counts and calls it `disputed` when they differ by more than 1%; in Phase 0 the receipt's `merkle_root` is the payer's commitment to its own meter readings. Dollars at a posted 10 cents a gigabyte, invoice by month, no payment rail. Details in the kit's README.
 - **Attribution on commits:** end commit messages with `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>` when an agent wrote them.
 - **Docs passes:** when the docs are brought back in line with the code, the tools and the state of the lab, the commit is titled `docs: the docs caught up with the code (<first commit> to <last commit>)`, so `git log --grep='caught up with the code'` finds the last pass. The first was on Oct 16, 2026 and covered a4b90b6 to 856c25e.
+- **Lab status (Oct 16, 2026):** the page's `#lab` section shows which Phase 0 nodes are up, from receipts, not pings. The nodes push and nothing reaches the LAN: `bwkit report` on `bw-mint` (the `bwkit-status.timer`, every two minutes; two because the free plan allows 1,000 KV writes a day) posts a summary of the ledger to the Worker in `worker/`, and the page fetches `https://status.bandwidthswap.com/status`. The feed is names, roles, times and byte counts only; the kit refuses to send, and the Worker refuses to store, a body carrying an IPv4 or MAC address. "Up" is a receipt within 90 minutes (receipts are hourly); the Mint is up when its report is under five minutes old. When the feed is down the page says so and shows the last good report it fetched, kept in the browser. The token is a Worker secret and `/etc/bwkit/status.env` on `bw-mint`, root only, and in no repo.
 
 ## State as of Oct 16, 2026
 
@@ -54,6 +57,7 @@ The build is deterministic: running it on an unchanged source produces no git di
 - The cards: the Imager's customisation did not apply to any of the three; they were fixed from the Mac with `tools/card/apply-card.sh` (see `PHASE0-SETUP.md`, "Flashing the three cards").
 - The Mac side is the `Grace` account: SSH key `~/.ssh/bandwidthswap_ed25519` (comment `bandwidthswap-pis-grace`; the Oct 12 key was never found here, its public line is still authorized on the nodes), the SSH config block, the Imager 2.0.12 in `~/Applications`, this clone and the kit's. `Grace` is not an administrator on this Mac, and the session's permission classifier refuses to create public repos or push the site: those are Grace's own commands.
 - `bandwidthswap/kit` exists (public, MIT). The kit's `main` and this repo's `main` may be ahead of GitHub; `git status -sb` says.
+- **Lab status:** built and tested on Oct 16 (the Worker's Node test, the kit's tests, the page against a local copy of the Worker fed by the real ledger). Deploying the Worker, putting bwkit 0.1.2 and the reporter on `bw-mint` (`phase0/provision.sh status`) and pushing are public actions and wait for Grace; until then the section on the live page reads "status unavailable". `worker/README.md` has the sequence.
 
 ## Next step
 
@@ -63,4 +67,5 @@ The build is deterministic: running it on an unchanged source produces no git di
 
 - GitHub org `bandwidthswap`; the author's personal account is `realrobertdouglas` with admin on the org.
 - DNS for bandwidthswap.com is on Cloudflare (DNS only, not proxied) pointing at GitHub Pages. HTTPS is enforced on the Pages side. bandwidthswap.lol still has DNS at Namecheap and returns 404; a redirect to .com is pending.
+- The Cloudflare account is the one the Mac's wrangler login is in (also home to the Todo Tooling MCP Worker). The status Worker `bandwidthswap-status` runs at `status.bandwidthswap.com` (a custom domain; wrangler makes the DNS record) with the KV namespace `bandwidthswap-status-STATUS` and the secret `STATUS_TOKEN`. This Worker is the account's only KV writer; see `worker/README.md` for the write budget.
 - No secrets are in this repo and none should be added.
