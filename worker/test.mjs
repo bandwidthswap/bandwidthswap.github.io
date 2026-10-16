@@ -22,15 +22,21 @@ const post = (body, token = env.STATUS_TOKEN, origin) => call('/status', {
   body: typeof body === 'string' ? body : JSON.stringify(body),
 });
 
+const win = (t_first, t_last, bytes, settled_bytes, disputed) => ({ t_first, t_last, bytes, settled_bytes, disputed });
 const report = {
-  v: 1, generated_at: 1792187273, bwkit: '0.1.2', phase: 0, window_s: 3600, service: true,
+  v: 1, generated_at: 1792187273, bwkit: '0.1.2', phase: 0, window_s: 3600, since: 1792185254, service: true,
   ledger: { receipts: 7, acks: 5, settlements: 5, disputed: 2, receipts_without_ack: 1, acks_without_receipt: 0 },
   nodes: [
-    { name: 'bw-house', role: 'payer', last_receipt: 1792186147, window_bytes: 2160, window_t_first: 1792186134, window_t_last: 1792186147, receipts: 7, windows: 5, disputed: 2 },
-    { name: 'bw-forest', role: 'hop', last_receipt: 1792186147, window_bytes: 5040, window_t_first: 1792186134, window_t_last: 1792186147, receipts: 5, windows: 5, disputed: 2 },
-    { name: 'bw-mint', role: 'mint', last_receipt: 1792186147, window_bytes: 2160, window_t_first: 1792186134, window_t_last: 1792186147, receipts: 12, windows: 5, disputed: 2 },
+    { name: 'bw-house', role: 'payer', last_receipt: 1792186147, window_bytes: 2160, window_t_first: 1792186134, window_t_last: 1792186147, receipts: 7, windows: 5, disputed: 2,
+      total_bytes: 65846000, history: [win(1792185254, 1792185266, 21950868, 1710, true), win(1792186134, 1792186147, 2160, 2160, false), win(1792186147, 1792188000, 8416, null, null)] },
+    { name: 'bw-forest', role: 'hop', last_receipt: 1792186147, window_bytes: 5040, window_t_first: 1792186134, window_t_last: 1792186147, receipts: 5, windows: 5, disputed: 2,
+      total_bytes: 43900000, history: [win(1792186134, 1792186147, 5040, 2160, false)] },
+    { name: 'bw-mint', role: 'mint', last_receipt: 1792186147, window_bytes: 2160, window_t_first: 1792186134, window_t_last: 1792186147, receipts: 12, windows: 5, disputed: 2,
+      total_bytes: 43900000, history: [win(1792186134, 1792186147, 2160, 2160, false)] },
   ],
 };
+const noHistory = { ...report, nodes: report.nodes.map(({ history, total_bytes, ...n }) => n) };
+delete noHistory.since;
 
 let r = await call('/status', { headers: { Origin: SITE } });
 check('GET before any report is 404', r.status === 404, r.status);
@@ -52,13 +58,25 @@ r = await post({ ...report, note: 'bw-mint is 192.168.0.61' });
 check('POST carrying an IPv4 address is 400', r.status === 400, r.status);
 r = await post({ ...report, note: 'b8:27:eb:6b:1b:09' });
 check('POST carrying a MAC address is 400', r.status === 400, r.status);
-r = await post({ ...report, pad: 'x'.repeat(17 * 1024) });
-check('POST over 16 KB is 413', r.status === 413, r.status);
+r = await post({ ...report, pad: 'x'.repeat(65 * 1024) });
+check('POST over 64 KB is 413', r.status === 413, r.status);
+r = await post({ ...report, nodes: [{ ...report.nodes[0], history: Array.from({ length: 49 }, (_, i) => win(i, i + 1, 1, 1, false)) }] });
+check('POST with a history of 49 windows is 400', r.status === 400, r.status);
+r = await post({ ...report, nodes: [{ ...report.nodes[0], history: [win(5, 4, 1, 1, false)] }] });
+check('POST with a window ending before it starts is 400', r.status === 400, r.status);
+r = await post({ ...report, nodes: [{ ...report.nodes[0], history: [{ t_first: 1, t_last: 2, bytes: '9', settled_bytes: null, disputed: null }] }] });
+check('POST with a string byte count is 400', r.status === 400, r.status);
+r = await post({ ...report, nodes: [{ ...report.nodes[0], total_bytes: -1 }] });
+check('POST with a negative total is 400', r.status === 400, r.status);
+r = await post({ ...report, since: 'yesterday' });
+check('POST with a bad since is 400', r.status === 400, r.status);
 r = await call('/status', { headers: { Origin: SITE } });
 check('nothing was stored by the refused posts', r.status === 404, r.status);
 
+r = await post(noHistory);
+check('a POST from an older reporter, without history, is 200', r.status === 200, r.status);
 r = await post(report);
-check('a good POST is 200', r.status === 200, r.status);
+check('a good POST with history is 200', r.status === 200, r.status);
 const posted = await r.json();
 check('…and answers with received_at', Number.isInteger(posted.received_at) && posted.stored === true);
 
@@ -66,6 +84,7 @@ r = await call('/status', { headers: { Origin: SITE } });
 check('GET after the post is 200', r.status === 200, r.status);
 const got = await r.json();
 check('…returns the report with received_at added', got.generated_at === report.generated_at && got.received_at === posted.received_at && got.nodes.length === 3);
+check('…history and totals intact', got.nodes[0].history.length === 3 && got.nodes[0].history[2].settled_bytes === null && got.nodes[0].total_bytes === 65846000 && got.since === report.since);
 check('…with CORS for https://bandwidthswap.com', r.headers.get('Access-Control-Allow-Origin') === SITE);
 check('…and a short cache', r.headers.get('Cache-Control') === 'public, max-age=30');
 r = await call('/status', { headers: { Origin: 'https://example.com' } });

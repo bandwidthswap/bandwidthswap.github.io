@@ -10,12 +10,14 @@
 //                  CORS for the site
 //   GET  /         one line of text
 //
-// A report is names and roles: node names, roles, times and byte counts. The
-// Worker refuses a body that carries an IPv4 or a MAC address, so a LAN detail
-// cannot leak through a careless reporter.
+// A report is names and roles: node names, roles, times and byte counts, and
+// per node a history of its last twelve hours' windows. The Worker refuses a
+// body that carries an IPv4 or a MAC address, so a LAN detail cannot leak
+// through a careless reporter.
 
 const KEY = 'status';
-const MAX_BODY = 16 * 1024;
+const MAX_BODY = 64 * 1024;
+const MAX_HISTORY = 48;
 const ROLES = new Set(['payer', 'hop', 'mint', 'peer']);
 const ORIGINS = new Set(['https://bandwidthswap.com', 'https://www.bandwidthswap.com']);
 const PRIVATE = [
@@ -58,15 +60,28 @@ async function sameToken(a, b) {
   return diff === 0;
 }
 
+const count = (v) => v === null || v === undefined || (Number.isInteger(v) && v >= 0);   // a byte count or a time, or none
+const flag = (v) => v === null || v === undefined || typeof v === 'boolean';
+
 // What a report must look like. Returns a reason, or null when it is fine.
 export function checkReport(report, text) {
   if (!report || typeof report !== 'object' || Array.isArray(report)) return 'the body must be a JSON object';
   if (!Number.isInteger(report.generated_at) || report.generated_at <= 0) return 'generated_at must be Unix seconds';
+  if (!count(report.since)) return 'since must be Unix seconds or null';
   if (!Array.isArray(report.nodes) || report.nodes.length < 1 || report.nodes.length > 16) return 'nodes must list 1 to 16 nodes';
   for (const n of report.nodes) {
     if (!n || typeof n !== 'object' || Array.isArray(n)) return 'each node must be an object';
     if (typeof n.name !== 'string' || !/^[a-z0-9][a-z0-9-]{0,31}$/.test(n.name)) return 'a node name is 1 to 32 of a-z, 0-9 and -';
     if (!ROLES.has(n.role)) return 'a node role is payer, hop, mint or peer';
+    if (!count(n.last_receipt) || !count(n.window_bytes) || !count(n.total_bytes)) return 'a node\'s times and byte counts are non-negative integers or null';
+    if (n.history !== undefined) {
+      if (!Array.isArray(n.history) || n.history.length > MAX_HISTORY) return 'a node\'s history is a list of at most ' + MAX_HISTORY + ' windows';
+      for (const w of n.history) {
+        if (!w || typeof w !== 'object' || Array.isArray(w)) return 'each window must be an object';
+        if (!Number.isInteger(w.t_first) || !Number.isInteger(w.t_last) || w.t_first < 0 || w.t_last < w.t_first) return 'a window has t_first <= t_last, in Unix seconds';
+        if (!Number.isInteger(w.bytes) || w.bytes < 0 || !count(w.settled_bytes) || !flag(w.disputed)) return 'a window has bytes, settled_bytes (or null) and a disputed flag (or null)';
+      }
+    }
   }
   for (const pat of PRIVATE) {
     if (pat.test(text)) return 'a report may not carry an address';

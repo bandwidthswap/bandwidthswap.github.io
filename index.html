@@ -76,9 +76,48 @@ figcaption{font-size:14px;color:var(--muted);margin-top:6px;max-width:65ch}
 .phases li{display:grid;grid-template-columns:90px minmax(0,1fr);gap:12px;padding:10px 0;border-top:1px dashed var(--line)}
 .phases .ph{font:600 13px/1.4 var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
 .phases .ph small{display:block;color:var(--muted);font:400 12px/1.3 var(--mono);text-transform:none;letter-spacing:0}
-.lab td.state{font:600 12px/1.3 var(--display);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
-.lab .up{color:var(--accent)}.lab .stale{color:var(--signal)}.lab .unknown{color:var(--muted)}
-.lab .note{font:400 13px/1.5 var(--mono);color:var(--muted);margin:-6px 0 16px;max-width:none}
+/* Lab status: a map of the bench over its ledger. Cards, lines and bars are plain elements, so the tokens apply in both themes. */
+.lab-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px 24px;flex-wrap:wrap}
+.lab-head>div{min-width:0;flex:1 1 420px}
+.lab-sum{margin:6px 0 0;text-align:right;font:500 12px/1.6 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);white-space:nowrap;max-width:none}
+.lab-sum .m{color:var(--muted)}.lab-sum.off{color:var(--signal)}
+.lab-map{position:relative;height:300px;margin:4px 0 18px}
+.lab .node{position:absolute;width:200px;min-height:92px;box-sizing:border-box;padding:10px 14px;display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font:400 14px/1.35 var(--body)}
+.lab .node b{font:700 18px/1.2 var(--display)}
+.lab .node .st{font:500 11px/1.4 var(--mono);letter-spacing:.04em;color:var(--muted)}
+.lab .node .dot{width:14px;height:14px;border-radius:50%;flex:none;box-sizing:border-box;border:2px solid var(--muted)}
+.lab .node.up .dot{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 18%,transparent)}
+.lab .node.up .st{color:var(--accent)}
+.lab .node.stale .dot,.lab .node.down .dot{background:var(--signal);border-color:var(--signal)}
+.lab .node.stale .st,.lab .node.down .st{color:var(--signal)}
+.lab .node.house{left:0;top:20px}.lab .node.forest{right:0;top:20px}.lab .node.mint{left:50%;top:196px;width:260px;margin-left:-130px;border-color:var(--accent)}
+.lab .ln{position:absolute;background:var(--muted)}
+.lab .ln.tunnel{left:200px;right:200px;top:62px;height:6px;border-radius:3px;background:var(--accent)}
+.lab .ln.drop{top:112px;width:2px;height:130px}.lab .ln.drop.l{left:99px}.lab .ln.drop.r{right:99px}
+.lab .ln.arrow{top:241px;height:2px}.lab .ln.arrow.l{left:99px;right:calc(50% + 134px)}.lab .ln.arrow.r{right:99px;left:calc(50% + 134px)}
+.lab .head{position:absolute;top:237px;width:10px;height:10px;color:var(--muted)}.lab .head.l{right:calc(50% + 130px)}.lab .head.r{left:calc(50% + 130px);transform:scaleX(-1)}
+.lab .lbl{position:absolute;font:400 13px/16px var(--mono);color:var(--muted);text-align:center;white-space:nowrap}
+.lab .lbl.ta{left:200px;right:200px;top:38px;font-weight:500;color:var(--accent)}
+.lab .lbl.tb{left:200px;right:200px;top:78px}
+.lab .lbl.la{left:112px;top:169px;text-align:left}.lab .lbl.lb{right:112px;top:169px;text-align:right}
+.lab .pulse{position:absolute;left:95px;top:107px;width:10px;height:10px;border-radius:50%;background:var(--accent);opacity:0;pointer-events:none}
+.lab-ledger{display:grid;grid-template-columns:140px repeat(12,minmax(0,1fr));gap:6px;align-items:end;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px 12px;min-width:640px}
+.lab-ledger:empty{display:none}
+.lab-ledger .rl{height:64px;display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:0}
+.lab-ledger .rl b{font:700 16px/1.2 var(--display)}.lab-ledger .rl span{font:400 12px/1.3 var(--body);color:var(--muted)}.lab-ledger .rl .c{font:500 11px/1.4 var(--mono);color:var(--accent);letter-spacing:.04em}
+.lab-ledger .cell{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:flex-end}
+.lab-ledger .bar{width:100%;background:var(--accent);border-radius:3px 3px 0 0}
+.lab-ledger .bar.disputed{background:repeating-linear-gradient(45deg,var(--signal) 0 3px,var(--panel) 3px 6px);border:1px solid var(--signal);border-bottom:0;box-sizing:border-box}
+.lab-ledger .rl.m{height:48px}.lab-ledger .cell.m{height:48px;border-bottom:0;align-items:center;justify-content:center}
+.lab-ledger .pip{width:12px;height:12px;border-radius:50%;background:var(--accent)}
+.lab-ledger .pip.disputed{background:var(--panel);border:3px solid var(--signal);box-sizing:border-box}
+.lab-ledger .hl{font:400 11px/1.4 var(--mono);color:var(--muted);text-align:center}.lab-ledger .hl.now{color:var(--accent)}.lab-ledger .hl.first{text-align:left;white-space:nowrap}
+.lab-legend{display:flex;justify-content:space-between;gap:6px 24px;flex-wrap:wrap;font:400 12px/1.5 var(--mono);color:var(--muted);max-width:none;margin:0 0 14px}
+.lab-legend .sw{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:middle;background:repeating-linear-gradient(45deg,var(--signal) 0 2px,var(--panel) 2px 4px);border:1px solid var(--signal)}
+.lab-legend .up{color:var(--accent)}.lab-legend .stale{color:var(--signal)}
+.lab .note{font:400 13px/1.5 var(--mono);color:var(--muted);margin:10px 0 8px;max-width:none}
+@media (max-width:1000px){.lab-map{height:auto;display:flex;flex-direction:column;gap:10px}.lab .node,.lab .node.mint{position:static;width:100%;min-height:0;margin:0}.lab .node.house{order:1}.lab .lbl.ta{order:2}.lab .lbl.tb{order:3;margin-top:-6px}.lab .node.forest{order:4}.lab .node.mint{order:5}
+.lab .ln,.lab .head,.lab .pulse,.lab .lbl.la,.lab .lbl.lb{display:none}.lab .lbl.ta,.lab .lbl.tb{position:static;text-align:left;white-space:normal}.lab-sum{text-align:left}}
 .callout{border-left:3px solid var(--signal);padding:4px 0 4px 14px;margin:0 0 16px;max-width:65ch}
 .callout p{margin-bottom:8px}
 .contact{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 14px}
@@ -240,19 +279,31 @@ signed by payer</code></pre>
 </section>
 
 <section id="lab" class="lab">
-  <p class="eyebrow">Phase 0, on the bench</p>
-  <h2>Lab status</h2>
-  <p>Three Raspberry Pi 3 B boards on a bench, on one home network, running <a href="https://github.com/bandwidthswap/kit">the kit</a>. At the top of every hour <code>bw-house</code> signs a receipt for the bytes that crossed the tunnel, <code>bw-forest</code> acknowledges it with its own count, and <code>bw-mint</code> settles the window at the smaller of the two. Every two minutes the Mint posts a summary of its ledger; this table is that summary. Nothing on the bench accepts a connection from the internet.</p>
-  <div class="tablewrap"><table id="lab-table">
-    <thead><tr><th>Node</th><th>Role</th><th>Last receipt</th><th>Bytes, last window</th><th>State</th></tr></thead>
-    <tbody>
-      <tr data-node="bw-house"><td><code>bw-house</code></td><td>gateway, payer</td><td class="num">—</td><td class="num">—</td><td class="state unknown">no data</td></tr>
-      <tr data-node="bw-forest"><td><code>bw-forest</code></td><td>relay, hop</td><td class="num">—</td><td class="num">—</td><td class="state unknown">no data</td></tr>
-      <tr data-node="bw-mint"><td><code>bw-mint</code></td><td>Mint, ledger</td><td class="num">—</td><td class="num">—</td><td class="state unknown">no data</td></tr>
-    </tbody>
-  </table></div>
+  <div class="lab-head">
+    <div>
+      <p class="eyebrow">Phase 0, on the bench</p>
+      <h2>Lab status</h2>
+      <p>Three Raspberry Pi 3 B boards on a bench, on one home network, running <a href="https://github.com/bandwidthswap/kit">the kit</a>. At the top of every hour <code>bw-house</code> signs a receipt for the bytes that crossed the tunnel, <code>bw-forest</code> answers with its own count, and <code>bw-mint</code> settles the window at the smaller of the two. Every two minutes the Mint posts a summary of its ledger; the map and the ledger below are that summary. Nothing on the bench accepts a connection from the internet.</p>
+    </div>
+    <p class="lab-sum" id="lab-sum" aria-live="polite"><span class="k">loading</span><br><span class="m">status feed</span></p>
+  </div>
+  <div class="lab-map" id="lab-map" role="img" aria-label="bw-house and bw-forest joined by the WireGuard tunnel, both sending hourly receipts down to bw-mint, which settles each window at the smaller count">
+    <div class="node house" data-node="bw-house"><span class="dot"></span><span class="txt"><b>bw-house</b><br><span class="role">gateway, payer</span><br><span class="st">NO DATA</span></span></div>
+    <div class="node forest" data-node="bw-forest"><span class="dot"></span><span class="txt"><b>bw-forest</b><br><span class="role">relay, hop</span><br><span class="st">NO DATA</span></span></div>
+    <div class="node mint" data-node="bw-mint"><span class="dot"></span><span class="txt"><b>bw-mint</b><br><span class="role">settles at the smaller count</span><br><span class="st">NO DATA</span></span></div>
+    <div class="ln tunnel"></div>
+    <div class="lbl ta" id="lab-tunnel">WireGuard tunnel · — this window</div>
+    <div class="lbl tb" id="lab-total">— since the bench came up</div>
+    <div class="ln drop l"></div><div class="ln arrow l"></div><svg class="head l" viewBox="0 0 10 10" aria-hidden="true"><path d="M0 0L10 5L0 10z" fill="currentColor"/></svg>
+    <div class="ln drop r"></div><div class="ln arrow r"></div><svg class="head r" viewBox="0 0 10 10" aria-hidden="true"><path d="M0 0L10 5L0 10z" fill="currentColor"/></svg>
+    <div class="lbl la">signed receipt, hourly</div>
+    <div class="lbl lb">own count, hourly</div>
+    <span class="pulse" aria-hidden="true"></span>
+  </div>
+  <div class="tablewrap"><div class="lab-ledger" id="lab-ledger" role="table" aria-label="The ledger: one row per node, one column per hourly window of the last twelve hours"></div></div>
+  <p class="lab-legend"><span><span class="up">●</span> up: receipt within 90 min &nbsp; <span class="stale">●</span> stale &nbsp; <span class="sw"></span> disputed, settled at the smaller count</span><span>empty: no receipt · bars are log scale</span></p>
   <p class="note" id="lab-note" aria-live="polite">Loading the status feed…</p>
-  <noscript><p class="note">The table needs JavaScript. The feed itself is plain JSON at <a href="https://status.bandwidthswap.com/status">status.bandwidthswap.com/status</a>.</p></noscript>
+  <noscript><p class="note">The map and the ledger need JavaScript. The feed itself is plain JSON at <a href="https://status.bandwidthswap.com/status">status.bandwidthswap.com/status</a>.</p></noscript>
   <p>A node is <strong>up</strong> when the Mint has a receipt from it within the last 90 minutes (receipts are hourly); the Mint is up when its report is under five minutes old and its ledger service answers. A <strong>disputed</strong> window is one where the two signed counts differed by more than 1%; it settles at the smaller count, like every other window. The feed carries names, roles, times and byte counts, and nothing about the network the boards sit on.</p>
 </section>
 
@@ -319,41 +370,109 @@ signed by payer</code></pre>
   });
 })();
 (function(){
-  /* Lab status: fetch the Mint's report, draw it, keep the last good one in this browser for when the feed is away. */
+  /* Lab status: the map and the ledger from the Mint's report. The last good report is kept in this browser for when the feed is away. */
   var sec=document.getElementById('lab'); if(!sec||!window.fetch) return;
-  var SRC=sec.getAttribute('data-src')||'https://status.bandwidthswap.com/status', UP_S=90*60, MINT_S=5*60, KEY='bw.lab.status';
-  var ROLE={payer:'gateway, payer',hop:'relay, hop',mint:'Mint, ledger',peer:'peer'};
-  var note=document.getElementById('lab-note'), tbody=document.querySelector('#lab-table tbody');
-  function ago(t,now){var s=Math.max(0,now-t);if(s<60)return 'just now';var m=Math.round(s/60);if(m<90)return m+' min ago';var h=Math.round(s/3600);if(h<48)return h+' h ago';return Math.round(s/86400)+' d ago';}
+  var SRC=sec.getAttribute('data-src')||'https://status.bandwidthswap.com/status', UP_S=90*60, MINT_S=5*60, KEY='bw.lab.status', COLS=12, H=3600;
+  var ROLE={payer:'gateway, payer',hop:'relay, hop',mint:'settles at the smaller count',peer:'peer'};
+  var SUB={payer:'bytes signed',hop:'bytes counted',mint:'windows settled',peer:'no receipts yet'};
+  var FALLBACK=[{name:'bw-house',role:'payer'},{name:'bw-forest',role:'hop'},{name:'bw-mint',role:'mint'}];
+  var sum=document.getElementById('lab-sum'), note=document.getElementById('lab-note'), ledger=document.getElementById('lab-ledger');
+  var tunnel=document.getElementById('lab-tunnel'), total=document.getElementById('lab-total'), map=document.getElementById('lab-map');
+  var seen=null;
+  function pad2(n){return (n<10?'0':'')+n;}
+  function hm(t){var d=new Date(t*1000);return pad2(d.getHours())+':'+pad2(d.getMinutes());}
+  function hms(t){return hm(t)+':'+pad2(new Date(t*1000).getSeconds());}
   function when(t){return new Date(t*1000).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'});}
+  function tz(){try{var p=new Intl.DateTimeFormat(undefined,{timeZoneName:'short'}).formatToParts(new Date());for(var i=0;i<p.length;i++)if(p[i].type==='timeZoneName')return p[i].value;}catch(e){}return '';}
+  function ago(t,now){var s=Math.max(0,now-t);if(s<60)return 'just now';var m=Math.round(s/60);if(m<90)return m+' min ago';var h=Math.round(s/3600);if(h<48)return h+' h ago';return Math.round(s/86400)+' d ago';}
   function bytes(n){if(n==null)return '—';var u=['B','KB','MB','GB','TB'],i=0;while(n>=1000&&i<u.length-1){n/=1000;i++;}return (i?n.toFixed(2):String(n))+' '+u[i];}
   function plural(n,w){return n+' '+w+(n===1?'':'s');}
-  function row(name){
-    var tr=tbody.querySelector('tr[data-node="'+name+'"]');
-    if(!tr){tr=document.createElement('tr');tr.setAttribute('data-node',name);
-      tr.innerHTML='<td><code></code></td><td></td><td class="num"></td><td class="num"></td><td class="state"></td>';
-      tr.firstChild.firstChild.textContent=name;tbody.appendChild(tr);}
-    return tr;
+  function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+  function stateOf(n,rep,now){
+    if(!n||!rep)return 'nodata';
+    if(n.role==='mint')return (now-rep.generated_at)>MINT_S?'stale':rep.service===false?'down':'up';
+    if(!n.last_receipt)return 'nodata';
+    return (now-n.last_receipt)<=UP_S?'up':'stale';
+  }
+  function card(name,n,rep,now){
+    var c=sec.querySelector('.node[data-node="'+name+'"]');
+    if(!c){c=el('div','node');c.setAttribute('data-node',name);c.innerHTML='<span class="dot"></span><span class="txt"><b></b><br><span class="role"></span><br><span class="st"></span></span>';c.querySelector('b').textContent=name;map.appendChild(c);}
+    var st=stateOf(n,rep,now), word={up:'UP',stale:'STALE',down:'LEDGER DOWN',nodata:'NO DATA'}[st];
+    c.classList.remove('up','stale','down','nodata');c.classList.add(st);
+    if(n&&ROLE[n.role])c.querySelector('.role').textContent=ROLE[n.role];
+    var s=c.querySelector('.st');
+    if(st==='nodata')s.textContent='NO DATA';
+    else if(n.role==='mint')s.textContent=word+' · REPORT '+hm(rep.generated_at);
+    else s.textContent=word+' · RECEIPT '+hm(n.last_receipt);
+    if(n&&n.last_receipt)c.title=(n.role==='mint'?'last ledger entry ':'last receipt reached the Mint ')+when(n.last_receipt);else c.removeAttribute('title');
+    return st;
+  }
+  function buckets(n){
+    var b={};(n&&n.history||[]).forEach(function(w){
+      if(!w||typeof w.t_last!=='number')return;
+      var k=Math.floor(w.t_last/H), o=b[k]||(b[k]={bytes:0,settled:0,disputed:false,count:0,anySettled:false});
+      o.bytes+=w.bytes||0;o.count++;
+      if(w.settled_bytes!=null){o.settled+=w.settled_bytes;o.anySettled=true;}
+      if(w.disputed===true)o.disputed=true;
+    });return b;
+  }
+  function drawLedger(rep,now){
+    var nodes=rep&&rep.nodes&&rep.nodes.length?rep.nodes:FALLBACK, last=Math.floor(now/H), first=last-(COLS-1);
+    var per=nodes.map(buckets), max=0;
+    nodes.forEach(function(n,i){if(n.role!=='mint')for(var k in per[i])if(per[i][k].bytes>max)max=per[i][k].bytes;});
+    ledger.textContent='';
+    nodes.forEach(function(n,i){
+      var isMint=n.role==='mint', rl=el('div','rl'+(isMint?' m':''));
+      rl.appendChild(el('b',null,n.name));rl.appendChild(el('span',null,SUB[n.role]||n.role));
+      if(n.receipts!=null)rl.appendChild(el('span','c',(isMint?plural(n.windows||0,'window'):plural(n.receipts,'receipt')).toUpperCase()));
+      ledger.appendChild(rl);
+      for(var k=first;k<=last;k++){
+        var o=per[i][k], cell=el('div','cell'+(isMint?' m':'')), label=hm(k*H)+' window';
+        if(o&&isMint&&o.anySettled){
+          cell.appendChild(el('span','pip'+(o.disputed?' disputed':'')));
+          cell.title=label+': settled '+bytes(o.settled)+(o.disputed?', disputed':'')+(o.count>1?' ('+o.count+' windows)':'');
+        }else if(o&&!isMint&&o.bytes>0){
+          var bar=el('div','bar'+(o.disputed?' disputed':''));
+          bar.style.height=Math.max(3,Math.round(60*Math.log(o.bytes+1)/Math.log(max+1)))+'px';
+          cell.appendChild(bar);
+          cell.title=label+': '+bytes(o.bytes)+(n.role==='hop'?' counted':' signed')+(o.anySettled?', settled '+bytes(o.settled):', not settled')+(o.disputed?', disputed':'')+(o.count>1?' ('+o.count+' windows)':'');
+        }else cell.title=label+': no receipt';
+        ledger.appendChild(cell);
+      }
+    });
+    ledger.appendChild(el('div','hl first','last 12 h, '+tz()));
+    for(var k=first;k<=last;k++)ledger.appendChild(el('div','hl'+(k===last?' now':''),pad2(new Date(k*H*1000).getHours())));
+  }
+  function pulse(){
+    var dot=sec.querySelector('.pulse'), mint=sec.querySelector('.node.mint');
+    if(!dot||!dot.animate||getComputedStyle(dot).display==='none')return;
+    if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    var dx=mint.getBoundingClientRect().left-map.getBoundingClientRect().left-100;
+    dot.animate([{transform:'translate(0,0)',opacity:0},{transform:'translate(0,20px)',opacity:1,offset:.15},{transform:'translate(0,130px)',opacity:1,offset:.5},{transform:'translate('+(dx-6)+'px,130px)',opacity:1,offset:.95},{transform:'translate('+dx+'px,130px)',opacity:0}],{duration:1800,easing:'ease-in-out'});
   }
   function draw(rep,now,fetched){
-    var fresh=(now-rep.generated_at)<=MINT_S;
-    rep.nodes.forEach(function(n){
-      var c=row(n.name).children, st;
-      c[1].textContent=ROLE[n.role]||n.role;
-      if(n.last_receipt){c[2].textContent=ago(n.last_receipt,now);c[2].title=when(n.last_receipt);}else{c[2].textContent='none yet';c[2].removeAttribute('title');}
-      c[3].textContent=bytes(n.window_bytes);
-      if(n.window_t_first)c[3].title='window '+when(n.window_t_first)+' to '+when(n.window_t_last);
-      if(n.role==='mint')st=!fresh?'stale':rep.service===false?'ledger down':'up';
-      else if(!n.last_receipt)st='no data';
-      else st=(now-n.last_receipt)<=UP_S?'up':'stale';
-      c[4].textContent=st;c[4].className='state '+(st==='up'?'up':st==='no data'?'unknown':'stale');
-    });
-    var L=rep.ledger||{}, parts=[];
-    if(L.settlements!=null)parts.push(plural(L.settlements,'window')+' settled, '+L.disputed+' disputed');
-    if(L.receipts_without_ack)parts.push(plural(L.receipts_without_ack,'receipt')+' without an ack');
-    parts.push('reported '+ago(rep.generated_at,now));
-    if(fetched)parts.push('status feed unavailable right now; this is the last good report, fetched '+when(fetched));
+    var states={}, names={};
+    (rep&&rep.nodes&&rep.nodes.length?rep.nodes:FALLBACK).forEach(function(n){names[n.name]=n;states[n.name]=card(n.name,rep?n:null,rep,now);});
+    var all=Object.keys(states), up=all.filter(function(k){return states[k]==='up';}).length;
+    sum.classList.toggle('off',!rep||up<all.length);
+    sum.querySelector('.k').textContent=!rep?'status unavailable':up===all.length?(all.length===3?'all three up':'all '+all.length+' up'):up+' of '+all.length+' up';
+    sum.querySelector('.m').textContent=rep?'Mint report '+hms(rep.generated_at)+' '+tz():'no report';
+    var mint=names['bw-mint'], house=names['bw-house'], src=rep&&(mint&&mint.window_bytes!=null?mint:house);
+    tunnel.textContent='WireGuard tunnel · '+(src?bytes(src.window_bytes):'—')+' this window';
+    if(src&&src.window_t_first)tunnel.title='window '+when(src.window_t_first)+' to '+when(src.window_t_last)+(src===mint?', settled':', signed by bw-house');
+    total.textContent=(src&&src.total_bytes!=null?bytes(src.total_bytes):'—')+' since the bench came up';
+    if(rep&&rep.since)total.title='first ledger entry '+when(rep.since);
+    drawLedger(rep,now);
+    var L=rep&&rep.ledger||{}, parts=[];
+    if(!rep)parts.push('Status unavailable: the feed at status.bandwidthswap.com did not answer, and this browser has no earlier report to show.');
+    else{
+      if(L.settlements!=null)parts.push(plural(L.settlements,'window')+' settled, '+L.disputed+' disputed');
+      if(L.receipts_without_ack)parts.push(plural(L.receipts_without_ack,'receipt')+' without an ack');
+      parts.push('reported '+ago(rep.generated_at,now));
+      if(fetched)parts.push('status feed unavailable right now; this is the last good report, fetched '+when(fetched));
+    }
     note.textContent=parts.join(' · ');
+    if(rep&&house&&house.last_receipt){if(seen!==null&&house.last_receipt>seen)pulse();seen=house.last_receipt;}
   }
   function load(){
     fetch(SRC,{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(rep){
@@ -362,8 +481,7 @@ signed by payer</code></pre>
     }).catch(function(){
       var saved=null;try{saved=JSON.parse(localStorage.getItem(KEY));}catch(e){}
       var now=Math.floor(Date.now()/1000);
-      if(saved&&saved.report)draw(saved.report,now,saved.fetched);
-      else note.textContent='Status unavailable: the feed at status.bandwidthswap.com did not answer, and this browser has no earlier report to show.';
+      if(saved&&saved.report)draw(saved.report,now,saved.fetched);else draw(null,now,null);
     });
   }
   load();
