@@ -42,6 +42,7 @@ svg .x{stroke:var(--signal);stroke-width:3;fill:none}
 .map[data-state="dark"] .st-posted,.map[data-state="dark"] .st-built,.map[data-state="dark"] .st-normal,.map[data-state="dark"] .st-down{display:none}
 .flows th:first-child,.flows td:first-child{min-width:12ch}
 .flows td.txt{white-space:normal;min-width:16ch}
+figure.plan{margin-bottom:28px}
 .cond{padding-left:1.2em}
 .cond li{margin-bottom:8px}
 .cond strong{font-weight:600}
@@ -66,7 +67,73 @@ svg .x{stroke:var(--signal);stroke-width:3;fill:none}
   <p>Green arrows are data. Orange dashed arrows are money. They are dashed because the money moves after the bytes: in the pilot as an invoice at the end of the month, in the design as a payment channel. Every payment shown has already lost its five percent to the burn, and the burn is written beside it.</p>
 
   <h2>1. A street with three dishes</h2>
-  <p>Three houses on one street each have a satellite dish. Each sells a share of its connection to one neighbor: House 1 to House 1a over a wire, House 2 to House 2a over Wi-Fi, House 3 to House 3a over a 915 MHz radio that goes through trees at a few megabits a second. The three dish houses are also linked to each other, Wi-Fi between 1 and 2 and 915 MHz between 2 and 3, and each posts a small price for carrying a neighbor's traffic across that link. A Raspberry Pi at House 2 is the street's Mint. Every hour each paying house signs a receipt for the bytes it bought, the house that carried them countersigns, and both copies go to the Pi.</p>
+  <p>Three houses on one street each have a satellite dish, and each sells a share of its connection to one neighbor. The street looks like this.</p>
+
+  <figure class="map plan">
+    <div class="figwrap"><svg viewBox="0 0 760 340" role="img" aria-label="Three dish houses on a street, each linked to one dependent house by a wire, by Wi-Fi, or by a 915 MHz radio through trees; the dish houses are linked to each other by Wi-Fi and 915 MHz; a Raspberry Pi at House 2 is the street's Mint" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <g id="dish"><path d="M-9 0a9 9 0 0 1 18 0" fill="var(--panel)" stroke="var(--fg)" stroke-width="1.6"/><path d="M0 0v7" stroke="var(--fg)" stroke-width="1.6"/></g>
+        <g id="wifi" fill="none" stroke="var(--muted)" stroke-width="1.8"><path d="M-10 -2a14 14 0 0 1 20 0"/><path d="M-6 2a8 8 0 0 1 12 0"/><circle cx="0" cy="6" r="1.6" fill="var(--muted)" stroke="none"/></g>
+        <g id="tree" fill="none" stroke="var(--line)" stroke-width="2"><path d="M0 0l9-20 9 20z"/></g>
+      </defs>
+      <!-- the satellite and its beams -->
+      <g transform="translate(380 22)"><rect x="-8" y="-6" width="16" height="12" rx="2" fill="var(--panel)" stroke="var(--fg)" stroke-width="1.6"/><rect x="-30" y="-4" width="18" height="8" fill="var(--panel)" stroke="var(--fg)" stroke-width="1.6"/><rect x="12" y="-4" width="18" height="8" fill="var(--panel)" stroke="var(--fg)" stroke-width="1.6"/></g>
+      <text x="420" y="27" class="m">satellite · each dish 150 Mbps</text>
+      <g stroke="var(--line)" stroke-width="1.5" stroke-dasharray="2 4" fill="none"><path d="M372 30L158 86"/><path d="M380 30V86"/><path d="M388 30L602 86"/></g>
+      <!-- dish houses -->
+      <g id="h1" transform="translate(130 0)">
+        <path d="M-75 118L0 84l75 34v50h-150z" fill="var(--panel)" stroke="var(--line)" stroke-width="2"/><use href="#dish" x="42" y="100"/>
+        <text x="0" y="141" text-anchor="middle">House 1</text><text x="0" y="157" text-anchor="middle" class="sub">sells its dish at $0.10/GB</text>
+      </g>
+      <g transform="translate(380 0)">
+        <path d="M-75 118L0 84l75 34v50h-150z" fill="var(--panel)" stroke="var(--line)" stroke-width="2"/><use href="#dish" x="42" y="100"/>
+        <text x="0" y="141" text-anchor="middle">House 2</text><text x="0" y="157" text-anchor="middle" class="sub">sells its dish at $0.10/GB</text>
+      </g>
+      <g transform="translate(630 0)">
+        <path d="M-75 118L0 84l75 34v50h-150z" fill="var(--panel)" stroke="var(--line)" stroke-width="2"/><use href="#dish" x="42" y="100"/>
+        <text x="0" y="141" text-anchor="middle">House 3</text><text x="0" y="157" text-anchor="middle" class="sub">sells its dish at $0.10/GB</text>
+      </g>
+      <!-- street links between the dish houses -->
+      <path d="M205 130H305" stroke="var(--muted)" stroke-width="2" stroke-dasharray="6 5" fill="none"/><use href="#wifi" x="255" y="126"/>
+      <text x="255" y="149" text-anchor="middle" class="m">Wi-Fi</text><text x="255" y="165" text-anchor="middle" class="m">$0.02/GB</text>
+      <path d="M455 130q7-7 14 0t14 0 14 0 14 0 14 0 14 0 14 0" stroke="var(--muted)" stroke-width="2" fill="none"/>
+      <text x="505" y="149" text-anchor="middle" class="m">915 MHz</text><text x="505" y="165" text-anchor="middle" class="m">$0.02/GB</text>
+      <!-- the Mint at House 2 -->
+      <path d="M320 168V176" stroke="var(--signal)" stroke-width="2" fill="none"/>
+      <rect x="180" y="176" width="150" height="40" rx="4" class="box mint"/>
+      <text x="255" y="194" text-anchor="middle">Street Mint</text><text x="255" y="209" text-anchor="middle" class="sub">a Raspberry Pi at House 2</text>
+      <!-- links down to the dependents -->
+      <path d="M130 168V246" stroke="var(--fg)" stroke-width="3" fill="none"/>
+      <text x="118" y="230" text-anchor="end" class="m">wire · 1 Gbps</text>
+      <path d="M380 168V246" stroke="var(--muted)" stroke-width="2" stroke-dasharray="6 5" fill="none"/><use href="#wifi" x="380" y="200"/>
+      <text x="392" y="212" class="m">Wi-Fi · 200 Mbps</text>
+      <path d="M630 168q-7 8 0 16t0 16 0 16 0 16V246" stroke="var(--muted)" stroke-width="2" fill="none"/>
+      <use href="#tree" x="590" y="236"/><use href="#tree" x="648" y="226"/><use href="#tree" x="664" y="208"/>
+      <text x="618" y="190" text-anchor="end" class="m">915 MHz · 4 Mbps</text><text x="618" y="206" text-anchor="end" class="m">through trees</text>
+      <!-- dependents -->
+      <g transform="translate(130 0)">
+        <path d="M-50 262L0 238l50 24v48h-100z" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="0" y="284" text-anchor="middle">House 1a</text><text x="0" y="300" text-anchor="middle" class="sub">buys 30 GB a day</text>
+      </g>
+      <g transform="translate(380 0)">
+        <path d="M-50 262L0 238l50 24v48h-100z" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="0" y="284" text-anchor="middle">House 2a</text><text x="0" y="300" text-anchor="middle" class="sub">buys 30 GB a day</text>
+      </g>
+      <g transform="translate(630 0)">
+        <path d="M-50 262L0 238l50 24v48h-100z" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="0" y="284" text-anchor="middle">House 3a</text><text x="0" y="300" text-anchor="middle" class="sub">buys 10 GB a day</text>
+      </g>
+      <!-- legend -->
+      <g class="m" font-size="11">
+        <path d="M40 326h26" stroke="var(--fg)" stroke-width="3"/><text x="72" y="330" class="m">wire</text>
+        <path d="M120 326h26" stroke="var(--muted)" stroke-width="2" stroke-dasharray="6 5"/><use href="#wifi" x="133" y="322"/><text x="152" y="330" class="m">Wi-Fi</text>
+        <path d="M200 326q4-5 8 0t8 0 8 0 8 0" stroke="var(--muted)" stroke-width="2" fill="none"/><text x="238" y="330" class="m">915 MHz radio</text>
+        <use href="#dish" x="340" y="322"/><text x="354" y="330" class="m">satellite dish</text>
+        <text x="460" y="330" class="m">green outline: pays · grey outline: sells</text>
+      </g>
+    </svg></div>
+    <figcaption>Each dish house sells its connection at ten cents a gigabyte. The dish houses are also linked to each other, by Wi-Fi between 1 and 2 and by 915 MHz between 2 and 3, and each charges two cents a gigabyte to carry a neighbor's traffic across that link. Every hour each buying house signs a receipt for the bytes it bought, the house that carried them countersigns, and both copies go to the Pi at House 2.</figcaption>
+  </figure>
 
   <figure class="map" id="map1" data-state="normal">
     <fieldset class="switch" aria-controls="svg1"><legend>House 1's dish</legend>
