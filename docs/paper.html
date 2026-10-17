@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bandwidth Swap: A Peer-to-Peer Bandwidth Exchange</title>
-<meta name="description" content="Bandwidth Swap: A Peer-to-Peer Bandwidth Exchange. Version 0.3
+<meta name="description" content="Bandwidth Swap: A Peer-to-Peer Bandwidth Exchange. Version 0.4
 (draft).">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/latex.css@1.10.0/style.min.css">
 <style>
@@ -50,7 +50,7 @@ sup{font-size:.7em}
   <h1>Bandwidth Swap: A Peer-to-Peer Bandwidth Exchange</h1>
   <p class="authors">Robert Douglas and Chris Odom</p>
   <p class="affil"><a href="mailto:bandwidthswap@pm.me">bandwidthswap@pm.me</a></p>
-  <p class="date">October 17, 2026 · Version 0.3 (draft)</p>
+  <p class="date">October 17, 2026 · Version 0.4 (draft)</p>
 </header>
 <div class="abstract">
 <p>A marketplace measured in available bandwidth has the possibility of
@@ -111,17 +111,25 @@ claim to be tested rather than assumed: Section 9 says how.</p>
 <p>The pilot settles in dollars. A payer and a relay agree a posted
 price per unit of data, the relay carries the data in hourly windows,
 each window closes with signed receipts, a Mint settles the window from
-those receipts, and the Mint issues a monthly invoice. There is no token
-and no chain in the pilot. The receipt mechanism is what is being
-proved, and it does not need either.</p>
+those receipts, and the Mint issues a monthly invoice. The invoice
+period is a credit term: between a window’s settlement and the invoice’s
+payment the relay has lent the payer the window’s value, so a relay in
+the pilot lends for up to a month and an hour. The term is bounded by
+membership, and a payer that does not pay an invoice is out (Section 4).
+There is no token and no chain in the pilot. The receipt mechanism is
+what is being proved, and it does not need either.</p>
 <p>A token, if one is issued, is denominated and settled under the rules
 in force at the time, and only after there is paying traffic to
-denominate. Nothing in this paper depends on it. Where version 0.2 said
-that rewards were issued by the chain, they are not: nothing is minted
-for availability, uptime, or capacity, and there is no block reward.
-Mints are paid from a share of the settlement fee on the receipts they
-publish. The Network Steward is paid from the unrecoverable fee defined
-in Section 3.3.</p>
+denominate. Nothing in this paper depends on it. The question a token
+would answer, which unit two parties share, returns before that, at the
+first link between two settlement domains, and Appendix A.5 gives the
+three answers available there: a count both sides can make, a bookkeeper
+both sides believe, or a thing both sides can weigh, which is what a
+token would be. Where version 0.2 said that rewards were issued by the
+chain, they are not: nothing is minted for availability, uptime, or
+capacity, and there is no block reward. Mints are paid from a share of
+the settlement fee on the receipts they publish. The Network Steward is
+paid from the unrecoverable fee defined in Section 3.3.</p>
 <p>When a second party that does not trust the first joins the network,
 a settlement layer is chosen. The candidates are a second-layer chain
 with native payment channels, a hub model in which each party holds one
@@ -267,7 +275,10 @@ weeks. A node that has been alone that long is declined, its window is
 lost, and nothing is paid. Drift between sites has not been measured. On
 a link with a light time, the tolerance widens by the light time both
 ways and the drift expected since the last contact; it is a parameter of
-the link (Appendix A).</p>
+the link (Appendix A). The payer’s timestamp is a claim, checked by the
+hop against that tolerance. The time a Mint’s commitment gives a receipt
+is a record. A receipt’s acceptance rests on the claim; its durability
+rests on the record (Appendix A.5).</p>
 <h3 id="payment-windows">3.6 Payment windows</h3>
 <p>A payment window is one hour on the pilot’s links; on a link that
 exists only during contacts, it is the contact (Appendix A). Before the
@@ -276,6 +287,19 @@ where there is no payment rail, the lock is the invoice and the exposure
 is bounded by membership. A relay therefore never fronts more than one
 window of bandwidth on credit, and a payer who consumes a window and
 leaves forfeits what was locked.</p>
+<p>A window has two prices, and on the pilot’s links the second is zero.
+The first is the posted price per byte. The second is the carry: a price
+per unit of time that the window’s value stays locked before it settles,
+published by the relay as a parameter of the link (Appendix A.1). On a
+wire the wait is an hour and the posted price absorbs it; on a link
+whose window closes a day or a year after it opens, a price per byte is
+half a price, and the carry is the other half. The carry is also what an
+unused reservation pays (Section 5.1). A prepaid window whose contact
+never opens is refunded in full: the relay carried nothing and is paid
+nothing, as Section 3.3 requires, and the relay prices the risk of a
+contact that never comes into the carry on the windows that do settle,
+as maritime lenders priced the ship that did not come home into the rate
+on the ones that did (Appendix A.2).</p>
 <p>A window settles at the smaller of the two signed byte counts, the
 payer’s and the hop’s. When the two counts are within one percent of
 each other the window is recorded as settled; when they differ by more
@@ -355,7 +379,19 @@ settles. Anyone holding a receipt can prove that it was included, or
 that it was not, and a Mint whose summary is shown to omit or alter a
 receipt forfeits a greater share of its bond than the fee it collected
 for that summary. This is the only penalty a Mint faces, and it works
-with a single Mint, which is what the pilot has.</p>
+with a single Mint, which is what the pilot has. The commitment is also
+the only thing a second party can check its receipts against, so a Mint
+publishes one for every settlement period, in the pilot the Merkle root
+of each hour’s settlements in the status it already posts, and it does
+so before a second operator signs a receipt. The ledger is
+reconstructible from the parties’ signed copies alone: a Mint whose
+ledger is lost rebuilds it from them, and a Mint whose rebuilt ledger
+differs from its published commitment has signed its own conviction. In
+the pilot the Mint’s bond is held by nobody. It is the Mint’s standing
+with its members, and a member who can show an omission has one remedy,
+which is to leave with the signed copies and the proof. That is the
+smallest case of the enforcement in Appendix A.5, not an absence of
+it.</p>
 <p>A Mint is compensated by a share of the settlement fee on the
 receipts it publishes. There is no block reward and no election. Version
 0.2 carried both from version 0.1, together with a committee of five
@@ -369,7 +405,9 @@ offline or inconsistent collecting nothing for that summary. Until then,
 a Mint’s bond is set by the membership. A Mint settles the links of one
 settlement domain; where a link crosses domains, the Mints on each side
 reconcile their published commitments whenever a link between them
-allows (Appendix A).</p>
+allows (Appendix A). A settlement domain is a bookkeeper, not a
+currency: two Mints that keep their books in the same unit are two
+domains, and one Mint that settles links in two units is one.</p>
 <p>User software queries the receipt graph that Mints aggregate for
 available routes, which reduces the cost of route calculation for users
 and removes from Mints the ability to discriminate among them.</p>
@@ -395,7 +433,16 @@ route privacy exists. Relay service is between members only.</p>
 that price governs every payment made to it. The opportunity-cost figure
 of the next paragraph is not a price; it is used only to divide a
 Steward purchase among the relays on a path. In the pilot the posted
-price is ten cents a gigabyte.</p>
+price is ten cents a gigabyte. The posted price is in the link’s unit
+(Appendix A.1), and on a link with a delay it is accompanied by the
+carry (Section 3.6).</p>
+<p>A relay that is the only way across a gap earns the whole route. That
+is the incentive to build where nothing exists, and for as long as it is
+the only way it is also a monopoly: nothing in the protocol bounds its
+price but the cost of the next bridge. The protocol does not prevent
+that, and nothing could. What it does is keep the second bridge always
+fundable: anyone may build one, and a purchase commitment on a route
+(Section 5.1) is a bid against the first bridge’s toll.</p>
 <p><strong>Route purchases.</strong> The Network Steward buys bandwidth
 on links it wants to exist, by defining a clear start point and endpoint
 and matching the receipts that bonded payers have already settled on
@@ -439,8 +486,11 @@ price; a number of windows; a deadline; and, optionally, a proving
 allowance. Its value is escrowed with the poster’s Mint, which is the
 prepayment of Section 3.6 made in bulk, and it is announced on the
 gossip layer like any announcement (Section 6). Any relay, or chain of
-relays, that serves the route carries the poster’s windows and
-collects.</p>
+relays, that serves the route carries the poster’s windows and collects.
+A commitment whose route crosses into another settlement domain is paid
+on the far side at the bridge relay’s rate (Appendix A.5), so its
+premium buys what the bridge’s price says it buys and not what the
+poster’s unit says.</p>
 <p>A committed window settles as every window does, at the smaller of
 the two signed counts, and then the Mint applies one more rule. At or
 above the minimum, the relay is paid the posted price and the full
@@ -450,9 +500,10 @@ of that window’s premium returns to the poster. The rate is the
 receipt’s byte count over the payer’s first and last timestamps; nothing
 new is measured, and a shortfall is resolved from the receipts alone.
 The posted price on committed windows is the poster’s to lose whether or
-not the poster sends, as a reservation is. Whether an unused reservation
-pays the relay anything is a term of the commitment, and the default is
-that it does not.</p>
+not the poster sends, as a reservation is. An unused reservation pays
+the relay the link’s carry for the window (Section 3.6) and nothing
+else: the carry is the price of holding the window’s value, and on the
+pilot’s links it is zero, so the pilot’s default stands.</p>
 <p><strong>Proving.</strong> Validators do not probe (Section 3.8), so a
 route is shown to be open by being used. A commitment may carry a
 proving allowance: the escrow reimburses the posted price of up to a
@@ -468,7 +519,12 @@ else.</p>
 open the only way the protocol can: it guarantees that carrying traffic
 across it is paid at the premium, and its proving allowance guarantees a
 minimum of traffic. A pipe nobody uses earns nothing, and a relay that
-lets it go dark stops earning when the receipts stop.</p>
+lets it go dark stops earning when the receipts stop. A pipe is also how
+a community retires a toll: it is the users of a sole bridge paying its
+owner in advance and for good instead of paying the toll forever, and in
+return the relay that accepts a pipe fixes its posted price on that
+route for as long as the pipe pays. That is what it gives up, and it is
+the only thing a pipe can ask of a monopoly.</p>
 <p><strong>Places.</strong> A commitment may name a place instead of a
 far node, to pay for people being served there. It cannot buy presence.
 Nothing in Section 3 can tell a hotspot in the square from the same box
@@ -641,6 +697,15 @@ one hop. Any subsidy, since there is no Steward. Any adversary, since
 one person operates all three nodes. It showed that the receipt
 mechanism works between machines that are not trusted to agree, which is
 the part a whitepaper cannot show on paper.</p>
+<p><strong>What Phase 0 does next.</strong> Two tests that Section 4
+depends on, and that Phase 2 needs before a second operator signs
+anything, have not run: rebuild the Mint’s ledger from the payer’s and
+the hop’s signed copies alone, and publish each hour’s Merkle commitment
+in the status the Mint already posts. The installations beyond the
+bench, from a neighbor across a valley to a link between stars, can be
+emulated on the same three boards with a delay on the tunnel and a
+schedule for the link; what each would show is set down in the project’s
+notes on example installations, and none of it has run.</p>
 <p><strong>Phase 1</strong> replaces the bench cable between the gateway
 and the relay with a radio link and moves receipts and liveness onto a
 low-rate control channel. Its test is to cut the gateway’s connection to
@@ -649,7 +714,7 @@ connection returns, which is the claim in Section 1. <strong>Phase
 2</strong> puts the relay outdoors on its own power and, with it, a
 second operator who is not the authors, which is the success criterion
 above.</p>
-<h2 id="what-version-0.3-leaves-open">10. What version 0.3 leaves
+<h2 id="what-version-0.4-leaves-open">10. What version 0.4 leaves
 open</h2>
 <ul>
 <li><strong>Whether a bounded subsidy moves anyone.</strong> With
@@ -680,20 +745,42 @@ replacement by bond age and diversity.</li>
 Carrying third-party traffic for the public internet raises liability
 the paper does not address, and is not in the pilot.</li>
 <li><strong>The token</strong>, its status, and the Steward’s legal
-form, all deferred until there is traffic to denominate, and all to be
-reviewed with counsel against the rules in force then.</li>
+form, deferred until there is traffic to denominate, and all to be
+reviewed with counsel against the rules in force then. The unit question
+itself returns earlier, at the first bridge between domains, and
+Appendix A.5 names the three answers; which one a given bridge uses is
+the bridge’s to announce.</li>
 <li><strong>Clock drift between sites</strong>, measured once the relay
 leaves the bench.</li>
-<li><strong>Reconciliation between Mints</strong> in different
-settlement domains, and the price of custody across a contact that may
-never come (Appendix A).</li>
+<li><strong>The levels.</strong> Version 0.4 says what the carry is for,
+what custody costs and what a bridge relay’s two bonds do; it does not
+know the numbers. How large the bonds must be relative to what a bridge
+earns, and the carry at which a prepaid window on a contact that may
+never come is worth opening, are set by the membership until a link with
+a real delay has settled enough windows to say.</li>
+<li><strong>The reconciliation wire format</strong> between Mints
+(Appendix A.5): what it carries and what it is for are stated, how it is
+encoded is not.</li>
 <li><strong>Whether proving allowances attract real testers</strong>
-(Section 5.1), or only a relay’s second identities; and what an unused
-reservation should pay, if anything.</li>
+(Section 5.1), or only a relay’s second identities.</li>
 <li><strong>Payers at a place.</strong> Whoever connects at an access
 point has to be a payer with a NYM, or the poster pays on their behalf
 through the commitment. That is an application as much as a rule, and it
 is the Phase 2 work.</li>
+<li><strong>Readmission.</strong> Appendix A.5 says an excluded domain
+may return once it reconciles and burns what it owed. Who decides that
+it has, when there is no committee, is governance (Section 8), and the
+pilot has none.</li>
+<li><strong>The lifetime of a receipt.</strong> A link names its
+signature scheme and how long a receipt stays presentable (A.1), and
+reconciliation deposits each Mint’s commitments with the others (A.5).
+What a Mint does with a receipt presented after its lifetime, and how a
+network moves every link to a stronger scheme before the old one breaks,
+are not written.</li>
+<li><strong>The horizon for institutions.</strong> Appendix A.7 puts a
+payer’s horizon at the payer’s life. What the protocol does with a
+window whose payer’s Mint outlives the payer is the question every
+estate has had to answer, and the paper has not.</li>
 </ul>
 <h2 id="appendix-a.-links-with-delay">Appendix A. Links with delay</h2>
 <p>The protocol has no constants. The hour, the five seconds, the one
@@ -706,17 +793,21 @@ end is years away; the differences are numbers, and the thing that
 proves delivery is the same two signatures on every link.</p>
 <p><strong>A.1 Link parameters.</strong> For each link it offers, a
 relay publishes: the one-way light time of the link; its contact plan,
-which is when the link exists, for how long, and the bytes it expects to
-carry in each contact; its posted price per byte; its clock tolerance;
-the kind of window it accepts, an hour, a contact, or a transmission;
-its medium and range class, a wire, a point-to-point radio, LoRa, or a
-short-range hotspot; and the settlement domain it settles in, which is
-the Mint that holds its bond. A payer that opens a window accepts those
-parameters for that window. Nothing in them is trusted for payment. The
-receipt graph records what each announced contact actually settled, and
-a relay whose contacts persistently settle less than it announced ranks
-below one whose contacts match, exactly as Section 6 ranks announcements
-on a continuous link.</p>
+which is when the link exists, for how long, the bytes it expects to
+carry in each contact, and how long it holds a bundle between contacts;
+its posted price per byte and the unit it is posted in; its carry, the
+price per unit of time that a window’s value stays locked (Section 3.6);
+its clock tolerance; the kind of window it accepts, an hour, a contact,
+or a transmission; its medium and range class, a wire, a point-to-point
+radio, LoRa, or a short-range hotspot; the signature scheme its receipts
+use and how long a receipt stays presentable to a Mint; and the
+settlement domain it settles in, which is the Mint that holds its bond.
+A payer that opens a window accepts those parameters for that window.
+Nothing in them is trusted for payment. The receipt graph records what
+each announced contact actually settled, and a relay whose contacts
+persistently settle less than it announced ranks below one whose
+contacts match, exactly as Section 6 ranks announcements on a continuous
+link.</p>
 <p><strong>A.2 Windows and custody.</strong> On a link with a contact
 plan the window is the contact: it opens when the link does, closes when
 it does, and the receipt is per contact. The window is prepaid (Section
@@ -728,6 +819,16 @@ transfer from the core of its bundle protocol for want of a way to make
 it reliable; this is that mechanism with the reason to accept custody
 attached. A relay accepts the bundle because the next contact’s window
 is already paid for.</p>
+<p>Three things make custody a term rather than a hope. The relay
+countersigns the bundle when it takes custody, a custody receipt in the
+format of Figure 2 with its own count, so that a bundle lost between
+contacts is a loss on paper and slashable. The contact plan says how
+long the relay holds a bundle before it may drop it, and that term is
+part of the price. And a prepaid window whose contact never opens is
+refunded in full, with the risk priced into the carry on the windows
+that settle (Section 3.6): the relay that held a bundle for a contact
+that never came has earned nothing on it, as Section 3.3 requires, and
+has earned the carry on every window that did.</p>
 <p><strong>A.3 Clocks.</strong> The tolerance of Section 3.5 is a link
 parameter: the base tolerance, plus the link’s light time both ways,
 plus the drift expected since the last contact. The relay’s check
@@ -739,29 +840,84 @@ the conditional payment of Section 3.2 applies, with lock timeouts no
 shorter than the route’s round trip. Above it, windows are prepaid and
 no lock is used: a lock that must run for days ties a relay’s capital to
 a timer, and a prepaid window bounded by the payer’s bond does the same
-work without one. The pilot is already on the prepaid side of that
-line.</p>
+work without one, for security. For cost it moves the lender from the
+relay to the payer: under a lock the relay lends for the round trip,
+under a prepaid window the payer lends for the contact, and the carry
+(Section 3.6) is where that cost is written on either kind of link. The
+pilot is already on the prepaid side of that line.</p>
 <p><strong>A.5 Settlement domains.</strong> A Mint settles the links of
-its domain, in practice a world. A relay on a link between two domains
-posts a bond with the Mint on each side, and a dispute on that link is
-resolved by either Mint from the two receipts, since the rule of Section
-3.6 needs no other input. Mints reconcile their published commitments
-(Section 4) whenever a link between them exists. A Mint whose
-commitments do not reconcile, or that has burned less than Section 3.3
-requires, is slashable by the other from its own publications. The burn
-is enforced by the settling Mint and audited at reconciliation; the
-reconciliation protocol itself is open (Section 10).</p>
+its domain. A domain is a bookkeeper, not a currency, and in practice a
+world. A relay on a link between two domains posts a bond with the Mint
+on each side, and a dispute on that link is resolved by either Mint from
+the two receipts, since the rule of Section 3.6 needs no other
+input.</p>
+<p><em>Units.</em> Each link’s prices, bonds and escrows are amounts in
+the unit its announcement names (A.1). The burn, the subsidy bound and
+the smaller-count rule are two ratios and a count, and cross a domain
+unchanged: the Sybil condition of Section 3.3 holds on a link between
+worlds without anyone converting anything. A relay bonded on both sides
+of a bridge holds value in two units and earns in both. Its two bonds
+are an exchange position, and the prices it posts on each side embed the
+rate between the domains, so a payer reading a bridge price is reading
+an exchange rate, and a commitment that crosses a bridge is priced by it
+(Section 5.1). Where two domains share no unit, the bridge counts bytes
+each way and the two Mints net the counts at reconciliation.</p>
+<p><em>Reconciliation.</em> Mints reconcile their published commitments
+(Section 4) whenever a link between them exists, and reconciliation does
+three things. It is a check: a Mint whose commitments do not reconcile,
+or that has burned less than Section 3.3 requires, is shown to have done
+so from its own publications. It is a deposit: each Mint includes the
+other’s latest commitment in its own, so that a receipt settled on one
+side is timestamped on the other, and a Mint that disappears leaves its
+register with the rest. And it is traffic: commitments cross a bridge in
+windows at the bridge’s posted price like any other bytes, so a bridge
+that withholds reconciliation has declined a window, which is on the
+record and governed by the sending Mint’s count, and a bridge that is
+the only path between two domains cannot hold their audits hostage
+without being seen to.</p>
+<p><em>Exclusion.</em> Across domains a Mint shown to have cheated is
+not slashed, because no other Mint can reach its bond. It is excluded:
+the honest Mint publishes the proof where any payer can find it before
+opening a window, stops reconciling, and slashes any relay bonded on its
+side that keeps settling with the condemned Mint. The bridge relays,
+bonded on both sides, carry the penalty at once. That is what their two
+bonds are for, and the membership sets them large enough that a bridge
+would rather lose one Mint than both. The penalty is worth the
+discounted value of every future reconciliation, which is much where
+reconciliation is daily and little where it is years, and on the longest
+links the two-sided bond carries the whole weight. A domain excluded for
+a proven fault may be readmitted when it has published a commitment that
+reconciles with the rest and burned what it owed; a network that polices
+by closing doors has to be able to open them, or it is a cartel. The
+reconciliation protocol’s wire format is open (Section 10). What it
+carries and what it is for are not.</p>
 <p><strong>A.6 Route discovery.</strong> A route between domains is not
 discovered; it is computed from the contact plans, as delay-tolerant
 networks compute routes from a contact graph, and ranked by what each
 relay settled in past contacts. A relay’s announcement therefore says
 when it will be reachable, not whether it is. Liveness has no meaning on
 such a link, and earns nothing on any link.</p>
-<p><strong>A.7 What this does not change.</strong> What the protocol
-rewards: bytes a payer signed for and a relay carried. What it refuses
-to pay for: everything else. What proves delivery: two signatures on one
-receipt. Distance changes how long it takes to make one, not what it
-is.</p>
+<p><strong>A.7 What this does not change, and where it stops.</strong>
+What the protocol rewards: bytes a payer signed for and a relay carried.
+What it refuses to pay for: everything else. What proves delivery: two
+signatures on one receipt. Distance changes how long it takes to make
+one, not what it is, for as long as the route’s round trip is inside the
+payer’s horizon, the time the payer will still be there to receive the
+closed receipt. Inside the horizon the payer is the party that wanted
+the bytes, and the receipt tells it they came, which is the whole of
+Section 3.2. Past it the party that wanted the bytes cannot have paid,
+since the payment would have to precede the delivery by more than a
+lifetime. The sender pays, the recipient receives a gift, and the
+protocol is a sound way for an institution to pay relays per link toward
+silence, which is honest and is not a proof of anything to the party
+that wanted the bytes. The horizon is a property of the payer, not of
+the link. For a person it is a few decades of round trip, which puts the
+Moon, Mars and the nearest star inside it; for an institution it is the
+institution’s life. On a link past a payer’s horizon the window is
+opened by the sender, two-way traffic is two one-way ledgers, and the
+Mints net them at reconciliation (A.5). The Sybil condition of Section
+3.3 holds on both sides of the horizon, because the burn is a ratio and
+the payer’s loss is certain whoever the payer is.</p>
 <section id="footnotes" class="footnotes footnotes-end-of-document"
 role="doc-endnotes">
 <hr />
