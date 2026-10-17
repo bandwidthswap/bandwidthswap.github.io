@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="What the Bandwidth Swap protocol pays for, what it refuses to pay for, and what three computers on a bench showed about it. A field note from Bandwidth Swap.">
+<title>The Receipt Is the Proof · Bandwidth Swap</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="notes.css">
+</head>
+<body>
+
+<header class="masthead"><div class="wrap">
+  <p class="brand"><a href="../">Bandwidth<span>Swap</span></a></p>
+  <p class="tag">A bandwidth market where the payment is the proof.</p>
+  <p class="status">Field notes · Oct 2026</p>
+</div></header>
+
+<div class="wrap">
+<article>
+  <p class="eyebrow"><a href="./">Field notes</a></p>
+  <h1>The Receipt Is the Proof</h1>
+  <p class="meta">October 17, 2026 · about 6 minutes · what the protocol pays for, what it refuses to pay for, and what three computers on a bench showed</p>
+
+  <h2>What a network rewards is what it becomes</h2>
+  <p>Every protocol is a job offer. It names one thing it will pay for, and the network that grows around it is the network of people doing that thing, whatever the authors hoped the thing would be.</p>
+  <p>The 2021 version of Bandwidth Swap offered to pay for a report. Once a minute each node told a validator its uptime and its available bandwidth, and the validator wrote the report down. It would have built a network of nodes that were very good at reporting. Not one byte had to move for a node to be paid, and no customer had to want it to.</p>
+  <p>That is the trap most "proof of" networks fall into. Proof of storage can be faked by a disk that answers challenges and holds nothing else. Proof of coverage can be faked by a radio in a closet. The faking is not a bug in the code. It is the code working as written, paying for the thing it measures instead of the thing it wants.</p>
+  <p>So the 2026 revision asks a narrower question. Not "is this node up?" but "did someone who could not be fooled pay for bytes that arrived?" Everything the protocol rewards, and everything it refuses to, follows from that one sentence.</p>
+
+  <h2>It pays for exactly one thing</h2>
+  <p>A relay earns a share of a settled fee, and nothing else. A fee settles when the person who paid for the bytes and the relay that carried them have both signed for how many crossed, and a Mint, which is a bookkeeper and not a judge, has written the window down.</p>
+  <p>Here is a window as it runs in the lab today. At the top of every hour the payer reads how many bytes went through the tunnel, signs a receipt for them, and asks the relay to acknowledge. The relay checks the signature, checks the payer's clock, and countersigns with its own count. Both copies go to the Mint. If the two counts are within one percent, the window settles. If they are not, the Mint records a dispute and settles anyway, at the smaller count. Nobody is asked who is right. The smaller number is paid, because each side can only lower the number the other side gets, and neither gains by doing it.</p>
+  <p>Three things fall out of that rule that the 2021 design could not have:</p>
+  <ul>
+    <li><strong>Only the party who was waiting for the bytes can create the proof.</strong> A relay cannot write itself a receipt; it needs the payer's key.</li>
+    <li><strong>A relay cannot inflate what it carried.</strong> The byte count is bound to a commitment the payer made, and the window settles at the payer's count regardless.</li>
+    <li><strong>Speed is paid without being proven.</strong> A fast relay settles more bytes an hour than a slow one and earns more. Nobody measures it; the market does.</li>
+  </ul>
+  <p>The paper's phrase for this is that the payment is the proof. Delivery, demand and quality, the three questions any bandwidth network has to answer, collapse into one receipt from one party who had no reason to lie.</p>
+
+  <h2>What it refuses to pay for</h2>
+  <p>The cleverness is less in what the protocol pays than in what it makes unprofitable. Each of these is a way to earn without serving a customer, and each costs more than it returns.</p>
+  <p><strong>Paying yourself.</strong> The obvious attack on a network that pays for traffic is to run both ends and send traffic to yourself all day. Bandwidth Swap makes that a loss by burning five percent of every fee. An operator who runs the payer, the relay and the Mint still loses five cents of every dollar it pays itself, and no rule anywhere pays it more than a dollar back. The paper states the condition in one line: no reward may exceed the fee that produced it, and no subsidy may exceed the burn.</p>
+  <p><strong>Claiming more than was paid for.</strong> A relay that signs for more than the payer signed for is paid for the payer's number and marked as disputed. There is no upside to the lie, and there is a record of it.</p>
+  <p><strong>Declining, dropping, or going quiet.</strong> A relay that refuses a receipt loses that window; the payer's count governs it. A relay that accepts a payload and does not forward it is never paid for it. A relay that is offline earns nothing, which is not a punishment, only the absence of a customer.</p>
+  <p><strong>Appearing to exist.</strong> Uptime, capacity, a big antenna in a closet: none of it earns, because none of it produces a receipt. The 2021 design would have paid for the appearance of a network. This one cannot see appearances.</p>
+  <p><strong>Lying as the bookkeeper.</strong> A Mint publishes what it settled as a Merkle commitment. Anyone holding a receipt can prove it was included or left out, and a Mint caught altering one forfeits more of its bond than it earned for the summary. The Mint is modeled on the notary in Open-Transactions, where the client holds the signed receipt and the server's word counts for nothing against it.</p>
+  <p>And then the subsidy. Every network like this wants to pay people to build links that do not exist yet, which is exactly the door through which the appearance of a network walks back in. So the treasury here never hands out a bonus. It buys bandwidth on a link it wants to exist, matching what paying users have already bought there, and never by more than the burn collected. That bounds the bonus hard, and the paper admits it may bound it to the point of uselessness. More on that below.</p>
+
+  <h2>Three computers on a bench</h2>
+  <p>The receipt mechanism has run on real hardware since October 16, 2026: three Raspberry Pi 3 boards on one home network, a gateway that pays, a relay that carries, and a Mint that keeps the ledger. The code is public and small, one Python file for all three roles.</p>
+  <p>On the first day, three tests were forced by resetting a byte counter on one side so that the two signed counts would disagree.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Test</th><th>Payer signed</th><th>Relay signed</th><th>Mint wrote</th></tr></thead>
+    <tbody>
+      <tr><td>Relay under-claims (its counter reset)</td><td class="num">21,945,428 bytes</td><td class="num">1,712 bytes</td><td>Disputed, settled at 1,712</td></tr>
+      <tr><td>Relay over-claims (payer's counter reset)</td><td class="num">272 bytes</td><td class="num">21,947,428 bytes</td><td>Disputed, settled at 272</td></tr>
+      <tr><td>Relay's clock stepped 10 seconds</td><td class="num">2,160 bytes</td><td>Declined, then 5,040</td><td>Receipt declined; next window settled at 2,160</td></tr>
+    </tbody>
+  </table></div>
+  <p>In every case the Mint resolved the window from the two signed receipts alone, with no measurement of its own. The over-claim is the one worth staring at: a relay that said it carried twenty-two megabytes was paid for 272 bytes, because 272 is what the payer signed for. The clock test is the quiet one: a relay five seconds out of step is declined, the window is lost, and nothing is paid. Synchronized, the three clocks agree within a millisecond; left alone, the fastest would drift past the tolerance in about a week.</p>
+  <p>None of this is a network yet. It is one person operating three machines that are not trusted to agree, and showing that they settle anyway. That is the part a whitepaper cannot show on paper.</p>
+
+  <h2>What it cannot prove yet</h2>
+  <p>The paper lists its own gaps, and the biggest is the bonus. With the subsidy capped at the burn, the most the treasury can add to a link is five cents on every dollar users pay across it. Whether that moves anyone to string a radio across a valley is unknown. The alternatives, grants from a treasury that does not depend on traffic, or a cap lifted by charging for identity instead of counting fees, each give back some of the protection. A simulation of one operator playing every role decides it.</p>
+  <p>The second gap is the customer. The pilot's use case is site-to-site backhaul between places that already overbuy capacity, chosen because the authors can supply both sides of it. Whether anyone picks this over a carrier contract or a satellite is a question only paying traffic answers.</p>
+  <p>Then the ordinary unknowns of a system with one hop and one operator: whether a Mint can verify a chain of receipts without learning the route, which settlement layer to use when a stranger joins, and what clocks do between sites instead of across a desk. The next step is a radio link between the house and the trees, and a test the paper names in its introduction: cut the house's internet mid-window and show the window still settles when it returns. After that, a second operator who is not one of the authors.</p>
+
+  <h2>A protocol is its incentives</h2>
+  <p>Strip away the terms and Bandwidth Swap is a rule about who gets paid: the party that carried bytes someone who could not be fooled paid for, and no one else. Every other mechanism in the paper, the burn, the smaller-count rule, the Merkle summaries, the clock tolerance, exists to make faking that one receipt cost more than it returns.</p>
+  <p>It is a modest claim next to the 2021 paper's, and the modesty is what makes it testable. The paper, the open questions and the live state of the three nodes are on this site, and the code is at <a href="https://github.com/bandwidthswap/kit">github.com/bandwidthswap/kit</a>. The next thing it needs is someone who is not its authors to run a node.</p>
+
+  <p class="sources">Sources: <a href="../docs/paper.html">the Bandwidth Swap whitepaper, v0.3</a> (Section 3 for the receipt and the burn, Section 5.1 for purchase commitments, Section 9 for the bench), <a href="../docs/OPEN-QUESTIONS.md">the open questions</a>, <a href="https://github.com/bandwidthswap/kit">the kit</a>, <a href="../#lab">lab status</a>.</p>
+</article>
+
+<footer>Bandwidth Swap · <a href="./">all field notes</a> · <a href="../">home</a> · the paper is a draft, the kit is a lab, the numbers in the open questions are the ones to argue with.</footer>
+</div>
+</body>
+</html>
