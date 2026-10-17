@@ -1,17 +1,19 @@
 #!/bin/sh
 # Rebuilds everything the site serves from the sources in paper/ and OPEN-QUESTIONS.md.
-#   paper/BANDWIDTH-whitepaper-v0.2.md  ->  docs/paper.html (LaTeX-style, via pandoc + latex.css)
-#                                       ->  docs/BANDWIDTH-whitepaper-v0.2.md and .txt (downloads)
-#   paper/v0.1.md vs v0.2.md            ->  docs/whitepaper-diff.html (side-by-side)
+#   paper/BANDWIDTH-whitepaper-v0.3.md  ->  docs/paper.html (LaTeX-style, via pandoc + latex.css)
+#                                       ->  docs/BANDWIDTH-whitepaper-v0.3.md and .txt (downloads)
+#   paper/v0.1.md vs v0.2.md            ->  docs/whitepaper-diff.html (side-by-side, historical)
+#   paper/v0.2.md vs v0.3.md            ->  docs/whitepaper-diff-v0.3.html (side-by-side)
 #   OPEN-QUESTIONS.md                   ->  docs/OPEN-QUESTIONS.md
 # Needs: pandoc, python3. Run from anywhere; then commit and push to deploy.
 set -e
 root="$(cd "$(dirname "$0")/.." && pwd)"
-src="$root/paper/BANDWIDTH-whitepaper-v0.2.md"
+src="$root/paper/BANDWIDTH-whitepaper-v0.3.md"
+prev="$root/paper/BANDWIDTH-whitepaper-v0.2.md"
 docs="$root/docs"
 mkdir -p "$docs"
-cp "$src" "$docs/BANDWIDTH-whitepaper-v0.2.md"
-cp "$src" "$docs/BANDWIDTH-whitepaper-v0.2.txt"
+cp "$src" "$docs/BANDWIDTH-whitepaper-v0.3.md"
+cp "$src" "$docs/BANDWIDTH-whitepaper-v0.3.txt"
 cp "$root/OPEN-QUESTIONS.md" "$docs/OPEN-QUESTIONS.md"
 
 python3 -I - "$src" > "$docs/.paper-body.md" <<'PY'
@@ -37,11 +39,13 @@ pandoc "$docs/.paper-body.md" -f markdown+footnotes+fenced_divs -t html5 --stand
   -M title="Bandwidth Swap: A Peer-to-Peer Bandwidth Exchange" \
   -M authors="Robert Douglas and Chris Odom" \
   -M email="bandwidthswap@pm.me" \
-  -M date="October 8, 2026" \
-  -M version="0.2 (draft)" \
+  -M date="October 17, 2026" \
+  -M version="0.3 (draft)" \
   -o "$docs/paper.html"
 rm "$docs/.paper-body.md"
 
-python3 -I "$root/tools/mkdiff.py" "$root/paper/BANDWIDTH-whitepaper-v0.1.md" "$src" "$docs/whitepaper-diff.html" \
+python3 -I "$root/tools/mkdiff.py" "$root/paper/BANDWIDTH-whitepaper-v0.1.md" "$prev" "$docs/whitepaper-diff.html" \
   '$BANDWIDTH whitepaper: version 0.1 to version 0.2' 'Before: v0.1, Aug 23 2021' 'After: v0.2 draft, Oct 8 2026' >/dev/null
-echo "built: docs/paper.html docs/whitepaper-diff.html docs/OPEN-QUESTIONS.md docs/BANDWIDTH-whitepaper-v0.2.{md,txt}"
+python3 -I "$root/tools/mkdiff.py" "$prev" "$src" "$docs/whitepaper-diff-v0.3.html" \
+  'Bandwidth Swap whitepaper: version 0.2 to version 0.3' 'Before: v0.2 draft, Oct 8 2026' 'After: v0.3 draft, Oct 17 2026' >/dev/null
+echo "built: docs/paper.html docs/whitepaper-diff.html docs/whitepaper-diff-v0.3.html docs/OPEN-QUESTIONS.md docs/BANDWIDTH-whitepaper-v0.3.{md,txt}"

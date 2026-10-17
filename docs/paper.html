@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bandwidth Swap: A Peer-to-Peer Bandwidth Exchange</title>
-<meta name="description" content="Bandwidth Swap: A Peer-to-Peer Bandwidth Exchange. Version 0.2
+<meta name="description" content="Bandwidth Swap: A Peer-to-Peer Bandwidth Exchange. Version 0.3
 (draft).">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/latex.css@1.10.0/style.min.css">
 <style>
@@ -40,8 +40,8 @@ sup{font-size:.7em}
 <body>
 <nav class="toolbar" aria-label="Paper tools">
   <span class="lead">Rendered from Markdown</span>
-  <a href="BANDWIDTH-whitepaper-v0.2.md" download>Download .md</a>
-  <a href="BANDWIDTH-whitepaper-v0.2.txt" download>Download .txt</a>
+  <a href="BANDWIDTH-whitepaper-v0.3.md" download>Download .md</a>
+  <a href="BANDWIDTH-whitepaper-v0.3.txt" download>Download .txt</a>
   <a href="BANDWIDTH-whitepaper-v0.1-original.pdf">Original 2021 PDF</a>
   <a href="../">bandwidthswap.com</a>
 </nav>
@@ -50,7 +50,7 @@ sup{font-size:.7em}
   <h1>Bandwidth Swap: A Peer-to-Peer Bandwidth Exchange</h1>
   <p class="authors">Robert Douglas and Chris Odom</p>
   <p class="affil"><a href="mailto:bandwidthswap@pm.me">bandwidthswap@pm.me</a></p>
-  <p class="date">October 8, 2026 · Version 0.2 (draft)</p>
+  <p class="date">October 17, 2026 · Version 0.3 (draft)</p>
 </header>
 <div class="abstract">
 <p>A marketplace measured in available bandwidth has the possibility of
@@ -59,30 +59,33 @@ determined, and the marketplace is decentralized with a low barrier to
 entry, growth and development of infrastructure has the capability to be
 optimized by the “invisible hand,” promoting robustness and consumer
 needs above all else. We propose improving the growth and development of
-communication infrastructure through peer-to-peer networks enforced by
-blockchain technology, directly associating incentives for hosts to
-build and maintain infrastructure, with the speed, reliability, and
-uptime interests of the user.</p>
+communication infrastructure through a peer-to-peer network in which the
+settled payment for bytes is the only proof that they were delivered,
+directly associating incentives for hosts to build and maintain
+infrastructure with the speed, reliability, and uptime interests of the
+user.</p>
 <p>Proof-of-bandwidth is not an attestation that a host makes about
 itself. It is the settled payment of a user who received the bytes.
 Every hop in a route is paid per unit of data through a conditional
 payment that unlocks only when the next hop acknowledges delivery, so
 the only party who can create a proof is the party who cannot be fooled
 about whether the data arrived.</p>
-<p>The network distributes rewards to relays in the network in
-proportion to the receipts they have settled, weighted by hop
-difficulty. Each relay’s difficulty, determining their transfer fee
-reward, is calculated by the opportunity cost of an alternative route
-around that relay, and that opportunity cost is computed from the graph
-of paid routes rather than from any claim a relay makes.</p>
-<p>Because rewards flow only from fees, generating traffic to oneself
-costs more than it earns. These human operator incentives encourage the
-construction of redundant and robust networks without rewarding the
-appearance of a network.</p>
+<p>Rewards flow only from fees, and a fixed fraction of every fee leaves
+the network for good. Generating traffic to oneself therefore costs more
+than it earns, and no subsidy may exceed what that fraction has
+collected. A treasury does not hand out bonuses for the appearance of a
+network; it buys bandwidth on the links it wants to exist, and only in
+proportion to bandwidth that paying users have already bought there.</p>
+<p>A lab of three nodes has run the receipt mechanism since October
+2026. It settles hourly windows at the smaller of two signed counts,
+resolves a forced disagreement from the receipt data alone, and declines
+a payer whose clock has drifted. What it has not yet shown is a second
+party, a subsidy that moves anyone, or a settlement layer other than an
+invoice. Those are stated as open.</p>
 </div>
 <h2 id="introduction">1. Introduction</h2>
-<p>Communications infrastructure growth has been historically retarded
-by monopolies and exclusion contracts designed to restrict users’
+<p>Communications infrastructure growth has been historically slowed by
+monopolies and exclusion contracts designed to restrict users’
 optionality such that a user is more likely to be a long-term customer
 of an ISP service, since ISPs pay a high initial capital expenditure to
 install in each area. This model protects companies’ cash flow, but
@@ -95,36 +98,48 @@ provided the legal ease to encourage just this.<a href="#fn2"
 class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
 <p>We propose a fundamental improvement to this supplier-consumer
 relationship by offering a peer-to-peer network where bandwidth is the
-product. A blockchain intermediary has the possibility to facilitate
-rewards and punish poor behavior by making it expensive for a bad actor
-to lie. When rewards are issued by enabling a customer relay and
-endpoint service, and there is a bonded barrier of entry to collect
-those rewards, only decentralized autonomous software is needed to
-govern the network.</p>
-<p>A network capable of rapid growth–one that incentivizes communication
-innovation–may be the best network for surviving a Carrington event, and
-offers improved support to industrial, scientific, and medical
-communications.</p>
-<h2 id="blockchain">2. Blockchain</h2>
-<p>The $BANDWIDTH blockchain is designed to offer users autonomy while
-incentivizing operators at any scale. Built around Ethereum’s blockchain
-and through its ERC-20 token protocol; with Open-Transactions it is
-designed to offer off-chain settlement for little or no fees, and
-complex financial instruments<a href="#fn3" class="footnote-ref"
-id="fnref3" role="doc-noteref"><sup>3</sup></a> so a first of its kind
-derivative marketplace may be available on launch to promote community
-scaling.</p>
-<p>The $BANDWIDTH token is the unit in which receipts are denominated
-and settled. It is fungible across multiple market makers with different
-price settlement techniques such as Curve, Balancer, or Uniswap.</p>
-<p>Receipts and per-hop payments are off-chain. Only three things touch
-the chain: the opening and closing of payment channels, the settlement
-summaries that Mints aggregate, and the slashing of bonds. This keeps
-the chain small enough that per-packet accounting never competes for
-block space.</p>
-<p>Proof-of-bandwidth is defined in Section 3. In short: a relay is paid
-for the bytes a user signed for, and a relay is rewarded in proportion
-to what it was paid.</p>
+product. A settlement layer that makes it expensive for a bad actor to
+lie has the possibility to facilitate rewards and punish poor behavior.
+When rewards are issued only against what users have paid for, and there
+is a bonded barrier of entry to collect those rewards, only
+decentralized autonomous software is needed to govern the network.</p>
+<p>A network whose proof of delivery is a signed receipt can keep moving
+bytes while its settlement layer is unreachable, and settle later. That
+is a narrower claim than surviving a continental outage, and it is a
+claim to be tested rather than assumed: Section 9 says how.</p>
+<h2 id="settlement">2. Settlement</h2>
+<p>The pilot settles in dollars. A payer and a relay agree a posted
+price per unit of data, the relay carries the data in hourly windows,
+each window closes with signed receipts, a Mint settles the window from
+those receipts, and the Mint issues a monthly invoice. There is no token
+and no chain in the pilot. The receipt mechanism is what is being
+proved, and it does not need either.</p>
+<p>A token, if one is issued, is denominated and settled under the rules
+in force at the time, and only after there is paying traffic to
+denominate. Nothing in this paper depends on it. Where version 0.2 said
+that rewards were issued by the chain, they are not: nothing is minted
+for availability, uptime, or capacity, and there is no block reward.
+Mints are paid from a share of the settlement fee on the receipts they
+publish. The Network Steward is paid from the unrecoverable fee defined
+in Section 3.3.</p>
+<p>When a second party that does not trust the first joins the network,
+a settlement layer is chosen. The candidates are a second-layer chain
+with native payment channels, a hub model in which each party holds one
+channel to a hub and the hub is a Mint, or a Lightning-like payment
+network with receipts kept separately from payments. The choice is made
+on cost per settlement, time to finality, and whether a Mint can act as
+a hub without becoming a custodian. Whichever is chosen, only three
+things touch it: the opening and closing of payment channels, the
+settlement summaries that Mints publish, and the slashing of bonds.
+Announcements never do. This keeps the settlement layer small enough
+that per-packet accounting never competes with it for space.</p>
+<p>Identity on the network is a key pair registered with a Mint against
+a bond. We call it a NYM, after the term Open-Transactions uses, and
+Open-Transactions remains one candidate for the notary and claims
+layer.<a href="#fn3" class="footnote-ref" id="fnref3"
+role="doc-noteref"><sup>3</sup></a> It is a notary system, which is to
+say a trust system, and the paper no longer presents it as anything
+else; the pilot runs without it.</p>
 <h2 id="proof-of-bandwidth">3. Proof of Bandwidth</h2>
 <p>“Proof” in a bandwidth network has to answer three separate
 questions, and a design that answers only one of them will be gamed on
@@ -138,25 +153,36 @@ that was claimed?</li>
 </ol>
 <p>Version 0.1 of this paper answered none of these. A node reported its
 own uptime and available bandwidth once a minute and a Mint recorded the
-report. This section replaces that model.</p>
+report. Version 0.2 replaced that model with the one below; version 0.3
+adds the two rules that make it hold, the unrecoverable fee and the
+payment window.</p>
 <h3 id="receipts">3.1 Receipts</h3>
-<p>The unit of proof is a receipt. For each payment window, the sender
-commits to a Merkle root over the chunks of the payload. Each hop that
-carries the payload signs a receipt containing:</p>
-<ul>
-<li>the sender’s and the hop’s Bandwidth-IDs (Open-Transactions
-NYMs),</li>
-<li>the Merkle root of the chunks carried,</li>
-<li>the byte count,</li>
-<li>the hop’s index in the route,</li>
-<li>the sender’s timestamps for the first and last chunk of the window,
-and</li>
-<li>the signature of the previous hop’s receipt, forming a chain.</li>
-</ul>
-<p>The recipient’s signature closes the chain. A relay cannot forge a
-receipt because every receipt requires the payer’s key, and a relay
-cannot inflate a receipt because the byte count is bound to a Merkle
-root the payer committed to.</p>
+<p>The unit of proof is a receipt. There are two kinds.</p>
+<p>The <strong>end-to-end receipt</strong> is signed by the payer. For
+each payment window it carries the payer’s and the recipient’s NYMs, the
+Merkle root of the chunks the payer sent, the byte count, and the
+payer’s timestamps for the first and last chunk of the window. The
+recipient’s signature closes it. The payer’s timestamps are the only
+authoritative ones in the route, because the payer is the one
+paying.</p>
+<p>A <strong>forwarding receipt</strong> is signed by each pair of
+adjacent hops. It carries the two hops’ NYMs, the hop’s index in the
+route, the Merkle root, the byte count the hop forwarded, and the
+signature of the previous forwarding receipt, forming a chain from the
+payer’s edge to the recipient’s. Hop timestamps are advisory. A payer
+who cannot see a hop cannot timestamp it, and does not need to: the
+chain is anchored at both ends by signatures the hops cannot
+produce.</p>
+<p>A relay cannot forge a receipt because every end-to-end receipt
+requires the payer’s key, and a relay cannot inflate a receipt because
+the byte count is bound to a Merkle root the payer committed to.</p>
+<p>The pilot runs without route privacy. The payer sees every hop and
+signs every receipt, which collapses the two kinds into one: in the
+Phase 0 lab, with a single hop, the receipt is the tuple in Figure 2,
+signed by the payer and countersigned by the hop with the hop’s own byte
+count. Whether a Mint can verify a chain of forwarding receipts without
+learning the route is an engineering question the pilot does not
+answer.</p>
 <h3 id="payment-is-the-proof">3.2 Payment is the proof</h3>
 <p>The only party who cannot be fooled about whether bytes arrived is
 the party who was waiting for them. We therefore make the user’s payment
@@ -164,30 +190,50 @@ the proof of delivery.</p>
 <p>Every hop is paid per unit of data through a conditional payment. The
 payment to hop <em>n</em> unlocks only when hop <em>n+1</em>
 acknowledges receipt, in the manner of a hash-time-locked contract
-across an onion route. A relay that accepts a payload and does not
-forward it is never paid for it. A relay that forwards it is paid
-whether or not any validator ever looks at the transfer.</p>
+across the route. A relay that accepts a payload and does not forward it
+is never paid for it. A relay that forwards it is paid whether or not
+any validator ever looks at the transfer.</p>
 <p>A settled payment is therefore a proof of delivery that required no
 probing, no attestation, and no trusted hardware. Delivery (question 1)
 collapses into demand (question 2).</p>
+<p>In the pilot, acknowledgement is the hop’s countersignature on the
+receipt and payment is the invoice. The conditional payment proper
+arrives with the settlement layer in Section 2. On a link whose light
+time exceeds a threshold the membership sets, windows are prepaid and no
+lock is used (Appendix A).</p>
 <h3 id="the-sybil-condition">3.3 The Sybil condition</h3>
 <p>If the only way to earn is to collect fees from a payer, then sending
 traffic to yourself costs the protocol fee and earns nothing. Wash
 traffic is net negative. This is the entire defense against Sybil
 relays, and it is the same reason routing networks built on conditional
 payment do not need a separate proof of relay.</p>
-<p>The defense holds under one condition: <strong>no reward may exceed
-the fee that produced it.</strong> The moment the network pays a relay
-more for carrying a byte than the byte cost to generate, self-dealing
-becomes profitable and the network fills with relays carrying traffic to
-themselves. This condition governs every subsidy in Sections 5 and
-7.</p>
+<p>It is only true if part of every fee leaves the colluding set.
+Version 0.2 did not say what part, or where it went. Version 0.3 does: a
+fixed fraction <em>b</em> of every fee is burned, and <em>b</em> is 5%
+until a simulation says otherwise. An operator who runs payer, relay,
+and Mint in one hand still loses <em>b</em> of every fee it pays itself.
+Routing the fraction to the Steward or to the settling Mint was
+considered and rejected, because both can leak back to the attacker when
+the attacker is also the Steward’s grantee or the Mint.</p>
+<p>The defense then holds under one condition: <strong>no reward may
+exceed the fee that produced it, and no subsidy may exceed the
+burn.</strong> If the Steward matches settled fees at a multiple
+<em>m</em>, self-dealing is unprofitable only while <em>m</em> is at
+most <em>b</em>. The Steward can never subsidize more than users were
+taxed. This bounds the bridge-node bonus that Section 5 describes, and
+it bounds it hard: at <em>b</em> of 5%, the most the Steward can add to
+a link is five cents on every dollar paid across it. Whether a bonus
+that small still moves anyone to build a link is the first question the
+pilot’s economics must answer (Section 10). The alternatives, paying
+bonuses out of a treasury that does not depend on traffic, or lifting
+the cap by charging for payer identity rather than counting fees, are
+recorded there and not adopted.</p>
 <ul>
-<li>Block rewards are never issued for availability, uptime, or capacity
-alone.</li>
-<li>The Network Steward’s route bonuses are issued only as a match
+<li>Block rewards do not exist. Nothing is issued for availability,
+uptime, or capacity.</li>
+<li>The Network Steward’s route purchases are issued only as a match
 against fees already settled, from payers whose identities are bonded
-and aged, and never above a published multiple of those fees.</li>
+and aged, and never above <em>m</em>.</li>
 <li>Route-map weight is denominated in fees paid, so inflating the map
 costs exactly what it would cost to buy the bandwidth.</li>
 </ul>
@@ -198,286 +244,446 @@ than a relay that is fast, and earns less. The market prices speed
 without the protocol having to prove it. Users choose routes from the
 receipt graph using the throughput that previous payers actually
 settled, not the throughput a relay advertises.</p>
-<p>A cryptographic speed proof is required only where a subsidy is at
-stake, because a subsidy is the one place a relay could profit from a
-false claim. For that tier, a payer may produce a client-side
-attestation of what it received and when, in the manner of TLS
-notarization, so that the measuring party is the one who was waiting for
-the bytes. This attestation is optional for ordinary traffic and
-mandatory for traffic that claims a route bonus.</p>
+<p>A speed proof is required only where a subsidy is at stake, because a
+subsidy is the one place a relay could profit from a false claim.
+Version 0.2 required a client-side attestation for that tier, in the
+manner of TLS notarization. No protocol for it is named and its overhead
+is unknown, and nothing in the pilot claims a subsidy, so it is
+deferred: the likely replacement is to make eligibility for a subsidy
+depend on the age and diversity of the payers’ bonds rather than on any
+measurement, and that is decided when there is a subsidy to protect.</p>
 <h3 id="clocks">3.5 Clocks</h3>
 <p>The payer’s clock is authoritative, because the payer is the one
-paying. Timestamps in a receipt are the payer’s. A relay may decline to
-serve a payer whose clock drifts beyond a published tolerance, and a
-Mint may discard receipts whose timestamps are inconsistent with the
-chain of hops.</p>
-<h3 id="residual-attacks">3.6 Residual attacks</h3>
+paying. Timestamps in a receipt are the payer’s. A relay declines to
+serve a payer whose clock differs from its own by more than five
+seconds, and a Mint discards receipts whose timestamps are inconsistent
+with the chain of hops.</p>
+<p>Five seconds is generous for a node that keeps a time source and
+fails safe for one that does not. In the Phase 0 lab, three nodes
+synchronized on one network agree within a millisecond. Left
+free-running, the fastest of their oscillators gains 0.76 seconds a day
+and crosses the tolerance in about a week; the slowest takes three
+weeks. A node that has been alone that long is declined, its window is
+lost, and nothing is paid. Drift between sites has not been measured. On
+a link with a light time, the tolerance widens by the light time both
+ways and the drift expected since the last contact; it is a parameter of
+the link (Appendix A).</p>
+<h3 id="payment-windows">3.6 Payment windows</h3>
+<p>A payment window is one hour on the pilot’s links; on a link that
+exists only during contacts, it is the contact (Appendix A). Before the
+window’s bytes move, the payer locks the window’s value; in the pilot,
+where there is no payment rail, the lock is the invoice and the exposure
+is bounded by membership. A relay therefore never fronts more than one
+window of bandwidth on credit, and a payer who consumes a window and
+leaves forfeits what was locked.</p>
+<p>A window settles at the smaller of the two signed byte counts, the
+payer’s and the hop’s. When the two counts are within one percent of
+each other the window is recorded as settled; when they differ by more
+it is recorded as disputed and settles by the same rule. Nothing else is
+needed to resolve a dispute: no probe, no testimony, no judgement. The
+rule was chosen because each party can only lower the number the other
+party is paid or paid for, and neither gains by doing so. A hop that
+declines a receipt loses the window: its next acknowledgement covers
+both windows, and the payer’s count governs.</p>
+<p>Streaming payments per chunk, which interactive traffic would need,
+are not in the pilot, which carries bulk traffic settled by the
+hour.</p>
+<h3 id="residual-attacks">3.7 Residual attacks</h3>
 <ul>
 <li><strong>Refusal to forward after accepting.</strong> Handled by
 conditional payment: the hop is never paid for what it did not
 forward.</li>
 <li><strong>A last hop that will not acknowledge.</strong> Only possible
-when payer and recipient are different parties with no relationship.
-Endpoint services, where the payer is also the recipient, do not have
-this problem. Relay services to a third party require the recipient to
-be a registered NYM with its own bond, and a recipient that fails to
-acknowledge delivered chunks is slashed.</li>
+when payer and recipient are different parties. Endpoint services, where
+the payer is also the recipient, do not have this problem. Relay
+services are between members: the recipient is a bonded NYM, and a
+recipient that fails to acknowledge delivered chunks is slashed.
+Delivery to an unbonded party on the public internet is endpoint service
+by definition (Section 5), and the last hop is the payer’s own.</li>
 <li><strong>Route inflation.</strong> A relay that wants to appear in
 more paths must pay for the traffic that puts it there. Because map
-weight is denominated in fees, this is not an attack; it is a
-purchase.</li>
+weight is denominated in fees, this is not an attack; it is a purchase,
+and <em>b</em> of the purchase is gone.</li>
 <li><strong>Collusion between a payer and a relay to claim a route
-bonus.</strong> Bounded by the subsidy multiple, the payer bond age, and
-the attestation requirement in Section 3.4.</li>
+bonus.</strong> Bounded by <em>m</em> at most <em>b</em>, and by the
+payer bond age in Section 5.</li>
+<li><strong>A hop that over-claims.</strong> The window settles at the
+payer’s count. Measured in the lab: a hop that signed for twenty-two
+megabytes against a payer who signed for 272 bytes was paid for 272
+bytes.</li>
 </ul>
-<h3 id="alternatives-considered">3.7 Alternatives considered</h3>
+<h3 id="alternatives-considered">3.8 Alternatives considered</h3>
 <ul>
 <li><strong>Validator probing.</strong> Mints push random payloads
 through relays and time them. Relays learn to recognize probe traffic
 and prioritize it, one pipe can masquerade as many nodes, and probes
 measure a relay’s behavior toward validators rather than toward users.
-Rejected.</li>
+Rejected, and version 0.2’s liveness check, which was the same thing by
+another name, is removed with the uptime penalty it served.</li>
 <li><strong>Hardware attestation.</strong> A trusted execution
 environment on the router counts bytes and signs. Sound, but it moves
 trust to a chip vendor and prices out small operators. Acceptable for a
-permissioned pilot, not for the open network.</li>
+permissioned pilot, not for the open network. The pilot has not needed
+it.</li>
 <li><strong>Signature-chain receipts alone.</strong> Prove delivery but
 not demand, since every signer may be the same operator. Retained as the
-receipt format in Section 3.1, but only because payment makes the chain
-costly to fake.</li>
+receipt format in Section 3.1, but only because payment, and the
+fraction of it that is burned, makes the chain costly to fake.</li>
 </ul>
-<h2 id="minting-validator">4. Minting (Validator)</h2>
-<p>In Bitcoin, miners solve a cryptographic puzzle, with the first one
-to do so receiving that block’s reward, encouraging people to pool their
-computing resources, spreading the reward across those who contributed.
-This promotes a form of centralization<a href="#fn4"
-class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> in
-mining pools.</p>
-<p>To discourage burdening service operators as well as to encourage
-integrity and distribution of the data load, we propose two layers of
-operator infrastructure to support the user-operator-blockchain
-incentivization cycle. Bandwidth Miners, who facilitate user
-interactions measured in the $BANDWIDTH token, are paid by users through
-receipts (Section 3). $BANDWIDTH Mints, who stake a large number of
-their own assets, aggregate those settled receipts, adjudicate disputes
-over them, hold the bonds of Miners and payers, and publish settlement
-summaries and the receipt graph to the $BANDWIDTH blockchain, receiving
-a reward for the act.</p>
-<p>Mints do not decide whether bandwidth was delivered. That question is
-settled by payment before a Mint ever sees the receipt. A Mint’s work is
-bookkeeping and enforcement, which is why it can be done for little
-computational energy.</p>
-<p>User software queries for available routes, seeking the receipt graph
-that’s aggregated by Mints, significantly reducing the cost of route
-calculation for users. …and unburdening them from the ability to
-discriminate.</p>
-<ul>
-<li>How Miners are compensated for provided transport: by the payer, per
-hop, per unit, at settlement.</li>
-<li>How Mints are compensated for aggregating receipt data: by a share
-of the settlement fee on the receipts they publish.</li>
-</ul>
-<p>Mints who have staked a large number of assets are compensated by the
-blockchain through an election process promoting those who have staked
-more. Every minute, for every block, one Mint is randomly chosen, based
-on the likelihood of how much they have staked, to validate the next
-block. This replaces the concept of traditional miners, with validators
-who, instead of mining a new block, mint new blocks for little
-computational energy. Should a validator mint a fraudulent block, they
-will forfeit a greater number of assets staked by them than the
-validation fee they received. Should a validator want their staked
-assets back, they can after a time greater than is needed to verify they
-have not previously minted a fraudulent block. The current minimum
-criteria for being chosen is 1/10,000 of all assets in circulation being
-staked, and a minimum of 10 Mb/s of bandwidth.</p>
-<p>If the three largest Bitcoin mining pools were to come together they
-would control more than 51% of the computational power, allowing them
-certain attacks on future transactions. In comparison, the
-proof-of-bandwidth protocol promotes a low hardware barrier to entry,
-encouraging more independent validators, making the network more
-decentralized and more secure.</p>
-<p>To discourage monetary centralization, the age of staked assets is a
-factor in the selection of validators.</p>
-<p>To further reduce the risk of a validator not doing their job, the
-proof-of-bandwidth algorithm takes five stakers on every block and seeks
-a minimum of three-out-of-five consensus, reducing the damage caused by
-a validator not doing their job, and punishing that validator by
-announcing their address to the blockchain. If their consensus is
-incomplete, including if the validator is offline, the inconsistent
-validator gets none of the mined block rewards.</p>
-<p>These validators we intend to call Mints, who stake a large number of
-assets, enabling them to mint new blocks for rewards. Because rewards to
-Miners flow from receipts and not from block issuance, a Mint’s block
-reward is its own; it is not a pool of new money to be distributed to
-Miners.</p>
-<h2 id="mining-hostsrd2">5. Mining (Hosts)<a href="#fn5"
-class="footnote-ref" id="fnref5"
-role="doc-noteref"><sup>5</sup></a></h2>
-<p>Miners fulfill the needs of users in the form of Relay or Endpoint
-services, spending computational energy and bandwidth to facilitate the
-data requested by users and collecting receipts from those users for
-payment.</p>
+<h2 id="mints">4. Mints</h2>
+<p>A Mint does not decide whether bandwidth was delivered. That question
+is settled by payment before a Mint ever sees the receipt. A Mint’s work
+is bookkeeping and enforcement: it holds the bonds of relays and payers,
+aggregates settled receipts, applies the dispute rule of Section 3.6,
+publishes settlement summaries, and publishes the receipt graph from
+which users choose routes. This is why it can be done for little
+computational energy, and why a Mint needs no particular bandwidth of
+its own.</p>
+<p>The Mint is modeled on the notary of Open-Transactions. There, a
+transaction server signs every receipt it processes and the client keeps
+the signed copy, so that the client’s proof of its own balance is a
+receipt in its hand and not the server’s word; a server that signed
+something it later denies has signed its own conviction. A Mint is that
+notary applied to a batch: it signs what it settles, every party keeps
+the signed receipts, and the summary it publishes commits it to
+them.</p>
+<p>A settlement summary is a Merkle commitment over the receipts it
+settles. Anyone holding a receipt can prove that it was included, or
+that it was not, and a Mint whose summary is shown to omit or alter a
+receipt forfeits a greater share of its bond than the fee it collected
+for that summary. This is the only penalty a Mint faces, and it works
+with a single Mint, which is what the pilot has.</p>
+<p>A Mint is compensated by a share of the settlement fee on the
+receipts it publishes. There is no block reward and no election. Version
+0.2 carried both from version 0.1, together with a committee of five
+validators reaching a three-of-five consensus every minute and a minimum
+stake of one ten-thousandth of all assets in circulation; the committee
+and the election contradicted each other, and the minimums referred to
+assets that do not exist. The pilot runs one Mint. The target, when more
+than one party operates a Mint, is one proposer and four attesters per
+summary, with three of five required to finalize, and a proposer that is
+offline or inconsistent collecting nothing for that summary. Until then,
+a Mint’s bond is set by the membership. A Mint settles the links of one
+settlement domain; where a link crosses domains, the Mints on each side
+reconcile their published commitments whenever a link between them
+allows (Appendix A).</p>
+<p>User software queries the receipt graph that Mints aggregate for
+available routes, which reduces the cost of route calculation for users
+and removes from Mints the ability to discriminate among them.</p>
+<h2 id="operators-relays-and-endpoints">5. Operators: Relays and
+Endpoints</h2>
+<p>Operators fulfill the needs of users in the form of Relay or Endpoint
+services, spending computational energy and bandwidth to carry the data
+users pay for and collecting receipts from those users for payment.</p>
 <blockquote>
 <p><strong>Endpoint services</strong> allow a user to query a known
-location, and extract information regardless if it is identifiable files
-by hash or a Web2.0 DataStream. This interaction is similar to a user’s
+location and extract information, whether identifiable files by hash or
+a Web 2.0 data stream. This interaction is similar to a user’s
 relationship with VPNs or Usenet. The payer and the recipient are the
-same party, so the receipt chain closes with the payer’s own
-signature.</p>
-<p><strong>Relay services</strong> allow users to query an unknown
-location and have their information securely passed to another relay or
-endpoint where only the edge devices are known by the user. A relay’s
-minimum price and its minimum transaction fee are determined by the
-total cost of an approved transaction’s routing difficulty, a variable
-that can be set by a user. The recipient must be a bonded NYM that
-acknowledges delivery (Section 3.6).</p>
+same party, so the receipt chain closes with the payer’s own signature.
+Delivery to any party that is not a bonded member, including the public
+internet, is endpoint service.</p>
+<p><strong>Relay services</strong> carry a payer’s data to another
+member. The recipient is a bonded NYM that acknowledges delivery
+(Section 3.7), and only the edge devices need be known to the payer once
+route privacy exists. Relay service is between members only.</p>
 </blockquote>
-<p>Route subsidy bonuses will be decided by the Network Steward, a DAO
-designed to receive 10% of every new block reward, decreasing every year
-by 1% until this project is 9 years old where it’ll maintain to help
-provide the infrastructure for all to become connected. These subsidy
-bonuses will be offered by the Network Steward defining a clear start
-point and endpoint. A bonus is paid only as a match against receipts
-already settled on that path, from payers whose bonds are older than the
-bonus program, and never above the published multiple (Section 3.3).
-Nodes on the path are compensated by measuring their opportunity cost
-against the total path, where opportunity cost is computed from the
-receipt graph: the fewer paid, disjoint paths that reach the endpoint
-without a node, the greater that node’s share.</p>
-<p>A node that has five other acceptable intermediaries in a possible
-chain will receive 1/5th of that location’s reward (example step 1),
-while a single node connecting a bridge will receive the full reward
-(example step 4) in maintaining a chain. Route subsidy rewards will be
-defined by the DAO. Traffic that claims a bonus must carry the
-client-side attestation described in Section 3.4.</p>
-<p>Miners, like Mints, must stake a small portion of assets on the
-Bandwidth blockchain for a Mint to provision it an Open Transactions NYM
-(similar to a registration number, but semi-anonymous) that it may
-broadcast in its header so other devices can know to securely connect to
-it.<a href="#fn6" class="footnote-ref" id="fnref6"
-role="doc-noteref"><sup>6</sup></a> Currently, the minimum is computed
-by taking $10 USD and measuring against the price of bandwidth on the
-Stasoshi Dex.<a href="#fn7" class="footnote-ref" id="fnref7"
-role="doc-noteref"><sup>7</sup></a></p>
-<p>An uptime penalty will tarnish a node’s ability to earn by deferring
-that amount to the Network Steward who is responsible for encouraging
-growth and development of the network. The uptime penalty is measured in
-seconds of a week with (number of seconds active) / 604,800 (the total
-number of seconds in a week) defining the reward that an operator may
-receive from a user while the difference is sent to the Network Steward.
-“Active” means the node appears in at least one settled receipt or
-answers a Mint’s liveness check during that second; it is not
-self-reported. This allows the system to operate normally once a node is
-turned on, while punishing nodes that turn on just for bonuses and
-during rate spikes, encouraging a long-life and stable network.</p>
-<h2 id="announcementsrd5">6. Announcements<a href="#fn8"
-class="footnote-ref" id="fnref8"
-role="doc-noteref"><sup>8</sup></a></h2>
+<p><strong>Price.</strong> A relay posts a price per unit of data, and
+that price governs every payment made to it. The opportunity-cost figure
+of the next paragraph is not a price; it is used only to divide a
+Steward purchase among the relays on a path. In the pilot the posted
+price is ten cents a gigabyte.</p>
+<p><strong>Route purchases.</strong> The Network Steward buys bandwidth
+on links it wants to exist, by defining a clear start point and endpoint
+and matching the receipts that bonded payers have already settled on
+that path, at a multiple <em>m</em> that is never above the burn
+<em>b</em> (Section 3.3). Payers whose bonds are younger than the
+program do not count. Relays on the path divide the purchase by
+opportunity cost, computed from the receipt graph: the fewer paid,
+disjoint paths that reach the endpoint without a relay, the greater that
+relay’s share. A relay with five acceptable alternatives in a possible
+chain receives one fifth of that location’s purchase, while a single
+relay connecting a bridge receives all of it. The attestation that
+version 0.2 required of traffic claiming a purchase is deferred (Section
+3.4); eligibility is by bond age and diversity.</p>
+<p><strong>Bonds.</strong> An operator stakes a small bond with a Mint
+to be provisioned a NYM, which it broadcasts in its header so that other
+devices can connect to it securely. The bond’s size is set by the
+membership in the pilot. The reference to a fictional exchange that
+version 0.2 used to size it is removed.</p>
+<p><strong>Availability.</strong> Version 0.2 kept an uptime penalty
+from version 0.1, which deferred part of a relay’s earnings to the
+Steward in proportion to the seconds of a week it was not seen in a
+receipt or by a Mint’s liveness check. It measured demand, not uptime,
+since a healthy relay with no customers at night was penalized, and the
+liveness check was the validator probing that Section 3.8 rejects. It is
+removed. A relay that is offline earns nothing, and quality is priced
+(Section 3.4). For the subsidy tier only, a relay must be seen by its
+peers to be eligible: availability is a gate on Steward purchases,
+measured by signed heartbeats between neighboring relays, with no reward
+attached to the heartbeat and no Mint involved.</p>
+<h2 id="announcements">6. Announcements</h2>
 <p>Announcements exist for route discovery. They carry no reward weight.
-Nothing in an announcement is trusted for payment, subsidy, or uptime;
-those are determined by receipts.</p>
-<p>Miners such as relays and endpoints in a pool of other connected
-devices announce to a Mint once per minute a 62 byte message containing
-a string of: (1) their Bandwidth-ID, set by the Open-Transactions NYM
-(2) their offered difficulty, or the minimum transaction amount they’re
-willing to pass on a message for; (3) their uninterrupted uptime, or how
-many seconds of all the seconds the device has been active has it been
-able to talk to a Mint; (4) the node’s maximum available bandwidth
-pressure whenever its operator allows a sync-test to run; and (5) the
-active votes cast by the miner for or against the publicly available
-Network Steward.</p>
-<p><strong>[Figure 1]</strong></p>
-<pre><code>(00040,000000,1630261675,1630264675,0000000034,0000000037,0000)
-  1      2        3          3           4          4       5</code></pre>
+Nothing in an announcement is trusted for payment, subsidy, or
+availability; those are determined by receipts.</p>
+<p>A relay announces to its peers, over a gossip layer or distributed
+hash table that never touches the settlement layer, its NYM, its posted
+price, the routes it will accept, and the parameters of each link it
+offers (Appendix A). On a link that exists only during contacts, the
+announcement is a contact plan: when the link will exist, for how long,
+and at what price. Version 0.2’s announcement also carried the relay’s
+own report of its uptime and its maximum available bandwidth, and a sync
+test by which a relay measured and reported its own throughput. All
+three were self-reports of the kind Section 3 exists to replace, and
+they are removed. A user’s software ranks relays by the throughput
+previous payers actually settled, which the receipt graph records and an
+announcement cannot inflate.</p>
 <p><strong>[Figure 2] Receipt</strong></p>
 <pre><code>(payer NYM, hop NYM, hop index, merkle root, bytes, t_first, t_last, prev receipt sig) signed by payer</code></pre>
-<p>Fields (3) and (4) of the announcement are advisory. A user’s
-software compares them against the settled throughput in the receipt
-graph, and a node whose announcements persistently exceed its receipts
-is ranked below nodes whose announcements match.</p>
-<p>This allows the minimum necessary information to be written to the
-blockchain immutably, while allowing auxiliary services to find and
-predict the best routes given a user’s search criteria, such as uptime
-or speed, independently reporting the location of the previously
-registered nodes.</p>
-<p>Interestingly, Open-Transactions’ features of claims and notaries
-allow a layer two label and verification of a particular node’s specific
-location or trustee should a specific person or group want to announce a
-claim.</p>
-<p>Should an operator see a direct connection to another node greater
-than can be reached by direct relay, or not currently accepting lookup,
-its Open-Transactions NYM lookup code could be offered by the owner over
-a third-party service such that two connections can be specifically
-linked on this protocol without outside interference.</p>
-<p>Sync-tests are a protocol enforced measurement that is run whenever a
-Miner establishes, or re-establishes, a connection to a Mint reporting
-other connected devices broadcasting the $BANDWIDTH header, and maximum
-throughput that node is able to offer to the network. A sync-test
-informs route discovery only; it never produces a receipt and never
-earns a reward.</p>
-<h2 id="network-stewardrd6">7. Network Steward<a href="#fn9"
-class="footnote-ref" id="fnref9"
-role="doc-noteref"><sup>9</sup></a></h2>
-<p>The Network Steward, a DAO,<a href="#fn10" class="footnote-ref"
-id="fnref10" role="doc-noteref"><sup>10</sup></a> is purposed to seed
-projects without bias and in such a way it promotes healthy competition
-to grow the $BANDWIDTH ecosystem. Its goal is to promote competition to
-keep prices the most competitive for users. The DAO will attempt to
-encourage a high rate of innovation<a href="#fn11" class="footnote-ref"
-id="fnref11" role="doc-noteref"><sup>11</sup></a> across all market
-segments that use the $BANDWIDTH protocol.</p>
+<p>In the pilot the hop countersigns the same tuple with its own byte
+count and with <em>prev receipt sig</em> set to the payer’s signature,
+and both signed copies go to the Mint. The Merkle root in the lab is the
+payer’s commitment to its own meter readings, since nothing is chunked
+yet; the field is kept so that the chunked form of Section 3.1 is a
+change of content, not of format.</p>
+<p>Open-Transactions’ claims and notaries would allow a second-layer
+label and verification of a particular node’s location or trustee,
+should a person or group want to announce such a claim. Nothing in the
+protocol depends on it, and nothing is paid for it.</p>
+<h2 id="network-steward">7. Network Steward</h2>
+<p>The Network Steward, a DAO,<a href="#fn4" class="footnote-ref"
+id="fnref4" role="doc-noteref"><sup>4</sup></a> is purposed to seed
+links without bias and in such a way that it promotes healthy
+competition to grow the network. Its goal is to promote competition to
+keep prices the most competitive for users, and to encourage a high rate
+of innovation<a href="#fn5" class="footnote-ref" id="fnref5"
+role="doc-noteref"><sup>5</sup></a> across all market segments that use
+the protocol.</p>
+<p>The Steward is funded by the burn: it receives, as its income, an
+amount equal to the fraction <em>b</em> of every fee that the network
+destroys, so that its income scales with the traffic the network carries
+and with nothing else. Version 0.2’s funding, ten percent of each block
+reward declining by a point a year, is deleted with the block reward;
+under those numbers the Steward’s income would have been under a third
+of its launch level by the third year and near zero by the ninth, for no
+stated purpose.</p>
 <p>The Steward never issues a reward for availability, uptime, or
-capacity alone. Every Steward disbursement to an operator is a match
-against fees that a bonded payer has already settled, subject to the
-multiple in Section 3.3.</p>
-<p>All proceeds received and spent by the DAO will be reported in the
-form of annual statements as it will be held to the standard set by
-Wyoming in the Decentralized Autonomous Organizations Supplement. Tokens
-unspent after 90 calendar days will be burned and reported to the
-network. Voting is performed by “marking” a Miner output with specific
-vote data. Each Miner votes through a Mint. These votes may be proposed
-by anyone and specifically address the membership, leadership, goals,
-and spends of the registered Wyoming DAO representing $BANDWIDTH.</p>
+capacity alone. Every Steward disbursement to an operator is a purchase
+of bandwidth on a named link, matched against fees that a bonded payer
+has already settled there, at a multiple no greater than <em>b</em>.</p>
+<p>All proceeds received and spent by the DAO are reported in annual
+statements, to the standard set by Wyoming’s Decentralized Autonomous
+Organizations Supplement. Funds unspent after 90 calendar days are
+returned to the burn and reported to the network. Each operator votes
+through a Mint by marking an output with its vote; proposals may be made
+by anyone and address the membership, leadership, goals, and spends of
+the registered Wyoming DAO.</p>
 <h2 id="governance">8. Governance</h2>
-<p>As this system’s deployment takes up physical space unlike software
-where the space is undefined, it is important that one individual’s
-preferences do not risk injuring or inappropriately change others
-ability to act in areas they do not affect. Thanks to special tests
-conducted by RUNE, PBC in 2018, at the time the active developer of
-Open-Transactions, initial prototypes of location-based notary services
-that interfaced trustlessly via the BIP-47 payment privacy protocol,
-confirm the ability to associate one’s vote with a physical location,
-without double voting. This combination of notary services, BIP47, and
-an alternative use of Chaumian Cash, can guarantee that in governance
-voting one’s ballot is both all they receive, blind, and can only be
-cast once.</p>
-<p>This proposed notarizing of ballots available, and specifying of
-location cast, becomes much more valuable when combined with proof of
-stake behaviors, that limit whale overruling. We propose protecting the
-ideas of the community by setting strong limits on the right to vote,
-such as:</p>
+<p>As this system’s deployment takes up physical space, unlike software
+whose space is undefined, it is important that one individual’s
+preferences do not risk injuring or inappropriately changing others’
+ability to act in areas they do not affect. Tests conducted in 2018 by
+the then developer of Open-Transactions, of location-based notary
+services that interfaced trustlessly via the BIP-47 payment privacy
+protocol, confirm the ability to associate a vote with a physical
+location without double voting. That combination of notary services,
+BIP-47, and an alternative use of Chaumian cash can guarantee that a
+ballot is all its holder receives, is blind, and can be cast only
+once.</p>
+<p>Governance is for bonded, identified members. Relays and payers may
+remain pseudonymous NYMs and use the network without it; a member who
+wishes to vote identifies itself to the DAO. Version 0.2 relied on that
+identification to restrict whales while describing the network as
+semi-anonymous; the two are reconciled by making identification a
+condition of governance membership and of nothing else.</p>
+<p>We propose protecting the ideas of the community by setting strong
+limits on the right to vote, such as:</p>
 <ol type="1">
 <li><p>Minimum use restrictions since the last polling period;<a
-href="#fn12" class="footnote-ref" id="fnref12"
-role="doc-noteref"><sup>12</sup></a> such that one must have spent a
-minimum amount of $BANDWIDTH in the ecosystem or operate a minimum
-number of $BANDWIDTH producing Nodes.</p></li>
+href="#fn6" class="footnote-ref" id="fnref6"
+role="doc-noteref"><sup>6</sup></a> such that one must have spent a
+minimum amount in the ecosystem or operate a minimum number of producing
+nodes.</p></li>
 <li><p>Minimum time restrictions since account creation; such that rash,
 emotional, or undeveloped requests are encouraged to be
 rejected.</p></li>
-<li><p>Anti-private interest restrictions; deployed by logarithmically
-associating the staking of 1 $BANDWIDTH as one vote, 10 $BANDWIDTH as 2
-votes, 100 $BANDWIDTH as 4 votes and 1000 $BANDWIDTH as 5 votes into
-continuum.</p></li>
+<li><p>Anti-private-interest restrictions, by weighting votes as the
+logarithm of stake: one unit staked is one vote, ten units are two, a
+hundred are three, a thousand are four, and so on. Version 0.2’s scale
+of one, two, four, and five was not logarithmic.</p></li>
 </ol>
 <p>These restrictions have the capacity to protect the ideas of the
 community while awarding those with more significant capital interest
-tools for communication and identification without having dictatorial
-control of any particular vote.</p>
-<p>These voting capabilities have been previously developed by Voting
-Matters, a wholly owned subsidiary of MatterFi, the current developers
-of Open-Transactions. When KYC is capable of restricting whales,
-consolidated private interests are less likely to win.</p>
+tools for communication and identification without dictatorial control
+of any particular vote. The voting capabilities described have been
+developed by Voting Matters, a subsidiary of MatterFi, the current
+developers of Open-Transactions.</p>
+<h2 id="the-pilot">9. The pilot</h2>
+<p>The pilot is permissioned: two or three sites with real spare
+backhaul, dollars not tokens, one Mint, no onion routing, hourly prepaid
+windows, signed receipts, a monthly invoice. It answers directly which
+price governs, who pays and for what, the receipt structure without
+route privacy, the payment window, the last-hop rule, the place of
+announcements, settlement by invoice, the clock tolerance, and the
+narrow resilience claim of Section 1. It answers by simulation alongside
+the unrecoverable fee, the subsidy bound, emissions, the Steward’s
+funding, availability, and Mint fraud proofs. It defers, honestly, the
+lifting of the subsidy cap, the Mint committee, attestation, open
+relays, the token, and governance.</p>
+<p>Success looks like: two parties who are not the authors settle a
+month of real traffic on receipts, dispute at least one receipt, and the
+dispute resolves from the receipt data alone.</p>
+<p><strong>Phase 0, October 2026.</strong> Three single-board computers
+on one home network: a gateway that is the payer, a relay that is the
+hop, and a Mint. The payer and the hop share a tunnel; at the top of
+every hour the payer reads the tunnel’s byte counters, builds the Figure
+2 receipt, signs it, and asks the hop to acknowledge. The hop checks the
+signature and the clock rule, countersigns with its own count, and both
+copies go to the Mint, which verifies the signatures, refuses NYMs it
+was not told about, appends everything to its ledger, and settles the
+window by the rule in Section 3.6. The posted price is ten cents a
+gigabyte and the invoice is by month. The code is published.</p>
+<p>Three forced tests were run on the first day, each by resetting a
+counter on one side so that the two signed counts would disagree.</p>
+<ul>
+<li><em>The hop under-claims.</em> Twenty megabytes crossed the tunnel;
+the payer signed 21,938,052 bytes and the hop 21,939,460, within one
+percent, and the Mint settled the window at the smaller count. Twenty
+more megabytes crossed; the hop’s counter was reset; the payer signed
+21,945,428 bytes and the hop 1,712; the Mint recorded a dispute and
+settled at 1,712.</li>
+<li><em>The hop over-claims.</em> The same two windows with the counter
+reset on the payer’s side instead: the payer signed 272 bytes against
+the hop’s 21,947,428, and the window settled at 272 bytes. A hop cannot
+be paid for more than the payer signed for.</li>
+<li><em>The clock rule.</em> The hop’s clock was stepped ten seconds; it
+declined the payer’s receipt, and the window was lost, not paid. The
+declined receipt stays on the Mint without an acknowledgement. The hop’s
+next acknowledgement covered both windows and settled at the payer’s
+count.</li>
+</ul>
+<p>In every case the Mint resolved the window from the two signed
+receipts alone, with no measurement of its own. In sync, the three
+clocks agree within a millisecond (Section 3.5).</p>
+<p><strong>What Phase 0 did not show.</strong> A second party. A payment
+rail, since the invoice is the settlement. Route privacy, since there is
+one hop. Any subsidy, since there is no Steward. Any adversary, since
+one person operates all three nodes. It showed that the receipt
+mechanism works between machines that are not trusted to agree, which is
+the part a whitepaper cannot show on paper.</p>
+<p><strong>Phase 1</strong> replaces the bench cable between the gateway
+and the relay with a radio link and moves receipts and liveness onto a
+low-rate control channel. Its test is to cut the gateway’s connection to
+the internet mid-window and show that the window still settles when the
+connection returns, which is the claim in Section 1. <strong>Phase
+2</strong> puts the relay outdoors on its own power and, with it, a
+second operator who is not the authors, which is the success criterion
+above.</p>
+<h2 id="what-version-0.3-leaves-open">10. What version 0.3 leaves
+open</h2>
+<ul>
+<li><strong>Whether a bounded subsidy moves anyone.</strong> With
+<em>m</em> at most <em>b</em>, the most the Steward can add to a link is
+<em>b</em> of what users pay across it. If that does not move an
+operator to build a link, the alternatives are to fund links from a
+treasury that does not depend on traffic, which is grant-making, or to
+lift the cap by charging for payer identity rather than counting fees,
+which requires knowing what a Sybil payer costs to manufacture. A
+simulation of one operator running payer, relays, and Mint, sweeping
+<em>b</em>, decides between them.</li>
+<li><strong>The customer.</strong> Site-to-site backhaul between
+locations that already overbuy capacity is the pilot’s use case because
+the authors can supply both sides of it. Whether anyone chooses this
+over a carrier contract, a satellite, or a VPN is a market question that
+only paying traffic answers.</li>
+<li><strong>Forwarding receipts under route privacy.</strong> Whether a
+Mint can verify the chain of Section 3.1 without learning the
+route.</li>
+<li><strong>The settlement layer.</strong> Chosen among the three
+candidates in Section 2 when an untrusted party joins; the cost of each
+has not been measured.</li>
+<li><strong>The Mint committee.</strong> One proposer and four attesters
+is the target; the pilot has one Mint and fraud proofs.</li>
+<li><strong>Attestation for the subsidy tier</strong>, or its
+replacement by bond age and diversity.</li>
+<li><strong>Open relays.</strong> Relay service is between members.
+Carrying third-party traffic for the public internet raises liability
+the paper does not address, and is not in the pilot.</li>
+<li><strong>The token</strong>, its status, and the Steward’s legal
+form, all deferred until there is traffic to denominate, and all to be
+reviewed with counsel against the rules in force then.</li>
+<li><strong>Clock drift between sites</strong>, measured once the relay
+leaves the bench.</li>
+<li><strong>Reconciliation between Mints</strong> in different
+settlement domains, and the price of custody across a contact that may
+never come (Appendix A).</li>
+</ul>
+<h2 id="appendix-a.-links-with-delay">Appendix A. Links with delay</h2>
+<p>The protocol has no constants. The hour, the five seconds, the one
+Mint, and the monthly invoice are the pilot’s choices for a link whose
+light time is nothing and whose contact is continuous. Each of them is a
+parameter of a link, published by the relay in its announcement and
+accepted by the payer when it opens a window. Written that way, the same
+receipt serves a bench, a relay in lunar orbit, and a link whose other
+end is years away; the differences are numbers, and the thing that
+proves delivery is the same two signatures on every link.</p>
+<p><strong>A.1 Link parameters.</strong> For each link it offers, a
+relay publishes: the one-way light time of the link; its contact plan,
+which is when the link exists, for how long, and the bytes it expects to
+carry in each contact; its posted price per byte; its clock tolerance;
+the kind of window it accepts, an hour, a contact, or a transmission;
+and the settlement domain it settles in, which is the Mint that holds
+its bond. A payer that opens a window accepts those parameters for that
+window. Nothing in them is trusted for payment. The receipt graph
+records what each announced contact actually settled, and a relay whose
+contacts persistently settle less than it announced ranks below one
+whose contacts match, exactly as Section 6 ranks announcements on a
+continuous link.</p>
+<p><strong>A.2 Windows and custody.</strong> On a link with a contact
+plan the window is the contact: it opens when the link does, closes when
+it does, and the receipt is per contact. The window is prepaid (Section
+3.6). A relay that stores bytes during one contact in order to carry
+them to the next is in custody of them, and custody is nothing more than
+a window on the next link: the relay is paid for it by the next link’s
+receipt, not by this one. Delay-tolerant networking removed custody
+transfer from the core of its bundle protocol for want of a way to make
+it reliable; this is that mechanism with the reason to accept custody
+attached. A relay accepts the bundle because the next contact’s window
+is already paid for.</p>
+<p><strong>A.3 Clocks.</strong> The tolerance of Section 3.5 is a link
+parameter: the base tolerance, plus the link’s light time both ways,
+plus the drift expected since the last contact. The relay’s check
+becomes whether the payer’s timestamp is plausible for a signal that
+left when the payer says it did. It is still the payer’s clock, and a
+receipt outside the tolerance is still declined and its window lost.</p>
+<p><strong>A.4 Payment.</strong> Below a light time the membership sets,
+the conditional payment of Section 3.2 applies, with lock timeouts no
+shorter than the route’s round trip. Above it, windows are prepaid and
+no lock is used: a lock that must run for days ties a relay’s capital to
+a timer, and a prepaid window bounded by the payer’s bond does the same
+work without one. The pilot is already on the prepaid side of that
+line.</p>
+<p><strong>A.5 Settlement domains.</strong> A Mint settles the links of
+its domain, in practice a world. A relay on a link between two domains
+posts a bond with the Mint on each side, and a dispute on that link is
+resolved by either Mint from the two receipts, since the rule of Section
+3.6 needs no other input. Mints reconcile their published commitments
+(Section 4) whenever a link between them exists. A Mint whose
+commitments do not reconcile, or that has burned less than Section 3.3
+requires, is slashable by the other from its own publications. The burn
+is enforced by the settling Mint and audited at reconciliation; the
+reconciliation protocol itself is open (Section 10).</p>
+<p><strong>A.6 Route discovery.</strong> A route between domains is not
+discovered; it is computed from the contact plans, as delay-tolerant
+networks compute routes from a contact graph, and ranked by what each
+relay settled in past contacts. A relay’s announcement therefore says
+when it will be reachable, not whether it is. Liveness has no meaning on
+such a link, and earns nothing on any link.</p>
+<p><strong>A.7 What this does not change.</strong> What the protocol
+rewards: bytes a payer signed for and a relay carried. What it refuses
+to pay for: everything else. What proves delivery: two signatures on one
+receipt. Distance changes how long it takes to make one, not what it
+is.</p>
 <section id="footnotes" class="footnotes footnotes-end-of-document"
 role="doc-endnotes">
 <hr />
@@ -490,102 +696,39 @@ id="fn2"><p>https://web.archive.org/web/20081202153609/http://www.ictregulationt
 href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn3"><p>http://opentransactions.org/wiki/index.php?title=About<a
 href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn4"><p>those with more powerful equipment, the higher your hash
-rate, the greater the chance you’ll have to mine the next block and
-receive the block reward. To increase these chances further miners can
-come together in pools to combine their computing power and distribute
-their rewards evenly<a href="#fnref4" class="footnote-back"
+<li id="fn4"><p>Wyoming was the first state in America to recognize a
+DAO LLC, under the Decentralized Autonomous Organizations Supplement
+passed by its legislature in March 2021. The registered name includes
+“DAO,” “LAO,” or “DAO LLC,” and the Articles of Organization include a
+Notice of Restrictions on Duties and Transfers stating that the
+Supplement, the underlying smart contracts, the articles, and the
+operating agreement may define, reduce, or eliminate fiduciary duties
+and may restrict the transfer of ownership interests, withdrawal from
+the DAO, return of capital contributions, and dissolution. A DAO may be
+member-managed or algorithmically managed, the latter only where the
+underlying smart contracts can be updated, and the Articles must be
+amended when those contracts change. A withdrawn member forfeits all
+membership interests unless the articles provide otherwise. Case law has
+yet to color how a court treats a DAO’s liability to creditors.
+Acceptance of the Network Steward as a Wyoming DAO would let it use
+ordinary banking to purchase bandwidth and ordinary tax reporting for
+what it pays operators, which is one reason the pilot settles in
+dollars.<a href="#fnref4" class="footnote-back"
 role="doc-backlink">↩︎</a></p></li>
-<li id="fn5"><p>Unlike the Mints of $BANDWIDTH, risking their assets in
-exchange to help be the Oracle of consensus that rewards operators
-fulfilling the needs of users, Miners.<a href="#fnref5"
+<li id="fn5"><p>The Steward’s model for each product it seeds: 1) Prove
+prototype and customer acceptance. 2) Grow to the critical mass at which
+the customer lifecycle can be defined. 3) Open source all materials and
+tools that will allow other companies to compete. 4) Transfer assets to
+a special-purpose vehicle, Company One, and offer incentives for
+liabilities and talent to join it. 5) Offer seed funding for two other
+companies to be started to fulfill the product need. This model was
+executed in the creation of three state-owned, yet competing, Chinese
+airlines, whose case studies can be confirmed.<a href="#fnref5"
 class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn6"><p>Perhaps this should be offered by Notary services
-instead…<a href="#fnref6" class="footnote-back"
-role="doc-backlink">↩︎</a></p></li>
-<li id="fn7"><p>This is a fictional DEX that will be the first to
-maintain the exchange of $BANDWIDTH (to determine a spot price)<a
-href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn8"><p>Should an outside party querying the node choose to
-request <strong>complete status</strong>, the node would report back,
-the names of other connected nodes, the route bonus currently being
-collected if a route bonus is available to them.</p>
-<p>Should an operator allow others, or choose themselves to run a
-<strong>sync test</strong> (which can be programmatically set at a fixed
-price for a user to run only if other users are able to see the last
-time the test was initiated when they query a node) the Relay or
-Endpoint will scan its network hardpoints for all other devices that are
-broadcasting the $BANDWIDTH prefix and offer to share their distributed
-hash table of connected devices with the $BANDWIDTH prefix allowing a
-device to query up the number of layers to other devices it sees fit,
-currently this variable is three. The most likely use case is when a
-user establishes a connection it takes a known route, and asks all nodes
-in the route to perform a sync such that if a less expensive route is
-available, with a higher or lower millisecond delay.<a href="#fnref8"
-class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn9"><p>Thanks to Advocate Kathrine Long and Wyoming Governor
-Mark Gordon, Wyoming is the first state in America to recognize a DAO
-LLC and based on the Decentralized Autonomous Organizations Supplement
-(DAO Supplement), a bill passed by Wyoming’s state senate on March 17th
-of 2021, there is enough clarity of the legal status of the
-decentralized autonomous organization (DAO) for operators to construct
-and rely on them even though the entity has not yet been contemplated by
-federal or state legislatures.</p>
-<p>Historically one would construct a semi-autonomous entity by
-initiating a PBC (Public Benefit Company) that would allow the entity to
-specify a public benefit above the fiduciary requirements of a director
-to its shareholders, followed by BI laws that force human turn over
-greater than the risk rate of collusion.</p>
-<p>Wyoming’s new acceptance and guidance protects DAOs from being sued
-as general partnerships but also solidifies the rights of DAOs as legal
-persons. The registered name will include “DAO,” “LAO,” or “DAO LLC.”,
-and within the Articles of Organization include a “Notice of
-Restrictions on Duties and Transfers,” stating that the DAO Supplement,
-underlying smart contracts, articles, and operating agreement, if
-applicable, of a DAO may define, reduce, or eliminate fiduciary duties
-and may restrict the transfer of ownership interests, withdrawal or
-resignation from the DAO, return of capital contributions, and
-dissolution of the DAO. The Articles may define the DAO as either
-member-managed or algorithmically managed (only legally formable if the
-underlying smart contracts can be updated, modified, or otherwise
-upgraded). These Articles must be amended when the DAO’s smart contracts
-have been updated or changed. In Wyoming a DAO LLC does not allow a
-member to have the organization dissolved for failure to return the
-member’s contribution of capital, and unless otherwise provided for in
-the articles, smart contracts, or operating agreement, a withdrawn
-member forfeits all membership interests in the DAO, including any
-governance or economic rights.</p>
-<p>This new doctrine is likely to yield rulings in the case of contested
-liability from creditors, challenged through the court system, although
-case law has yet to color in what favor a Judge may lean. Acceptance of
-the Network Steward as a DAO by the Wyoming courts enables the DAO to
-use fiat banking for the distribution of rewards and traditional
-Internal Revenue Service structured 1099 relationships for the
-distribution of non-token rewards. Given the governance characteristics
-of this token, as it relates to pool operators and supply held, non
-token distributions will allow many freedoms normally prohibited in
-undefined prosecution of token-reward marketplace as the securities and
-exchange act of 1933 has not yet been adopted to the cryptocurrency
-space.<a href="#fnref9" class="footnote-back"
-role="doc-backlink">↩︎</a></p></li>
-<li id="fn10"><p>Block rewards undergo a recurring decimation, whereby
-distributions reduce by 10% every 100 days. Each decimation ensures a
-smooth issuance decay.<a href="#fnref10" class="footnote-back"
-role="doc-backlink">↩︎</a></p></li>
-<li id="fn11"><p>of each finger of its determined products by following
-the same model. 1) Prove prototype and customer acceptance. 2) Grow to
-critical mass that the customer lifecycle can be defined. 3) Open source
-all materials and tools that will allow other companies to compete. 4)
-Transfer assets to an SPV known as Company one and offer incentives for
-liabilities and talent to join company one. 5) Offer seed funding for
-two other companies to be started to fulfill the product need. This
-model was well executed prior in the creation of three state-owned, yet
-competing, Chinese airlines whose case studies can be confirmed.<a
-href="#fnref11" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn12"><p>Possible with Pseudonyms through Open Transactions and
+<li id="fn6"><p>Possible with Pseudonyms through Open Transactions and
 OBPP-05
 (https://github.com/OpenBitcoinPrivacyProject/rfc/blob/master/obpp-05.mediawiki)<a
-href="#fnref12" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 </article>

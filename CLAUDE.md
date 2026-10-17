@@ -14,7 +14,8 @@ Site: https://bandwidthswap.com, served by GitHub Pages from `main` of this repo
 |---|---|
 | `index.html` | The project page. Hand-written HTML, no build step. |
 | `docs/` | Everything the site serves besides the page. **Generated**, except the 2021 PDF. Do not edit by hand. |
-| `paper/BANDWIDTH-whitepaper-v0.2.md` | **The paper's source of truth.** Edit this. |
+| `paper/BANDWIDTH-whitepaper-v0.3.md` | **The paper's source of truth.** Edit this. Oct 17, 2026: the open questions resolved by their defaults and the Phase 0 lab, Section 9 on the pilot, Section 10 on what stays open, Appendix A on links with delay (the protocol as link parameters). |
+| `paper/BANDWIDTH-whitepaper-v0.2.md` | The Oct 8, 2026 revision as published; the baseline for the v0.3 diff. Never edit. |
 | `paper/BANDWIDTH-whitepaper-v0.1.md` | Faithful Markdown clone of the 2021 PDF. Never edit; it is the diff baseline. |
 | `paper/whitepaper-spelling-diff.html` | Record of the copyedit pass on v0.2. Historical. |
 | `SHOPPING-LIST.md` | Parts to turn the three Pi 3 boards into nodes, by phase, with budget. |
@@ -29,7 +30,7 @@ Site: https://bandwidthswap.com, served by GitHub Pages from `main` of this repo
 
 ## Workflow
 
-1. Edit `paper/BANDWIDTH-whitepaper-v0.2.md`, `OPEN-QUESTIONS.md`, or `index.html`.
+1. Edit `paper/BANDWIDTH-whitepaper-v0.3.md`, `OPEN-QUESTIONS.md`, or `index.html`.
 2. Run `tools/build.sh` if you touched the paper or the backlog. The paper page's title block (authors, email, date, version) and the diff page's "Before" and "After" labels are arguments inside the script, not read from the Markdown header, which the build drops; a new paper date or version is set there too.
 3. Commit and push to `main`. Pages deploys in about 30 seconds. Verify with `curl -sI https://bandwidthswap.com/docs/paper.html`.
 4. If you touched `worker/`, run `node worker/test.mjs`, then deploy from that directory with `npx -y wrangler@3 deploy` (a public action: Grace's call). The Worker is not part of Pages; a push does not deploy it.
