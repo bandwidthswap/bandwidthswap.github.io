@@ -218,7 +218,7 @@ signed by payer</code></pre>
   <div class="rules">
     <div class="rule"><h4>Payment is the proof</h4><p>The only party who can't be fooled about whether bytes arrived is the one who paid for them. So the payer's settled payment is the proof, and no validator ever has to measure a relay.</p></div>
     <div class="rule"><h4>No reward may exceed its fee</h4><p>If a relay could earn more for carrying a byte than the byte cost to generate, it would carry bytes to itself. Every subsidy is bounded by this rule.</p></div>
-    <div class="rule"><h4>The treasury is the first customer</h4><p>The treasury doesn't hand out bonuses. It buys bandwidth on links it wants to exist, at a posted price for a posted term. Whoever builds the link gets paid on receipts the treasury signs.</p></div>
+    <div class="rule"><h4>The treasury is the first customer</h4><p>The treasury doesn't hand out bonuses. It buys bandwidth on links it wants to exist, at a posted price for a posted term. Whoever builds the link gets paid on receipts the treasury signs. Anyone can post the same kind of commitment, a bounty with a minimum rate that refunds on shortfall (paper, Section 5.1).</p></div>
     <div class="rule"><h4>Quality is priced, not proven</h4><p>A slow relay settles fewer bytes per window and earns less. Speed proofs are required only where a subsidy is claimed, which is the one place a false claim would pay.</p></div>
   </div>
 </section>
@@ -315,7 +315,7 @@ signed by payer</code></pre>
     <li><span class="ph">Phase 0<small>one evening</small></span><span>Three Pis on the home network. Time, tunnel, receipts, one Mint. You pay yourself. Proves the receipt code and the clock rule.</span></li>
     <li><span class="ph">Phase 1<small>one weekend</small></span><span>Radios in. House to forest over a 5 GHz or HaLow pair, receipts and liveness over LoRa. Unplug the house's internet mid-window and show settlement still closes.</span></li>
     <li><span class="ph">Phase 2<small>a month</small></span><span>A neighbor operates the ridge. The treasury posts its first purchase commitment: this much data a day across this link, at this price, for this long. Paid in dollars on receipts. First real dispute.</span></li>
-    <li><span class="ph">Phase 3<small>open</small></span><span>Open-source the kit and the bounty board. Anyone can post a named link and fund it. Anyone can build it.</span></li>
+    <li><span class="ph">Phase 3<small>open</small></span><span>Open-source the kit and the bounty board. Anyone can post a purchase commitment on a named link or a place and fund it; the paper's Section 5.1 says how one settles and refunds. Anyone can build it.</span></li>
     <li><span class="ph">Phase 4<small>north star</small></span><span>Links into places where the internet is forbidden. This is the right long-term target and the wrong next step: receipts prove delivery, not location, and paying for a node in a hostile jurisdiction needs a location proof that doesn't exist yet, legal review, and an incentive design that never makes a border crossing the thing being paid for.</span></li>
   </ul>
 </section>
