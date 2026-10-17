@@ -14,7 +14,8 @@ Site: https://bandwidthswap.com, served by GitHub Pages from `main` of this repo
 |---|---|
 | `index.html` | The project page. Hand-written HTML, no build step. |
 | `docs/` | Everything the site serves besides the page. **Generated**, except the 2021 PDF. Do not edit by hand. |
-| `paper/BANDWIDTH-whitepaper-v0.3.md` | **The paper's source of truth.** Edit this. Oct 17, 2026: the open questions resolved by their defaults and the Phase 0 lab, Section 9 on the pilot, Section 10 on what stays open, Appendix A on links with delay (the protocol as link parameters). |
+| `paper/BANDWIDTH-whitepaper-v0.4.md` | **The v0.4 draft, Oct 17, 2026, not yet published.** v0.3 aligned with `PRESSURE-TESTS.md` and `INSTALLATIONS.md`: the invoice as a credit term, the Mint's standing as its pilot bond, the published commitment, the carry, custody receipts and holding terms, refund of a window whose contact never comes, A.5 rewritten (units, reconciliation as check, deposit and traffic, exclusion and readmission), the sole bridge as a monopoly and the pipe as a toll buy-out, A.7 bounded by the payer's horizon, Section 10 rewritten. To publish: point `tools/build.sh` at v0.4 with v0.3 as `prev`, add the v0.3-to-v0.4 diff page, update the Reading list and masthead in `index.html`. |
+| `paper/BANDWIDTH-whitepaper-v0.3.md` | **The published paper's source.** Edit this only until v0.4 is published. Oct 17, 2026: the open questions resolved by their defaults and the Phase 0 lab, Section 9 on the pilot, Section 10 on what stays open, Appendix A on links with delay (the protocol as link parameters). |
 | `paper/BANDWIDTH-whitepaper-v0.2.md` | The Oct 8, 2026 revision as published; the baseline for the v0.3 diff. Never edit. |
 | `paper/BANDWIDTH-whitepaper-v0.1.md` | Faithful Markdown clone of the 2021 PDF. Never edit; it is the diff baseline. |
 | `paper/whitepaper-spelling-diff.html` | Record of the copyedit pass on v0.2. Historical. |
