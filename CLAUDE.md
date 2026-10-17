@@ -21,6 +21,8 @@ Site: https://bandwidthswap.com, served by GitHub Pages from `main` of this repo
 | `SHOPPING-LIST.md` | Parts to turn the three Pi 3 boards into nodes, by phase, with budget. |
 | `PHASE0-SETUP.md` | **The hands-on handoff for Phase 0**: what is already set up on the Mac, how to flash the three cards, how to check the nodes, and the exact work the next session does over SSH. |
 | `OPEN-QUESTIONS.md` | **The build backlog.** 20 numbered questions (A1 to A6, B1 to B10, C1 to C4), each with options, what a build reveals, and a default. Section D is what the copyedit left open; section E defines the pilot. |
+| `PRESSURE-TESTS.md` | The ledger of what the Captain's Notes essays on commerce across infinite time and distance found: per essay, what held, what strained, what the paper should say. Oct 17, 2026. |
+| `INSTALLATIONS.md` | Five example installations (bench, valley, Moon, Mars, Proxima) walked through those findings, with bench-emulable tests and the matrix that orders the alignment pass on the paper. |
 | `tools/build.sh` | Regenerates `docs/` from `paper/` and `OPEN-QUESTIONS.md`. Needs pandoc and python3. |
 | `tools/paper.tmpl` | Pandoc template for the LaTeX-style paper page (latex.css, Latin Modern). |
 | `tools/mkdiff.py` | Side-by-side Markdown diff renderer. |
