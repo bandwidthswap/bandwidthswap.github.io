@@ -24,6 +24,7 @@ Site: https://bandwidthswap.com, served by GitHub Pages from `main` of this repo
 | `tools/build.sh` | Regenerates `docs/` from `paper/` and `OPEN-QUESTIONS.md`. Needs pandoc and python3. |
 | `tools/paper.tmpl` | Pandoc template for the LaTeX-style paper page (latex.css, Latin Modern). |
 | `tools/mkdiff.py` | Side-by-side Markdown diff renderer. |
+| `notes/` | Field notes: short articles in the site's style, one HTML file each, sharing `notes/notes.css`; `notes/index.html` lists them and so does the Field notes section of `index.html`. No build step. |
 | `tools/card/` | `apply-card.sh`: customises a Pi OS card on the Mac (cloud-init files, the `ssh` switch, a one-shot `firstrun.sh`) when the Imager's settings do not apply, as happened on Oct 16. |
 | `worker/` | The status feed at `status.bandwidthswap.com`: a Cloudflare Worker with one KV key, posted to by the Mint, read by the page's Lab status section. `node worker/test.mjs` tests it; its README has the deploy steps and the token handling. |
 | `CNAME`, `.nojekyll` | Pages config. Leave alone. |
