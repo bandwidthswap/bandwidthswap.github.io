@@ -41,6 +41,7 @@ svg .x{stroke:var(--signal);stroke-width:3;fill:none}
 .map[data-state="built"] .st-posted,.map[data-state="built"] .st-dark,.map[data-state="built"] .st-normal,.map[data-state="built"] .st-down{display:none}
 .map[data-state="dark"] .st-posted,.map[data-state="dark"] .st-built,.map[data-state="dark"] .st-normal,.map[data-state="dark"] .st-down{display:none}
 .flows th:first-child,.flows td:first-child{min-width:12ch}
+.flows td.txt{white-space:normal;min-width:16ch}
 .cond{padding-left:1.2em}
 .cond li{margin-bottom:8px}
 .cond strong{font-weight:600}
@@ -91,8 +92,8 @@ svg .x{stroke:var(--signal);stroke-width:3;fill:none}
       <path d="M380 120V40" class="link"/><text x="386" y="80" class="m">dish · 150 Mbps</text>
       <path d="M630 120V40" class="link"/><text x="636" y="80" class="m">dish · 150 Mbps</text>
       <!-- street links -->
-      <path d="M190 145H320" class="link"/><text x="255" y="138" text-anchor="middle" class="m">Wi-Fi · 200 Mbps</text><text x="255" y="186" text-anchor="middle" class="m">$0.02/GB as a hop</text>
-      <path d="M440 145H570" class="link"/><text x="505" y="138" text-anchor="middle" class="m">915 MHz · 4 Mbps</text><text x="505" y="186" text-anchor="middle" class="m">$0.02/GB as a hop</text>
+      <path d="M190 145H320" class="link"/><text x="255" y="138" text-anchor="middle" class="m">Wi-Fi · 200 Mbps</text><text x="255" y="170" text-anchor="middle" class="m">$0.02/GB as a hop</text>
+      <path d="M440 145H570" class="link"/><text x="505" y="138" text-anchor="middle" class="m">915 MHz · 4 Mbps</text><text x="505" y="170" text-anchor="middle" class="m">$0.02/GB as a hop</text>
       <!-- dependents -->
       <rect x="70" y="250" width="120" height="50" rx="4" class="box pay"/>
       <text x="130" y="270" text-anchor="middle">House 1a</text><text x="130" y="287" text-anchor="middle" class="sub">pays · 30 GB a day</text>
@@ -100,9 +101,9 @@ svg .x{stroke:var(--signal);stroke-width:3;fill:none}
       <text x="380" y="270" text-anchor="middle">House 2a</text><text x="380" y="287" text-anchor="middle" class="sub">pays · 30 GB a day</text>
       <rect x="570" y="250" width="120" height="50" rx="4" class="box pay"/>
       <text x="630" y="270" text-anchor="middle">House 3a</text><text x="630" y="287" text-anchor="middle" class="sub">pays · 10 GB a day</text>
-      <path d="M130 170V250" class="link"/><text x="124" y="206" class="m" text-anchor="end">wire · 1 Gbps</text>
-      <path d="M380 170V250" class="link"/><text x="374" y="206" class="m" text-anchor="end">Wi-Fi · 200 Mbps</text>
-      <path d="M630 170V250" class="link"/><text x="624" y="206" class="m" text-anchor="end">915 MHz · 4 Mbps</text>
+      <path d="M130 170V250" class="link"/><text x="106" y="214" class="m" text-anchor="end">wire · 1 Gbps</text>
+      <path d="M380 170V250" class="link"/><text x="356" y="214" class="m" text-anchor="end">Wi-Fi · 200 Mbps</text>
+      <path d="M630 170V250" class="link"/><text x="606" y="214" class="m" text-anchor="end">915 MHz · 4 Mbps</text>
       <!-- the Mint -->
       <rect x="300" y="340" width="160" height="44" rx="4" class="box mint"/>
       <text x="380" y="358" text-anchor="middle">Street Mint</text><text x="380" y="374" text-anchor="middle" class="sub">a Pi at House 2 · receipts hourly</text>
@@ -126,16 +127,15 @@ svg .x{stroke:var(--signal);stroke-width:3;fill:none}
         <path d="M118 248V172" class="flow" marker-end="url(#m1g)"/>
         <path d="M190 154H318" class="flow" marker-end="url(#m1g)"/>
         <path d="M368 118V44" class="flow" marker-end="url(#m1g)"/>
-        <path d="M142 172V246" class="cash" marker-end="url(#m1s)"/><text x="150" y="240" class="money">$0.12/GB</text>
-        <text x="150" y="222" class="m">$0.02 to House 1, $0.10 to House 2</text>
+        <path d="M142 172V246" class="cash" marker-end="url(#m1s)"/><text x="150" y="242" class="money">$0.12/GB</text>
+        <text x="150" y="224" class="m">$0.02 + $0.10</text>
         <path d="M318 126H192" class="cash" marker-end="url(#m1s)"/><text x="255" y="118" text-anchor="middle" class="money">$0.10 + $0.02 → House 2</text>
-        <text x="372" y="100" text-anchor="end" class="m">House 1's own traffic too, at $0.10</text>
         <path d="M368 248V172" class="flow" marker-end="url(#m1g)"/>
         <path d="M392 172V246" class="cash" marker-end="url(#m1s)"/><text x="400" y="236" class="money">$0.10/GB</text>
         <path d="M618 248V172" class="flow" marker-end="url(#m1g)"/><path d="M618 118V44" class="flow" marker-end="url(#m1g)"/>
         <path d="M642 172V246" class="cash" marker-end="url(#m1s)"/><text x="650" y="236" class="money">$0.10/GB</text>
         <text x="392" y="98" class="money">House 2 may raise its price,</text><text x="392" y="114" class="money">up to the way around: $0.14</text>
-        <text x="40" y="318" class="data">1a's bytes: wire → House 1 → Wi-Fi → House 2's dish · two hops, two receipts, two payments</text>
+        <text x="40" y="318" class="data">1a's bytes: wire → House 1 → Wi-Fi → House 2's dish · two hops, two receipts · House 1's own traffic too</text>
       </g>
     </svg></div>
     <figcaption>Working: three one-hop markets, each dependent paying its dish house. Down: House 1a's bytes cross the street link to House 2's dish and House 1a pays both houses; House 2 can charge up to what the way around through House 3 would cost ($0.02 + $0.02 + $0.10). Nothing is paid to House 1 for its dish being down, and nothing for standing by.</figcaption>
@@ -145,7 +145,7 @@ svg .x{stroke:var(--signal);stroke-width:3;fill:none}
   <div class="tablewrap"><table class="flows">
     <thead><tr><th>Who pays whom</th><th>Working</th><th>House 1's dish down</th></tr></thead>
     <tbody>
-      <tr><td>House 1a → House 1</td><td class="num">$0.10/GB · $3.00 a day</td><td class="num">$0.02/GB as a hop · $0.60 a day</td></tr>
+      <tr><td>House 1a → House 1</td><td class="num">$0.10/GB · $3.00 a day</td><td class="num txt">$0.02/GB as a hop · $0.60 a day</td></tr>
       <tr><td>House 1a → House 2</td><td class="num">nothing</td><td class="num">$0.10/GB · $3.00 a day</td></tr>
       <tr><td>House 1 → House 2 (its own use, 20 GB)</td><td class="num">nothing</td><td class="num">$0.10/GB · $2.00 a day</td></tr>
       <tr><td>House 2a → House 2</td><td class="num">$0.10/GB · $3.00 a day</td><td class="num">$0.10/GB · $3.00 a day</td></tr>
@@ -181,7 +181,7 @@ svg .x{stroke:var(--signal);stroke-width:3;fill:none}
         <marker id="m2s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--signal)"/></marker>
       </defs>
       <rect x="520" y="14" width="200" height="26" rx="4" class="box"/><text x="620" y="31" text-anchor="middle">the internet</text>
-      <path d="M665 120V40" class="link"/><text x="659" y="84" class="m" text-anchor="end">dish · $0.10/GB</text>
+      <path d="M665 120V40" class="link"/><text x="645" y="84" class="m" text-anchor="end">dish · $0.10/GB</text>
       <!-- trees -->
       <g fill="none" stroke="var(--line)" stroke-width="2">
         <path d="M160 230l12-26 12 26zM200 100l12-26 12 26zM230 250l12-26 12 26zM270 90l12-26 12 26zM300 240l12-26 12 26zM470 100l12-26 12 26zM500 250l12-26 12 26zM540 235l12-26 12 26zM190 170l10-22 10 22zM440 190l10-22 10 22z"/>
@@ -239,8 +239,8 @@ svg .x{stroke:var(--signal);stroke-width:3;fill:none}
     <tbody>
       <tr><td>Above the minimum</td><td class="num">1.2 GB</td><td class="num">$0.06 + $0.06</td><td class="num">$0.12 + $0.06</td><td class="num">$0.015</td><td class="num">nothing</td></tr>
       <tr><td>Rain on the radio</td><td class="num">0.5 GB</td><td class="num">$0.025 + $0.025</td><td class="num">$0.05 + $0.025</td><td class="num">$0.006</td><td class="num">$0.05 of premium</td></tr>
-      <tr><td>Cabin away, nothing sent</td><td class="num">0</td><td class="num">nothing</td><td class="num">nothing</td><td class="num">nothing</td><td class="num">the window's escrow, at the deadline</td></tr>
-      <tr><td>A hiker's phone tries the route</td><td class="num">0.3 GB</td><td class="num">$0.015</td><td class="num">$0.03</td><td class="num">$0.002</td><td class="num">the escrow reimburses the hiker's $0.045, up to ten times a week</td></tr>
+      <tr><td>Cabin away, nothing sent</td><td class="num">0</td><td class="num">nothing</td><td class="num">nothing</td><td class="num">nothing</td><td class="num txt">the window's escrow, at the deadline</td></tr>
+      <tr><td>A hiker's phone tries the route</td><td class="num">0.3 GB</td><td class="num">$0.015</td><td class="num">$0.03</td><td class="num">$0.002</td><td class="num txt">the escrow reimburses the hiker's $0.045, up to ten times a week</td></tr>
       <tr><td>Relay dark all month</td><td class="num">0</td><td class="num">nothing</td><td class="num">nothing</td><td class="num">nothing</td><td class="num">$180 at day 60</td></tr>
     </tbody>
   </table></div>
@@ -317,9 +317,9 @@ svg .x{stroke:var(--signal);stroke-width:3;fill:none}
     <thead><tr><th>Who pays whom</th><th>Line clear</th><th>Solar conjunction, Mars clear</th><th>Mars behind the Sun too</th></tr></thead>
     <tbody>
       <tr><td>Earth institution → Jupiter relay orbiter</td><td class="num">$50</td><td class="num">nothing directly</td><td class="num">nothing for three weeks</td></tr>
-      <tr><td>Earth institution → Mars bridge relay</td><td class="num">nothing</td><td class="num">$20 + $3 carry (six hours of custody)</td><td class="num">nothing</td></tr>
-      <tr><td>Mars bridge → Jupiter relay orbiter</td><td class="num">nothing</td><td class="num">$40, in Mars's unit at the bridge's rate</td><td class="num">nothing</td></tr>
-      <tr><td>Jupiter relay orbiter → Europa lander</td><td class="num">from the Jupiter Mint, per the same receipts</td><td class="num">the same</td><td class="num">settled when the link returns</td></tr>
+      <tr><td>Earth institution → Mars bridge relay</td><td class="num">nothing</td><td class="num txt">$20 + $3 carry (six hours of custody)</td><td class="num">nothing</td></tr>
+      <tr><td>Mars bridge → Jupiter relay orbiter</td><td class="num">nothing</td><td class="num txt">$40, in Mars's unit at the bridge's rate</td><td class="num">nothing</td></tr>
+      <tr><td>Jupiter relay orbiter → Europa lander</td><td class="num txt">from the Jupiter Mint, per the same receipts</td><td class="num">the same</td><td class="num">settled when the link returns</td></tr>
       <tr><td>Burned</td><td class="num">$2.50 on Earth</td><td class="num">$1.15 on Earth, $2.00 on Mars</td><td class="num">nothing</td></tr>
       <tr><td>Earth pays in all</td><td class="num">$50</td><td class="num">$63</td><td class="num">nothing; the terabyte waits</td></tr>
     </tbody>
