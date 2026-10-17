@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="How long light takes to reach Mars and the Moon right now, drawn live from the orbits: a year back and a year ahead, with today marked. A field note from Bandwidth Swap.">
+<title>The Light Delay Today · Bandwidth Swap</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="notes.css">
+<style>
+.now{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0 0 22px}
+.now div{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+.now .k{font:600 12px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.now .v{font:500 30px/1.1 var(--mono);font-variant-numeric:tabular-nums;margin:0}
+.now .s{font:400 13px/1.4 var(--mono);color:var(--muted);margin:6px 0 0}
+figure.ld{margin:0 0 6px;position:relative}
+figure.ld svg{width:100%;height:auto;display:block;font-family:var(--mono)}
+figure.ld .tip{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:6px 9px;font:400 12px/1.4 var(--mono);color:var(--fg);white-space:nowrap;display:none}
+figcaption{font:400 13px/1.5 var(--mono);color:var(--muted);margin:6px 0 26px}
+@media (max-width:600px){.now{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="masthead"><div class="wrap">
+  <p class="brand"><a href="../">Bandwidth<span>Swap</span></a></p>
+  <p class="tag">A bandwidth market where the payment is the proof.</p>
+  <p class="status">Field notes · live</p>
+</div></header>
+
+<div class="wrap">
+<article>
+  <p class="eyebrow"><a href="./">Field notes</a></p>
+  <h1>The Light Delay Today</h1>
+  <p class="meta">Live · drawn in your browser from the orbits, a year back and a year ahead · updated every minute</p>
+
+  <p>Light takes about 1.3 seconds to reach the Moon. It takes between 3 and 22 minutes to reach Mars, and which end of that range you are at depends on where the two planets are in their orbits. This page works it out for the moment you opened it.</p>
+
+  <div class="now" aria-live="polite">
+    <div><p class="k">Earth to Mars, one way</p><p class="v" id="mars-now">…</p><p class="s" id="mars-sub">computing</p></div>
+    <div><p class="k">Earth to the Moon, one way</p><p class="v" id="moon-now">…</p><p class="s" id="moon-sub">computing</p></div>
+  </div>
+
+  <figure class="ld" id="fig-mars">
+    <svg id="svg-mars" viewBox="0 0 720 300" role="img" aria-label="One-way light time from Earth to Mars, in minutes, from one year ago to one year ahead, with today marked"></svg>
+    <div class="tip" id="tip-mars"></div>
+    <figcaption id="cap-mars">Earth to Mars, minutes. The long swing is the two orbits: closest at opposition, farthest when Mars is behind the Sun. Closest and farthest are marked within the two years shown; hover for any day.</figcaption>
+  </figure>
+
+  <figure class="ld" id="fig-moon">
+    <svg id="svg-moon" viewBox="0 0 720 220" role="img" aria-label="One-way light time from Earth to the Moon, in seconds, from one year ago to one year ahead, with today marked"></svg>
+    <div class="tip" id="tip-moon"></div>
+    <figcaption id="cap-moon">Earth to the Moon, seconds. The ripple is the Moon's own orbit: perigee to apogee and back every 27.6 days.</figcaption>
+  </figure>
+
+  <h2>Why a bandwidth protocol cares</h2>
+  <p>Every number in the Bandwidth Swap pilot was chosen for a bench where the answer comes back in microseconds: an hourly window, a five-second clock tolerance, a Mint that is always reachable. Version 0.3 of the paper now treats those as parameters of a link rather than constants of the protocol (<a href="../docs/paper.html">Appendix A</a>), and this chart is the reason. A relay serving Mars has a clock tolerance that moves with the orange line, a window that is a contact pass rather than an hour, and a Mint it reconciles with when the link allows. The previous note, <a href="receipts-across-the-light-delay.html">Receipts Across the Light Delay</a>, walks through what survives that and what has to change.</p>
+
+  <h2>How it is computed</h2>
+  <p>No server and no ephemeris download. The page places Earth and Mars on their orbits from their mean orbital elements at the J2000 epoch, solves Kepler's equation for each day, and divides the distance by the speed of light. The Moon's distance is its mean distance with the perigee-to-apogee swing on its 27.55-day anomalistic month. Against the almanac this is accurate to about a minute for Mars and a few hundredths of a second for the Moon: good for the shape and the day's figure, not for navigation. The code is in this page.</p>
+
+  <p class="sources">Sources: mean orbital elements from <a href="https://ssd.jpl.nasa.gov/planets/approx_pos.html">JPL Solar System Dynamics, approximate positions of the planets</a>; lunar constants from the <a href="https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html">NASA Moon fact sheet</a>; the <a href="../docs/paper.html">Bandwidth Swap whitepaper, v0.3</a>.</p>
+</article>
+
+<footer>Bandwidth Swap · <a href="./">all field notes</a> · <a href="../">home</a> · the paper is a draft, the kit is a lab, the numbers in the open questions are the ones to argue with.</footer>
+</div>
+
+<script>
+(function(){
+  var AU=149597870.7, C=299792.458, DAY=86400000, J2000=Date.UTC(2000,0,1,12);
+  function kepler(M,e){var E=M;for(var i=0;i<30;i++){E-=(E-e*Math.sin(E)-M)/(1-e*Math.cos(E));}return E;}
+  function pos(a,e,L0,w,P,d){var M=((L0-w)+360*d/P)*Math.PI/180;M=M%(2*Math.PI);if(M<0)M+=2*Math.PI;var E=kepler(M,e);
+    var nu=2*Math.atan2(Math.sqrt(1+e)*Math.sin(E/2),Math.sqrt(1-e)*Math.cos(E/2));var r=a*(1-e*Math.cos(E));var th=nu+w*Math.PI/180;
+    return [r*Math.cos(th),r*Math.sin(th)];}
+  function marsMinutes(t){var d=(t-J2000)/DAY;var E=pos(1.00000011,0.01671022,100.46435,102.94719,365.256363,d);var M=pos(1.52366231,0.09341233,355.45332,336.04084,686.97959,d);
+    return Math.hypot(M[0]-E[0],M[1]-E[1])*AU/C/60;}
+  var PERIGEE=Date.UTC(2025,10,5,22);
+  function moonSeconds(t){var Mm=2*Math.PI*((t-PERIGEE)/DAY)/27.55455;return 384400*(1-0.0549*Math.cos(Mm))/C;}
+  var MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function fdate(t){var d=new Date(t);return MONTHS[d.getUTCMonth()]+' '+d.getUTCDate()+', '+d.getUTCFullYear();}
+  function fmin(m){var s=Math.round(m*60);return Math.floor(s/60)+' min '+(s%60)+' s';}
+  function fsec(s){return s.toFixed(2)+' s';}
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+
+  function draw(id,tipId,fn,opts){
+    var svg=document.getElementById(id), tip=document.getElementById(tipId);
+    var W=720,H=opts.h,L=52,R=16,T=18,B=34;
+    var now=Date.now(), t0=now-365*DAY, t1=now+365*DAY;
+    var pts=[];for(var t=t0;t<=t1;t+=DAY){pts.push([t,fn(t)]);}
+    var ymin=opts.ymin,ymax=opts.ymax;
+    var x=function(t){return L+(t-t0)/(t1-t0)*(W-L-R);}, y=function(v){return T+(ymax-v)/(ymax-ymin)*(H-T-B);};
+    var s='';
+    var ticks=opts.ticks;for(var i=0;i<ticks.length;i++){var v=ticks[i];s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(v).toFixed(1)+'" y2="'+y(v).toFixed(1)+'" style="stroke:var(--line);stroke-width:1"/>';
+      s+='<text x="'+(L-8)+'" y="'+(y(v)+4).toFixed(1)+'" text-anchor="end" style="fill:var(--muted);font-size:11px">'+v+opts.unit+'</text>';}
+    var d0=new Date(t0);var m=new Date(Date.UTC(d0.getUTCFullYear(),d0.getUTCMonth()+1,1));
+    while(m.getTime()<t1){var mt=m.getTime();var major=(m.getUTCMonth()%3===0);
+      s+='<line x1="'+x(mt).toFixed(1)+'" x2="'+x(mt).toFixed(1)+'" y1="'+(H-B)+'" y2="'+(H-B+(major?6:3))+'" style="stroke:var(--muted);stroke-width:1"/>';
+      if(major){s+='<text x="'+x(mt).toFixed(1)+'" y="'+(H-B+20)+'" text-anchor="middle" style="fill:var(--muted);font-size:11px">'+MONTHS[m.getUTCMonth()]+' '+m.getUTCFullYear()+'</text>';}
+      m=new Date(Date.UTC(m.getUTCFullYear(),m.getUTCMonth()+1,1));}
+    s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+(H-B)+'" y2="'+(H-B)+'" style="stroke:var(--muted);stroke-width:1"/>';
+    var path='';for(var j=0;j<pts.length;j++){path+=(j?'L':'M')+x(pts[j][0]).toFixed(1)+' '+y(pts[j][1]).toFixed(1);}
+    s+='<path d="'+path+'" style="fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round;stroke-linecap:round"/>';
+    var lo=pts[0],hi=pts[0];for(var k=1;k<pts.length;k++){if(pts[k][1]<lo[1])lo=pts[k];if(pts[k][1]>hi[1])hi=pts[k];}
+    if(opts.extremes){[lo,hi].forEach(function(p,n){var lab=(n?'farthest ':'closest ')+fdate(p[0])+' · '+opts.fmt(p[1]);var px=x(p[0]),py=y(p[1]);var anchor=px>W*0.6?'end':'start';var tx=px+(anchor==='end'?-8:8);var ty=py-10;
+      s+='<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="4" style="fill:var(--accent);stroke:var(--bg);stroke-width:2"/>';
+      s+='<text x="'+tx.toFixed(1)+'" y="'+ty.toFixed(1)+'" text-anchor="'+anchor+'" style="fill:var(--muted);font-size:11px">'+esc(lab)+'</text>';});}
+    var vnow=fn(now);
+    s+='<line x1="'+x(now).toFixed(1)+'" x2="'+x(now).toFixed(1)+'" y1="'+T+'" y2="'+(H-B)+'" style="stroke:var(--signal);stroke-width:1.5;stroke-dasharray:4 4"/>';
+    s+='<circle cx="'+x(now).toFixed(1)+'" cy="'+y(vnow).toFixed(1)+'" r="5" style="fill:var(--signal);stroke:var(--bg);stroke-width:2"/>';
+    s+='<text x="'+(x(now)+8).toFixed(1)+'" y="'+(T+12)+'" style="fill:var(--signal);font-size:11px;font-weight:500">now · '+esc(opts.fmt(vnow))+'</text>';
+    s+='<line id="'+id+'-cross" x1="0" x2="0" y1="'+T+'" y2="'+(H-B)+'" style="stroke:var(--muted);stroke-width:1;display:none"/>';
+    s+='<rect x="'+L+'" y="'+T+'" width="'+(W-L-R)+'" height="'+(H-T-B)+'" style="fill:transparent"/>';
+    svg.innerHTML=s;
+    var cross=document.getElementById(id+'-cross');
+    svg.addEventListener('mousemove',function(ev){var r=svg.getBoundingClientRect();var fx=(ev.clientX-r.left)/r.width*W;if(fx<L||fx>W-R){tip.style.display='none';cross.style.display='none';return;}
+      var t=t0+(fx-L)/(W-L-R)*(t1-t0);var v=fn(t);cross.setAttribute('x1',fx.toFixed(1));cross.setAttribute('x2',fx.toFixed(1));cross.style.display='';
+      tip.textContent=fdate(t)+' · '+opts.fmt(v);tip.style.display='block';var left=ev.clientX-r.left+12;if(left>r.width-150)left=ev.clientX-r.left-150;tip.style.left=left+'px';tip.style.top=(ev.clientY-r.top-34)+'px';});
+    svg.addEventListener('mouseleave',function(){tip.style.display='none';cross.style.display='none';});
+    return {now:vnow,lo:lo,hi:hi};
+  }
+  function render(){
+    var mars=draw('svg-mars','tip-mars',marsMinutes,{h:300,ymin:0,ymax:24,ticks:[0,6,12,18,24],unit:'',fmt:fmin,extremes:true});
+    var moon=draw('svg-moon','tip-moon',moonSeconds,{h:220,ymin:1.15,ymax:1.40,ticks:[1.2,1.3,1.4],unit:'',fmt:fsec,extremes:false});
+    var now=Date.now();
+    document.getElementById('mars-now').textContent=fmin(mars.now);
+    document.getElementById('mars-sub').textContent=(mars.lo[0]>now?'next closest ':'closest was ')+fdate(mars.lo[0])+' at '+fmin(mars.lo[1])+(mars.lo[0]>now?'':', now moving apart');
+    document.getElementById('moon-now').textContent=fsec(moon.now);
+    document.getElementById('moon-sub').textContent='between '+fsec(moon.lo[1])+' at perigee and '+fsec(moon.hi[1])+' at apogee';
+  }
+  render();
+  setInterval(render,60000);
+})();
+</script>
+</body>
+</html>
