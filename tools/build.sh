@@ -5,6 +5,8 @@
 #   paper/v0.1.md vs v0.2.md            ->  docs/whitepaper-diff.html (side-by-side, historical)
 #   paper/v0.2.md vs v0.3.md            ->  docs/whitepaper-diff-v0.3.html (side-by-side, historical)
 #   paper/v0.3.md vs v0.4.md            ->  docs/whitepaper-diff-v0.4.html (side-by-side)
+#   paper/BANDWIDTH-whitepaper-v0.4-plain.md      ->  docs/paper-plain.html (+ .md/.txt downloads)
+#   paper/BANDWIDTH-whitepaper-v0.4-operators.md  ->  docs/paper-operators.html (+ .md/.txt downloads)
 #   OPEN-QUESTIONS.md                   ->  docs/OPEN-QUESTIONS.md
 # Needs: pandoc, python3. Run from anywhere; then commit and push to deploy.
 set -e
@@ -43,8 +45,29 @@ pandoc "$docs/.paper-body.md" -f markdown+footnotes+fenced_divs -t html5 --stand
   -M email="bandwidthswap@pm.me" \
   -M date="October 17, 2026" \
   -M version="0.4 (draft)" \
+  -M slug="BANDWIDTH-whitepaper-v0.4" \
   -o "$docs/paper.html"
 rm "$docs/.paper-body.md"
+
+# The two readings by audience share the template; their title block is the part before the first rule.
+render_reading() {  # <source.md> <docs basename> <title> <version>
+  local md="$1" base="$2" title="$3" ver="$4"
+  cp "$md" "$docs/$(basename "$md")"
+  cp "$md" "$docs/$(basename "$md" .md).txt"
+  python3 -I -c 'import sys; print(open(sys.argv[1]).read().split("\n---\n",1)[1])' "$md" > "$docs/.reading-body.md"
+  pandoc "$docs/.reading-body.md" -f markdown+footnotes -t html5 --standalone \
+    --template "$root/tools/paper.tmpl" \
+    -M title="$title" \
+    -M authors="Robert Douglas and Chris Odom" \
+    -M email="bandwidthswap@pm.me" \
+    -M date="October 17, 2026" \
+    -M version="$ver" \
+    -M slug="$(basename "$md" .md)" \
+    -o "$docs/$base.html"
+  rm "$docs/.reading-body.md"
+}
+render_reading "$root/paper/BANDWIDTH-whitepaper-v0.4-plain.md" paper-plain "Bandwidth Swap, in plain words" "0.4 (draft), plain reading"
+render_reading "$root/paper/BANDWIDTH-whitepaper-v0.4-operators.md" paper-operators "Bandwidth Swap for operators" "0.4 (draft), for operators"
 
 python3 -I "$root/tools/mkdiff.py" "$root/paper/BANDWIDTH-whitepaper-v0.1.md" "$v02" "$docs/whitepaper-diff.html" \
   '$BANDWIDTH whitepaper: version 0.1 to version 0.2' 'Before: v0.1, Aug 23 2021' 'After: v0.2 draft, Oct 8 2026' >/dev/null
@@ -52,4 +75,4 @@ python3 -I "$root/tools/mkdiff.py" "$v02" "$prev" "$docs/whitepaper-diff-v0.3.ht
   'Bandwidth Swap whitepaper: version 0.2 to version 0.3' 'Before: v0.2 draft, Oct 8 2026' 'After: v0.3 draft, Oct 17 2026' >/dev/null
 python3 -I "$root/tools/mkdiff.py" "$prev" "$src" "$docs/whitepaper-diff-v0.4.html" \
   'Bandwidth Swap whitepaper: version 0.3 to version 0.4' 'Before: v0.3 draft, Oct 17 2026' 'After: v0.4 draft, Oct 17 2026' >/dev/null
-echo "built: docs/paper.html docs/whitepaper-diff.html docs/whitepaper-diff-v0.3.html docs/whitepaper-diff-v0.4.html docs/OPEN-QUESTIONS.md docs/BANDWIDTH-whitepaper-v0.4.{md,txt}"
+echo "built: docs/paper.html docs/paper-plain.html docs/paper-operators.html docs/whitepaper-diff.html docs/whitepaper-diff-v0.3.html docs/whitepaper-diff-v0.4.html docs/OPEN-QUESTIONS.md docs/BANDWIDTH-whitepaper-v0.4.{md,txt}"

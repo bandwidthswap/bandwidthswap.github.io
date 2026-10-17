@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bandwidth Swap, in plain words</title>
+<meta name="description" content="Bandwidth Swap, in plain
+words. Version 0.4 (draft), plain reading.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/latex.css@1.10.0/style.min.css">
+<style>
+body{max-width:80ch;padding-top:1.5rem}
+.toolbar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;align-items:baseline;justify-content:flex-end;font-family:"Latin Modern Sans","Computer Modern Sans",sans-serif;font-size:.85rem;background:var(--bg,#fff);padding:.5rem 0 .6rem;border-bottom:1px solid currentColor;margin-bottom:2rem}
+.toolbar a{text-decoration:none;border-bottom:1px solid currentColor}
+.toolbar a:hover{border-bottom-width:2px}
+.toolbar .lead{margin-right:auto;opacity:.75}
+header.titleblock{text-align:center;margin-bottom:2.2rem}
+header.titleblock h1{font-size:1.9rem;margin:0 0 1rem;line-height:1.2}
+header.titleblock .authors{font-size:1.15rem;margin:0 0 .4rem}
+header.titleblock .affil,header.titleblock .date{font-size:.95rem;margin:0 0 .2rem}
+header.titleblock .affil a{text-decoration:none}
+.revnote{font-size:.9rem;font-style:italic;max-width:62ch;margin:0 auto 2rem;text-align:center}
+.abstract{margin:0 auto 2rem;max-width:62ch;font-size:.95rem}
+.abstract p:first-child::before{content:"Abstract. ";font-weight:bold;font-style:normal}
+.abstract p{text-align:justify;margin:0 0 .6rem}
+h2{font-size:1.25rem;margin-top:2.2rem}
+h3{font-size:1.05rem}
+blockquote{margin:1rem 2rem;font-size:.95rem}
+pre{font-size:.85rem;overflow-x:auto}
+figure,pre{max-width:100%}
+.footnotes{font-size:.85rem}
+.footnotes::before{content:"Notes";display:block;font-weight:bold;font-size:1.05rem;margin:0 0 .6rem}
+.footnotes hr{display:none}
+.footnotes ol{padding-left:1.4rem}
+.footnotes li{margin-bottom:.5rem}
+sup{font-size:.7em}
+@media (prefers-color-scheme: dark){.toolbar{background:#1a1a1a}}
+@media (max-width:600px){body{padding-left:1rem;padding-right:1rem}}
+</style>
+</head>
+<body>
+<nav class="toolbar" aria-label="Paper tools">
+  <span class="lead">Rendered from Markdown</span>
+  <a href="BANDWIDTH-whitepaper-v0.4-plain.md" download>Download .md</a>
+  <a href="BANDWIDTH-whitepaper-v0.4-plain.txt" download>Download .txt</a>
+  <a href="BANDWIDTH-whitepaper-v0.1-original.pdf">Original 2021 PDF</a>
+  <a href="../">bandwidthswap.com</a>
+</nav>
+<article>
+<header class="titleblock">
+  <h1>Bandwidth Swap, in plain words</h1>
+  <p class="authors">Robert Douglas and Chris Odom</p>
+  <p class="affil"><a href="mailto:bandwidthswap@pm.me">bandwidthswap@pm.me</a></p>
+  <p class="date">October 17, 2026 · Version 0.4 (draft), plain
+reading</p>
+</header>
+<p><em>This is the whitepaper’s argument without its machinery, for
+anyone who wants to know what Bandwidth Swap is and why it is built the
+way it is. The full paper, with every rule and every number, is at <a
+href="paper.html">paper.html</a>. If you would run a node, the
+operators’ version at <a
+href="paper-operators.html">paper-operators.html</a> is written for
+you.</em></p>
+<h2 id="the-problem">The problem</h2>
+<p>Most places have one way to get a connection and one company selling
+it. The company paid to run the line, so it is in no hurry to let anyone
+else use it. Prices stay high, and the places where nobody has run a
+line stay unconnected, because the first line into a valley costs a
+great deal and earns slowly.</p>
+<p>Bandwidth Swap treats a connection as something anyone can resell,
+one hop at a time. If you have a line and your neighbor on the ridge
+does not, you can sell them a share of yours over a radio. If the forest
+beyond the ridge has no connection at all, the neighbor can sell on to
+it. Everyone who carries the traffic is paid for carrying it. The
+question is how to pay people for carrying bytes without being cheated,
+and that question has a history.</p>
+<h2 id="the-idea-that-did-not-work">The idea that did not work</h2>
+<p>The first version of this paper, in 2021, proposed that every node in
+the network announce how much of the time it was online and how fast its
+connection was, and be rewarded for it. That is how several networks of
+this kind have been built, and it has the same flaw in all of them. A
+node can say anything. A network that pays for reports gets a network of
+excellent reporters, with a radio in a closet behind each one.</p>
+<h2 id="the-idea-that-does">The idea that does</h2>
+<p>The 2026 version pays for exactly one thing: bytes that someone paid
+for and signed for. The person who paid is the only party who cannot be
+fooled about whether the bytes arrived, so their signature is the
+proof.</p>
+<p>Here is how it works in the lab that runs today. Every hour, the
+computer that is paying reads how many bytes went through its connection
+and signs a short note saying so. The computer that carried the bytes
+checks the signature and signs the same note with its own count. Both
+notes go to a bookkeeper, which writes the hour down and, at the end of
+the month, adds up the bill. Nobody measures anything. Nobody has to
+trust anyone. The paper’s phrase for this is that the payment is the
+proof.</p>
+<p>A note like that is about a hundred bytes, which is small enough to
+send over a radio that reaches for miles at the speed of a dial-up
+modem. That matters, because it means the notes keep moving when the
+internet does not.</p>
+<h2 id="four-rules">Four rules</h2>
+<p>Everything else in the paper exists to make faking that one note cost
+more than it pays.</p>
+<p><strong>Payment is the proof.</strong> Only the party who paid can
+sign for delivery. A carrier cannot write itself a receipt.</p>
+<p><strong>Nothing earns more than the fee that produced it.</strong>
+Five percent of every fee is destroyed. If you run both ends of a
+connection and send traffic to yourself all day, you lose five cents of
+every dollar you pay yourself, and no rule anywhere pays you more than a
+dollar back.</p>
+<p><strong>The treasury is the first customer.</strong> Most networks
+like this hand out bonuses for building, and the bonuses are where the
+radio in the closet comes back. This one has a treasury that buys
+bandwidth on links it wants to exist, at a posted price for a posted
+term, and never pays for being online. Anyone can post the same kind of
+offer, a bounty on a link that does not exist yet, which is how the
+second link across a valley gets funded when the first one charges too
+much.</p>
+<p><strong>Quality is priced, not proven.</strong> A slow carrier
+settles fewer bytes an hour and earns less. Nobody has to measure its
+speed; the market does.</p>
+<h2 id="when-two-counts-disagree">When two counts disagree</h2>
+<p>Sometimes the payer’s count and the carrier’s count differ. The rule
+is to pay the smaller one. Each side can only lower the number the other
+side gets, and neither gains by doing it, so the truth is the best
+strategy for both. There is no judge, no hearing, and no third party who
+has to be reachable. A disagreement between a computer on Earth and one
+on Mars was settled the moment both signatures existed.</p>
+<h2 id="what-a-bookkeeper-is">What a bookkeeper is</h2>
+<p>The paper calls it a Mint, and it is a bookkeeper, not a judge. It
+holds a deposit from each member, writes down what was settled, and
+publishes a summary that anyone holding a receipt can check their
+receipt against. If the summary leaves a receipt out or changes it, the
+receipt proves it, and the bookkeeper loses more of its deposit than it
+earned for the summary. Everyone keeps their own signed copies, so a
+bookkeeper’s books can be rebuilt without the bookkeeper. In the lab
+there is one bookkeeper and its deposit is its reputation; a member who
+catches it out leaves with the proof.</p>
+<h2 id="what-the-lab-showed">What the lab showed</h2>
+<p>Since October 16, 2026, three small computers on a bench have run
+this: one that pays, one that carries, one that keeps the books. On the
+first day three disagreements were forced on purpose. When the carrier’s
+count was reset so it claimed almost nothing, the hour settled at almost
+nothing. When the payer’s count was reset so the carrier claimed
+twenty-two megabytes against the payer’s 272 bytes, the carrier was paid
+for 272 bytes. When the carrier’s clock was pushed ten seconds out of
+step, it refused the payer’s note and the hour went unpaid. In every
+case the books were settled from the two signatures alone.</p>
+<p>That is not a network. It is one person running three machines that
+are not trusted to agree, and showing that they settle anyway. It is the
+part a paper cannot show on paper.</p>
+<h2 id="across-a-valley-across-a-planet-across-the-dark">Across a
+valley, across a planet, across the dark</h2>
+<p>The same note works on a cable, on a radio through trees, on a link
+to the Moon or to Mars. What changes is the numbers: how long an hour
+is, how far two clocks may drift, and how long someone waits to be
+paid.</p>
+<p>Waiting has a price, and the paper now says so. Whoever moves first
+across a delay is lending for the length of it, and on a long link the
+carrier posts a price for the wait beside its price per byte. A carrier
+that holds your data between two passes of an orbiter signs for what it
+holds, so a lost bundle is a loss on paper. And if a pass never comes,
+you get your prepayment back; the carrier priced that risk into the
+passes that did come, the way sailors’ lenders once priced the ships
+that never came home into the rate on the ones that did.</p>
+<p>Between worlds, nobody can fine a bookkeeper that cheats, because
+nobody can reach its deposit. What the others can do is publish the
+proof, stop dealing with it, and penalize anyone on their side who keeps
+dealing with it. That is how trade between strangers was policed for
+centuries before there were courts, and the paper names it as the
+rule.</p>
+<p>There is a limit, and the paper names that too. When no reply can
+come back while the payer is still there to receive it, the payment
+stops being proof and becomes a gift. The Moon, Mars and the nearest
+star are inside that limit for a person who can wait. Past it, the
+protocol still pays carriers honestly, link by link, but it is paying
+for carriage toward silence, and the paper says so rather than
+pretending otherwise.</p>
+<h2 id="what-nobody-knows-yet">What nobody knows yet</h2>
+<p>The paper keeps its own list of what it cannot settle. The biggest
+item is the bonus. With the treasury’s subsidy capped at five cents on
+the dollar, nobody knows whether that moves anyone to string a radio
+across a valley. The second is the customer: the lab’s use case is two
+sites that already overbuy capacity, and whether anyone picks this over
+a carrier contract or a satellite is a question only paying traffic
+answers. The rest, from how two bookkeepers on different worlds trade
+notes to how long a signature stays believable, are listed with the same
+honesty.</p>
+<h2 id="where-to-go-next">Where to go next</h2>
+<p>The full paper is at <a href="paper.html">paper.html</a>; its Section
+3 is the argument that a payment is a proof. The list of open questions
+is at <a href="OPEN-QUESTIONS.md">OPEN-QUESTIONS.md</a>. The lab’s live
+state is on the <a href="../#lab">project page</a>, and the code that
+runs it is at <a
+href="https://github.com/bandwidthswap/kit">github.com/bandwidthswap/kit</a>.
+If you have a Raspberry Pi and a line of sight to somewhere that has no
+connection, the operators’ version is next.</p>
+</article>
+</body>
+</html>
