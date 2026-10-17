@@ -7,7 +7,7 @@ Oct 16th 2026
 Version 0.3 (draft)
 admin@bandwidthswap.com
 
-*Version 0.3 resolves the open questions recorded against version 0.2, using the defaults set down for each and the first measurements from the Phase 0 lab. It removes what the receipt model made obsolete: the token emission and its decay schedules, the validator election, the uptime penalty, sync tests, and the self-reported fields of the announcement. It adds the unrecoverable fee and the payment window to Section 3, rewrites Sections 2 and 4 through 8 around a pilot that settles in dollars, and adds Section 9 on the pilot and Section 10 on what remains open.*
+*Version 0.3 resolves the open questions recorded against version 0.2, using the defaults set down for each and the first measurements from the Phase 0 lab. It removes what the receipt model made obsolete: the token emission and its decay schedules, the validator election, the uptime penalty, sync tests, and the self-reported fields of the announcement. It adds the unrecoverable fee and the payment window to Section 3, rewrites Sections 2 and 4 through 8 around a pilot that settles in dollars, and adds Section 9 on the pilot and Section 10 on what remains open. Appendix A restates the protocol without constants, as parameters of a link, so that the same receipt serves a link with any light delay.*
 
 ---
 
@@ -67,7 +67,7 @@ Every hop is paid per unit of data through a conditional payment. The payment to
 
 A settled payment is therefore a proof of delivery that required no probing, no attestation, and no trusted hardware. Delivery (question 1) collapses into demand (question 2).
 
-In the pilot, acknowledgement is the hop's countersignature on the receipt and payment is the invoice. The conditional payment proper arrives with the settlement layer in Section 2.
+In the pilot, acknowledgement is the hop's countersignature on the receipt and payment is the invoice. The conditional payment proper arrives with the settlement layer in Section 2. On a link whose light time exceeds a threshold the membership sets, windows are prepaid and no lock is used (Appendix A).
 
 ### 3.3 The Sybil condition
 
@@ -91,11 +91,11 @@ A speed proof is required only where a subsidy is at stake, because a subsidy is
 
 The payer's clock is authoritative, because the payer is the one paying. Timestamps in a receipt are the payer's. A relay declines to serve a payer whose clock differs from its own by more than five seconds, and a Mint discards receipts whose timestamps are inconsistent with the chain of hops.
 
-Five seconds is generous for a node that keeps a time source and fails safe for one that does not. In the Phase 0 lab, three nodes synchronized on one network agree within a millisecond. Left free-running, the fastest of their oscillators gains 0.76 seconds a day and crosses the tolerance in about a week; the slowest takes three weeks. A node that has been alone that long is declined, its window is lost, and nothing is paid. Drift between sites has not been measured.
+Five seconds is generous for a node that keeps a time source and fails safe for one that does not. In the Phase 0 lab, three nodes synchronized on one network agree within a millisecond. Left free-running, the fastest of their oscillators gains 0.76 seconds a day and crosses the tolerance in about a week; the slowest takes three weeks. A node that has been alone that long is declined, its window is lost, and nothing is paid. Drift between sites has not been measured. On a link with a light time, the tolerance widens by the light time both ways and the drift expected since the last contact; it is a parameter of the link (Appendix A).
 
 ### 3.6 Payment windows
 
-A payment window is one hour. Before the window's bytes move, the payer locks the window's value; in the pilot, where there is no payment rail, the lock is the invoice and the exposure is bounded by membership. A relay therefore never fronts more than one window of bandwidth on credit, and a payer who consumes a window and leaves forfeits what was locked.
+A payment window is one hour on the pilot's links; on a link that exists only during contacts, it is the contact (Appendix A). Before the window's bytes move, the payer locks the window's value; in the pilot, where there is no payment rail, the lock is the invoice and the exposure is bounded by membership. A relay therefore never fronts more than one window of bandwidth on credit, and a payer who consumes a window and leaves forfeits what was locked.
 
 A window settles at the smaller of the two signed byte counts, the payer's and the hop's. When the two counts are within one percent of each other the window is recorded as settled; when they differ by more it is recorded as disputed and settles by the same rule. Nothing else is needed to resolve a dispute: no probe, no testimony, no judgement. The rule was chosen because each party can only lower the number the other party is paid or paid for, and neither gains by doing so. A hop that declines a receipt loses the window: its next acknowledgement covers both windows, and the payer's count governs.
 
@@ -123,7 +123,7 @@ The Mint is modeled on the notary of Open-Transactions. There, a transaction ser
 
 A settlement summary is a Merkle commitment over the receipts it settles. Anyone holding a receipt can prove that it was included, or that it was not, and a Mint whose summary is shown to omit or alter a receipt forfeits a greater share of its bond than the fee it collected for that summary. This is the only penalty a Mint faces, and it works with a single Mint, which is what the pilot has.
 
-A Mint is compensated by a share of the settlement fee on the receipts it publishes. There is no block reward and no election. Version 0.2 carried both from version 0.1, together with a committee of five validators reaching a three-of-five consensus every minute and a minimum stake of one ten-thousandth of all assets in circulation; the committee and the election contradicted each other, and the minimums referred to assets that do not exist. The pilot runs one Mint. The target, when more than one party operates a Mint, is one proposer and four attesters per summary, with three of five required to finalize, and a proposer that is offline or inconsistent collecting nothing for that summary. Until then, a Mint's bond is set by the membership.
+A Mint is compensated by a share of the settlement fee on the receipts it publishes. There is no block reward and no election. Version 0.2 carried both from version 0.1, together with a committee of five validators reaching a three-of-five consensus every minute and a minimum stake of one ten-thousandth of all assets in circulation; the committee and the election contradicted each other, and the minimums referred to assets that do not exist. The pilot runs one Mint. The target, when more than one party operates a Mint, is one proposer and four attesters per summary, with three of five required to finalize, and a proposer that is offline or inconsistent collecting nothing for that summary. Until then, a Mint's bond is set by the membership. A Mint settles the links of one settlement domain; where a link crosses domains, the Mints on each side reconcile their published commitments whenever a link between them allows (Appendix A).
 
 User software queries the receipt graph that Mints aggregate for available routes, which reduces the cost of route calculation for users and removes from Mints the ability to discriminate among them.
 
@@ -147,7 +147,7 @@ Operators fulfill the needs of users in the form of Relay or Endpoint services, 
 
 Announcements exist for route discovery. They carry no reward weight. Nothing in an announcement is trusted for payment, subsidy, or availability; those are determined by receipts.
 
-A relay announces to its peers, over a gossip layer or distributed hash table that never touches the settlement layer, its NYM, its posted price, and the routes it will accept. Version 0.2's announcement also carried the relay's own report of its uptime and its maximum available bandwidth, and a sync test by which a relay measured and reported its own throughput. All three were self-reports of the kind Section 3 exists to replace, and they are removed. A user's software ranks relays by the throughput previous payers actually settled, which the receipt graph records and an announcement cannot inflate.
+A relay announces to its peers, over a gossip layer or distributed hash table that never touches the settlement layer, its NYM, its posted price, the routes it will accept, and the parameters of each link it offers (Appendix A). On a link that exists only during contacts, the announcement is a contact plan: when the link will exist, for how long, and at what price. Version 0.2's announcement also carried the relay's own report of its uptime and its maximum available bandwidth, and a sync test by which a relay measured and reported its own throughput. All three were self-reports of the kind Section 3 exists to replace, and they are removed. A user's software ranks relays by the throughput previous payers actually settled, which the receipt graph records and an announcement cannot inflate.
 
 **[Figure 2] Receipt**
 
@@ -216,6 +216,25 @@ In every case the Mint resolved the window from the two signed receipts alone, w
 - **Open relays.** Relay service is between members. Carrying third-party traffic for the public internet raises liability the paper does not address, and is not in the pilot.
 - **The token**, its status, and the Steward's legal form, all deferred until there is traffic to denominate, and all to be reviewed with counsel against the rules in force then.
 - **Clock drift between sites**, measured once the relay leaves the bench.
+- **Reconciliation between Mints** in different settlement domains, and the price of custody across a contact that may never come (Appendix A).
+
+## Appendix A. Links with delay
+
+The protocol has no constants. The hour, the five seconds, the one Mint, and the monthly invoice are the pilot's choices for a link whose light time is nothing and whose contact is continuous. Each of them is a parameter of a link, published by the relay in its announcement and accepted by the payer when it opens a window. Written that way, the same receipt serves a bench, a relay in lunar orbit, and a link whose other end is years away; the differences are numbers, and the thing that proves delivery is the same two signatures on every link.
+
+**A.1 Link parameters.** For each link it offers, a relay publishes: the one-way light time of the link; its contact plan, which is when the link exists, for how long, and the bytes it expects to carry in each contact; its posted price per byte; its clock tolerance; the kind of window it accepts, an hour, a contact, or a transmission; and the settlement domain it settles in, which is the Mint that holds its bond. A payer that opens a window accepts those parameters for that window. Nothing in them is trusted for payment. The receipt graph records what each announced contact actually settled, and a relay whose contacts persistently settle less than it announced ranks below one whose contacts match, exactly as Section 6 ranks announcements on a continuous link.
+
+**A.2 Windows and custody.** On a link with a contact plan the window is the contact: it opens when the link does, closes when it does, and the receipt is per contact. The window is prepaid (Section 3.6). A relay that stores bytes during one contact in order to carry them to the next is in custody of them, and custody is nothing more than a window on the next link: the relay is paid for it by the next link's receipt, not by this one. Delay-tolerant networking removed custody transfer from the core of its bundle protocol for want of a way to make it reliable; this is that mechanism with the reason to accept custody attached. A relay accepts the bundle because the next contact's window is already paid for.
+
+**A.3 Clocks.** The tolerance of Section 3.5 is a link parameter: the base tolerance, plus the link's light time both ways, plus the drift expected since the last contact. The relay's check becomes whether the payer's timestamp is plausible for a signal that left when the payer says it did. It is still the payer's clock, and a receipt outside the tolerance is still declined and its window lost.
+
+**A.4 Payment.** Below a light time the membership sets, the conditional payment of Section 3.2 applies, with lock timeouts no shorter than the route's round trip. Above it, windows are prepaid and no lock is used: a lock that must run for days ties a relay's capital to a timer, and a prepaid window bounded by the payer's bond does the same work without one. The pilot is already on the prepaid side of that line.
+
+**A.5 Settlement domains.** A Mint settles the links of its domain, in practice a world. A relay on a link between two domains posts a bond with the Mint on each side, and a dispute on that link is resolved by either Mint from the two receipts, since the rule of Section 3.6 needs no other input. Mints reconcile their published commitments (Section 4) whenever a link between them exists. A Mint whose commitments do not reconcile, or that has burned less than Section 3.3 requires, is slashable by the other from its own publications. The burn is enforced by the settling Mint and audited at reconciliation; the reconciliation protocol itself is open (Section 10).
+
+**A.6 Route discovery.** A route between domains is not discovered; it is computed from the contact plans, as delay-tolerant networks compute routes from a contact graph, and ranked by what each relay settled in past contacts. A relay's announcement therefore says when it will be reachable, not whether it is. Liveness has no meaning on such a link, and earns nothing on any link.
+
+**A.7 What this does not change.** What the protocol rewards: bytes a payer signed for and a relay carried. What it refuses to pay for: everything else. What proves delivery: two signatures on one receipt. Distance changes how long it takes to make one, not what it is.
 
 ---
 
