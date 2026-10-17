@@ -332,16 +332,46 @@ svg .pill{fill:var(--panel);stroke:var(--line);stroke-width:1}
   </figure>
 
   <h3>Prices and money, window by window</h3>
-  <div class="tablewrap"><table class="flows">
-    <thead><tr><th>One hourly window</th><th>Bytes</th><th>Ridge relay gets</th><th>House 3 gets</th><th>Burned</th><th>Back to the cabin</th></tr></thead>
-    <tbody>
-      <tr><td>Above the minimum</td><td class="num">1.2 GB</td><td class="num">$0.06 + $0.06</td><td class="num">$0.12 + $0.06</td><td class="num">$0.015</td><td class="num">nothing</td></tr>
-      <tr><td>Rain on the radio</td><td class="num">0.5 GB</td><td class="num">$0.025 + $0.025</td><td class="num">$0.05 + $0.025</td><td class="num">$0.006</td><td class="num">$0.05 of premium</td></tr>
-      <tr><td>Cabin away, nothing sent</td><td class="num">0</td><td class="num">nothing</td><td class="num">nothing</td><td class="num">nothing</td><td class="num txt">the window's escrow, at the deadline</td></tr>
-      <tr><td>A hiker's phone tries the route</td><td class="num">0.3 GB</td><td class="num">$0.015</td><td class="num">$0.03</td><td class="num">$0.002</td><td class="num txt">the escrow reimburses the hiker's $0.045, up to ten times a week</td></tr>
-      <tr><td>Relay dark all month</td><td class="num">0</td><td class="num">nothing</td><td class="num">nothing</td><td class="num">nothing</td><td class="num">$180 at day 60</td></tr>
-    </tbody>
-  </table></div>
+  <figure class="map plan">
+    <div class="figwrap"><svg viewBox="0 0 760 540" role="img" aria-label="Money flows per hourly window out of the cabin's escrow: a full window pays the ridge relay and House 3 their posted prices and the premium; a rainy window pays less and returns part of the premium to the cabin; a hiker's window is reimbursed from the escrow; a window with nothing sent, or a relay gone dark, moves nothing" xmlns="http://www.w3.org/2000/svg">
+      <text x="185" y="22" text-anchor="middle">A full window · 1.2 GB</text>
+      <rect x="20" y="90" width="110" height="40" rx="4" class="box mint"/><text x="75" y="106" text-anchor="middle">The escrow</text><text x="75" y="122" text-anchor="middle" class="sub">pays 30¢ this window</text>
+      <rect x="250" y="50" width="100" height="40" rx="4" class="box"/><text x="300" y="66" text-anchor="middle">Ridge relay</text><text x="300" y="82" text-anchor="middle" class="sub">keeps 11.4¢</text>
+      <rect x="250" y="110" width="100" height="40" rx="4" class="box"/><text x="300" y="126" text-anchor="middle">House 3</text><text x="300" y="142" text-anchor="middle" class="sub">keeps 17.1¢</text>
+      <rect x="250" y="170" width="100" height="40" rx="4" class="box ghost"/><text x="300" y="186" text-anchor="middle">Back to the cabin</text><text x="300" y="202" text-anchor="middle" class="sub">nothing</text>
+      <g class="band"><path d="M130 100C190 100 190 70 250 70" stroke-width="12"/><path d="M130 120C190 120 190 130 250 130" stroke-width="18"/></g>
+      <rect x="157" y="76" width="66" height="16" rx="3" class="pill"/><text x="190" y="88" text-anchor="middle" class="money">6¢ + 6¢</text><rect x="155" y="118" width="70" height="16" rx="3" class="pill"/><text x="190" y="130" text-anchor="middle" class="money">12¢ + 6¢</text>
+      <text x="185" y="236" text-anchor="middle" class="m">30¢ paid · 1.5¢ burned · 28.5¢ kept</text>
+
+      <text x="575" y="22" text-anchor="middle">Rain · 0.5 GB</text>
+      <rect x="410" y="90" width="110" height="40" rx="4" class="box mint"/><text x="465" y="106" text-anchor="middle">The escrow</text><text x="465" y="122" text-anchor="middle" class="sub">pays 12.5¢</text>
+      <rect x="640" y="50" width="100" height="40" rx="4" class="box"/><text x="690" y="66" text-anchor="middle">Ridge relay</text><text x="690" y="82" text-anchor="middle" class="sub">keeps 4.75¢</text>
+      <rect x="640" y="110" width="100" height="40" rx="4" class="box"/><text x="690" y="126" text-anchor="middle">House 3</text><text x="690" y="142" text-anchor="middle" class="sub">keeps 7.1¢</text>
+      <rect x="640" y="170" width="100" height="40" rx="4" class="box pay"/><text x="690" y="186" text-anchor="middle">Back to the cabin</text><text x="690" y="202" text-anchor="middle" class="sub">5¢ of premium</text>
+      <g class="band"><path d="M520 98C580 98 580 70 640 70" stroke-width="5"/><path d="M520 110C580 110 580 130 640 130" stroke-width="7.5"/><path d="M520 122C580 122 580 190 640 190" stroke-width="5"/></g>
+      <rect x="540" y="74" width="80" height="16" rx="3" class="pill"/><text x="580" y="86" text-anchor="middle" class="money">2.5¢ + 2.5¢</text><rect x="545" y="112" width="70" height="16" rx="3" class="pill"/><text x="580" y="124" text-anchor="middle" class="money">5¢ + 2.5¢</text><rect x="550" y="162" width="60" height="16" rx="3" class="pill"/><text x="580" y="174" text-anchor="middle" class="money">5¢ back</text>
+      <text x="575" y="236" text-anchor="middle" class="m">12.5¢ paid · 0.6¢ burned · 5¢ returned to the cabin</text>
+
+      <text x="185" y="292" text-anchor="middle">A hiker tries the route · 0.3 GB</text>
+      <rect x="20" y="320" width="110" height="40" rx="4" class="box pay"/><text x="75" y="336" text-anchor="middle">A hiker's phone</text><text x="75" y="352" text-anchor="middle" class="sub">pays 4.5¢</text>
+      <rect x="20" y="400" width="110" height="40" rx="4" class="box mint"/><text x="75" y="416" text-anchor="middle">The escrow</text><text x="75" y="432" text-anchor="middle" class="sub">reimburses the hiker</text>
+      <rect x="250" y="320" width="100" height="40" rx="4" class="box"/><text x="300" y="336" text-anchor="middle">Ridge relay</text><text x="300" y="352" text-anchor="middle" class="sub">keeps 1.4¢</text>
+      <rect x="250" y="380" width="100" height="40" rx="4" class="box"/><text x="300" y="396" text-anchor="middle">House 3</text><text x="300" y="412" text-anchor="middle" class="sub">keeps 2.85¢</text>
+      <rect x="250" y="440" width="100" height="40" rx="4" class="box pay"/><text x="300" y="456" text-anchor="middle">The hiker</text><text x="300" y="472" text-anchor="middle" class="sub">gets 4.5¢ back</text>
+      <g class="band"><path d="M130 332C190 332 190 340 250 340" stroke-width="2"/><path d="M130 348C190 348 190 400 250 400" stroke-width="3"/><path d="M130 420C190 420 190 460 250 460" stroke-width="4.5"/></g>
+      <rect x="168" y="314" width="44" height="16" rx="3" class="pill"/><text x="190" y="326" text-anchor="middle" class="money">1.5¢</text><rect x="168" y="368" width="44" height="16" rx="3" class="pill"/><text x="190" y="380" text-anchor="middle" class="money">3¢</text><rect x="168" y="438" width="44" height="16" rx="3" class="pill"/><text x="190" y="450" text-anchor="middle" class="money">4.5¢</text>
+      <text x="185" y="506" text-anchor="middle" class="m">proved by use · up to ten windows a week</text>
+
+      <text x="575" y="292" text-anchor="middle">Nothing sent, or the relay dark</text>
+      <text x="575" y="330" text-anchor="middle" class="m">No bytes, no receipts, no payments.</text>
+      <text x="575" y="348" text-anchor="middle" class="m">The window's escrow waits for the deadline</text>
+      <text x="575" y="366" text-anchor="middle" class="m">and returns to the cabin at day 60.</text>
+      <text x="575" y="396" text-anchor="middle" class="m">A relay dark all month returns all $180.</text>
+      <text x="575" y="414" text-anchor="middle" class="m">The bounty stays open to a second path.</text>
+      <text x="380" y="532" text-anchor="middle" class="m">a band's thickness is cents per window · what each relay keeps is after the five percent burn</text>
+    </svg></div>
+    <figcaption>Each window draws its own amounts out of the escrow. Above the minimum the relays get their posted prices and the full premium. In rain the premium prorates and the rest goes back to the cabin. A hiker's window is reimbursed from the escrow, so the route is proved by use. A window with nothing sent, or a relay gone dark, moves nothing, and its escrow returns at the deadline.</figcaption>
+  </figure>
 
   <h3>The conditions</h3>
   <ul class="cond">
@@ -411,17 +441,31 @@ svg .pill{fill:var(--panel);stroke:var(--line);stroke-width:1}
   </figure>
 
   <h3>Prices and money, per gigabyte</h3>
-  <div class="tablewrap"><table class="flows">
-    <thead><tr><th>Who pays whom</th><th>Line clear</th><th>Solar conjunction, Mars clear</th><th>Mars behind the Sun too</th></tr></thead>
-    <tbody>
-      <tr><td>Earth institution → Jupiter relay orbiter</td><td class="num">$50</td><td class="num">nothing directly</td><td class="num">nothing for three weeks</td></tr>
-      <tr><td>Earth institution → Mars bridge relay</td><td class="num">nothing</td><td class="num txt">$20 + $3 carry (six hours of custody)</td><td class="num">nothing</td></tr>
-      <tr><td>Mars bridge → Jupiter relay orbiter</td><td class="num">nothing</td><td class="num txt">$40, in Mars's unit at the bridge's rate</td><td class="num">nothing</td></tr>
-      <tr><td>Jupiter relay orbiter → Europa lander</td><td class="num txt">from the Jupiter Mint, per the same receipts</td><td class="num">the same</td><td class="num">settled when the link returns</td></tr>
-      <tr><td>Burned</td><td class="num">$2.50 on Earth</td><td class="num">$1.15 on Earth, $2.00 on Mars</td><td class="num">nothing</td></tr>
-      <tr><td>Earth pays in all</td><td class="num">$50</td><td class="num">$63</td><td class="num">nothing; the terabyte waits</td></tr>
-    </tbody>
-  </table></div>
+  <figure class="map plan">
+    <div class="figwrap"><svg viewBox="0 0 760 360" role="img" aria-label="Money flows per gigabyte from Earth to Europa: with the line clear Earth pays the Jupiter orbiter $50 and the Jupiter Mint pays the lander its share; in solar conjunction Earth pays the Mars bridge $63, which keeps $23 and passes $40 to the Jupiter orbiter in Mars's unit; with Mars behind the Sun too nothing moves" xmlns="http://www.w3.org/2000/svg">
+      <text x="185" y="22" text-anchor="middle">Line clear</text>
+      <rect x="20" y="70" width="110" height="40" rx="4" class="box pay"/><text x="75" y="86" text-anchor="middle">Earth institution</text><text x="75" y="102" text-anchor="middle" class="sub">pays $50 a gigabyte</text>
+      <rect x="250" y="50" width="110" height="40" rx="4" class="box"/><text x="305" y="66" text-anchor="middle">Jupiter orbiter</text><text x="305" y="82" text-anchor="middle" class="sub">keeps $47.50</text>
+      <rect x="240" y="210" width="130" height="40" rx="4" class="box"/><text x="305" y="226" text-anchor="middle">Europa lander</text><text x="305" y="242" text-anchor="middle" class="sub">paid by the Jupiter Mint</text>
+      <g class="band"><path d="M130 90C190 90 190 70 250 70" stroke-width="20"/><path d="M305 90V210" stroke-width="6"/></g>
+      <rect x="164" y="72" width="52" height="16" rx="3" class="pill"/><text x="190" y="84" text-anchor="middle" class="money">$50</text><rect x="270" y="142" width="70" height="16" rx="3" class="pill"/><text x="305" y="154" text-anchor="middle" class="money">its share</text>
+      <text x="185" y="276" text-anchor="middle" class="m">$50 paid · $2.50 burned · $47.50 to Jupiter</text>
+
+      <text x="575" y="22" text-anchor="middle">Solar conjunction, Mars clear</text>
+      <rect x="410" y="90" width="110" height="40" rx="4" class="box pay"/><text x="465" y="106" text-anchor="middle">Earth institution</text><text x="465" y="122" text-anchor="middle" class="sub">pays $63 a gigabyte</text>
+      <rect x="640" y="50" width="110" height="40" rx="4" class="box"/><text x="695" y="66" text-anchor="middle">Mars bridge relay</text><text x="695" y="82" text-anchor="middle" class="sub">keeps $21.85</text>
+      <rect x="640" y="130" width="110" height="40" rx="4" class="box"/><text x="695" y="146" text-anchor="middle">Jupiter orbiter</text><text x="695" y="162" text-anchor="middle" class="sub">keeps $38</text>
+      <rect x="630" y="210" width="130" height="40" rx="4" class="box"/><text x="695" y="226" text-anchor="middle">Europa lander</text><text x="695" y="242" text-anchor="middle" class="sub">paid by the Jupiter Mint</text>
+      <g class="band"><path d="M520 110C580 110 580 70 640 70" stroke-width="25"/><path d="M695 90V130" stroke-width="16"/><path d="M695 170V210" stroke-width="6"/></g>
+      <rect x="554" y="82" width="52" height="16" rx="3" class="pill"/><text x="580" y="94" text-anchor="middle" class="money">$63</text><rect x="639" y="102" width="112" height="16" rx="3" class="pill"/><text x="695" y="114" text-anchor="middle" class="money">$40 in Mars's unit</text><rect x="660" y="182" width="70" height="16" rx="3" class="pill"/><text x="695" y="194" text-anchor="middle" class="money">its share</text>
+      <text x="575" y="276" text-anchor="middle" class="m">$63 paid · $3.15 burned · $59.85 to the relays</text>
+
+      <text x="380" y="314" text-anchor="middle" class="m">Mars behind the Sun too: nothing moves for three weeks. Receipts wait in outboxes,</text>
+      <text x="380" y="330" text-anchor="middle" class="m">every window settles when the line returns, and nothing is paid for the silence.</text>
+      <text x="380" y="352" text-anchor="middle" class="m">a band's thickness is dollars a gigabyte · what each relay keeps is after the five percent burn</text>
+    </svg></div>
+    <figcaption>With the line clear, Earth pays the Jupiter orbiter directly and the Jupiter Mint pays the lander its share from the same receipts. In conjunction Earth pays the Mars bridge $63: it keeps its $20 and $3 of carry and passes $40 to the Jupiter orbiter in Mars's unit at its own rate, with the burn taken on each side. When Mars is behind the Sun too, nothing moves and nothing is paid.</figcaption>
+  </figure>
 
   <h3>The conditions</h3>
   <ul class="cond">
