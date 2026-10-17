@@ -323,15 +323,22 @@ signed by payer</code></pre>
 <section id="open">
   <p class="eyebrow">Honesty</p>
   <h2>What we don't know yet</h2>
-  <p>The revised paper fixed the proof problem and opened a set of new questions. These are the ones that decide whether the mechanism works at all. The full backlog has twenty, each with the options and a default so the build is never blocked.</p>
+  <p>Version 0.3 of the paper took the default on every question in the backlog and built Phase 0 on them. What it could not settle is its Section 10; this is that list, in the paper's order. The backlog keeps the options behind each default.</p>
   <ul>
-    <li><strong>The unrecoverable fee.</strong> "Wash traffic costs the fee" is only true if part of every fee is burned or leaves the colluding set. The fraction isn't set.</li>
-    <li><strong>The subsidy bound.</strong> If a fraction <em>b</em> of each fee is burned and the treasury matches fees at multiple <em>m</em>, self-dealing stays unprofitable only when <em>m</em> is less than <em>b</em>. The treasury-as-customer model avoids this for bootstrapping. It returns the moment the treasury matches third-party fees.</li>
-    <li><strong>Receipts under onion routing.</strong> A payer can't timestamp a hop it can't see. The pilot sidesteps this by showing every hop; the real design needs two receipt types.</li>
-    <li><strong>Payment windows.</strong> Inside a window the relay extends credit. The pilot uses hourly prepaid windows; interactive traffic will need something finer.</li>
-    <li><strong>Location.</strong> No receipt can prove where a node is. Every subsidy for building in a specific place inherits this problem.</li>
+    <li><strong>Whether a bounded subsidy moves anyone.</strong> The treasury can add to a link at most the burned fraction of what users pay across it. If that doesn't get a link built, the choices are grants from a treasury that doesn't depend on traffic, or lifting the cap by charging for payer identity instead of counting fees, which needs a figure for what a fake payer costs to manufacture. A simulation of one operator running payer, relays and Mint decides between them.</li>
+    <li><strong>The customer.</strong> The pilot's use case is backhaul between two sites that already overbuy capacity, because the authors can supply both ends. Whether anyone picks this over a carrier contract, a satellite or a VPN, only paying traffic answers.</li>
+    <li><strong>Receipts under route privacy.</strong> Whether a Mint can verify a chain of receipts without learning the route.</li>
+    <li><strong>The settlement layer.</strong> The paper names three candidates and picks one when an untrusted party joins. The cost of each hasn't been measured.</li>
+    <li><strong>The Mint committee.</strong> One proposer and four attesters is the target. The pilot has one Mint and fraud proofs.</li>
+    <li><strong>Attestation for the subsidy tier,</strong> or replacing it with bond age and diversity.</li>
+    <li><strong>Open relays.</strong> Relay service is between members. Carrying strangers' traffic to the public internet raises liability the paper doesn't address, and it isn't in the pilot.</li>
+    <li><strong>The token,</strong> its status and the treasury's legal form, all deferred until there is traffic to denominate, and all for counsel to review against the rules in force then.</li>
+    <li><strong>Clock drift between sites,</strong> measured once the relay leaves the bench.</li>
+    <li><strong>Reconciliation between Mints</strong> in different settlement domains, and what custody costs across a contact that may never come (Appendix A).</li>
+    <li><strong>Whether proving allowances attract real testers</strong> (Section 5.1), or only a relay's second identities; and what an unused reservation should pay, if anything.</li>
+    <li><strong>Payers at a place.</strong> Whoever connects at an access point is a payer with a NYM, or the poster pays for them through the commitment. That is an application as much as a rule, and it is the Phase 2 work.</li>
   </ul>
-  <div class="callout"><p>Phase 0 and 1 answer the clock, window, and offline-settlement questions directly. The economic ones get a simulation alongside. The location question is unsolved and we say so.</p></div>
+  <div class="callout"><p>Phase 0 settled the clock rule and the dispute path on the bench (Section 9); Phase 1 is the offline-settlement test. The economic questions get a simulation alongside. Location left this list because the paper stopped trying to prove it: a commitment can buy service within a radio's range, never presence (Section 5.1), and Phase 4 stays a north star.</p></div>
   <p><a href="docs/OPEN-QUESTIONS.md">Read the open questions backlog</a></p>
 </section>
 
