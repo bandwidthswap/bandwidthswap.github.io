@@ -45,6 +45,8 @@ svg .x{stroke:var(--signal);stroke-width:3;fill:none}
 figure.plan{margin-bottom:28px}
 svg .band path{stroke:var(--signal);opacity:.55;fill:none}
 svg .pill{fill:var(--panel);stroke:var(--line);stroke-width:1}
+svg .bar.was{fill:var(--line)}
+svg .bar.now{fill:var(--signal)}
 .cond{padding-left:1.2em}
 .cond li{margin-bottom:8px}
 .cond strong{font-weight:600}
@@ -152,11 +154,11 @@ svg .pill{fill:var(--panel);stroke:var(--line);stroke-width:1}
       <text x="380" y="31" text-anchor="middle">the internet</text>
       <!-- dish houses -->
       <rect x="70" y="120" width="120" height="50" rx="4" class="box"/>
-      <text x="130" y="140" text-anchor="middle">House 1</text><text x="130" y="157" text-anchor="middle" class="sub">dish · sells at $0.10/GB</text>
+      <text x="130" y="140" text-anchor="middle">House 1</text>
       <rect x="320" y="120" width="120" height="50" rx="4" class="box"/>
-      <text x="380" y="140" text-anchor="middle">House 2</text><text x="380" y="157" text-anchor="middle" class="sub">dish · sells at $0.10/GB</text>
+      <text x="380" y="140" text-anchor="middle">House 2</text>
       <rect x="570" y="120" width="120" height="50" rx="4" class="box"/>
-      <text x="630" y="140" text-anchor="middle">House 3</text><text x="630" y="157" text-anchor="middle" class="sub">dish · sells at $0.10/GB</text>
+      <text x="630" y="140" text-anchor="middle">House 3</text>
       <!-- uplinks -->
       <path d="M130 120V40" class="link"/><text x="136" y="80" class="m">dish · 150 Mbps</text>
       <path d="M380 120V40" class="link"/><text x="386" y="80" class="m">dish · 150 Mbps</text>
@@ -181,6 +183,9 @@ svg .pill{fill:var(--panel);stroke:var(--line);stroke-width:1}
 
       <!-- NORMAL: three independent markets -->
       <g class="st-normal">
+        <text x="130" y="157" text-anchor="middle" class="sub">earns $2.85 a day</text>
+        <text x="380" y="157" text-anchor="middle" class="sub">earns $2.85 a day</text>
+        <text x="630" y="157" text-anchor="middle" class="sub">earns $0.95 a day</text>
         <path d="M118 248V172" class="flow" marker-end="url(#m1g)"/><path d="M118 118V44" class="flow" marker-end="url(#m1g)"/>
         <path d="M142 172V246" class="cash" marker-end="url(#m1s)"/><text x="150" y="236" class="money">$0.10/GB</text>
         <path d="M368 248V172" class="flow" marker-end="url(#m1g)"/><path d="M368 118V44" class="flow" marker-end="url(#m1g)"/>
@@ -192,6 +197,10 @@ svg .pill{fill:var(--panel);stroke:var(--line);stroke-width:1}
 
       <!-- DOWN: House 1's dish is out; 1a goes through House 1 to House 2 -->
       <g class="st-down">
+        <rect x="320" y="120" width="120" height="50" rx="4" fill="none" stroke="var(--signal)" stroke-width="2.5"/>
+        <text x="130" y="157" text-anchor="middle" class="sub">earns 57¢, pays $2</text>
+        <text x="380" y="157" text-anchor="middle" class="money">earns $7.60 a day</text>
+        <text x="630" y="157" text-anchor="middle" class="sub">earns $0.95 a day</text>
         <path d="M130 120V40" class="link down"/>
         <path d="M120 70L140 90M140 70L120 90" class="x"/><text x="108" y="104" class="money" text-anchor="end">down</text>
         <path d="M118 248V172" class="flow" marker-end="url(#m1g)"/>
@@ -209,6 +218,24 @@ svg .pill{fill:var(--panel);stroke:var(--line);stroke-width:1}
       </g>
     </svg></div>
     <figcaption>Working: three one-hop markets, each dependent paying its dish house. Down: House 1a's bytes cross the street link to House 2's dish and House 1a pays both houses; House 2 can charge up to what the way around through House 3 would cost ($0.02 + $0.02 + $0.10). Nothing is paid to House 1 for its dish being down, and nothing for standing by.</figcaption>
+  </figure>
+
+  <p>The street links are not charity. When House 1's dish fails, House 2 earns more than twice what it did the day before, and House 1 keeps a customer it would otherwise have lost for the price of a hop. That is what pays for the second radio before the snow.</p>
+
+  <figure class="map plan">
+    <div class="figwrap"><svg viewBox="0 0 760 210" role="img" aria-label="What each dish house earns a day, working and with House 1's dish down: House 1 falls from $2.85 to 57 cents and pays $2.00; House 2 rises from $2.85 to $7.60; House 3 stays at 95 cents" xmlns="http://www.w3.org/2000/svg">
+      <text x="60" y="22">What each dish house earns a day</text>
+      <rect x="520" y="12" width="12" height="12" class="bar was"/><text x="538" y="22" class="m">working</text>
+      <rect x="610" y="12" width="12" height="12" class="bar now"/><text x="628" y="22" class="m">House 1's dish down</text>
+      <path d="M60 160H700" stroke="var(--line)" stroke-width="1.5"/>
+      <rect x="124" y="120" width="40" height="40" class="bar was"/><text x="144" y="114" text-anchor="middle" class="m">$2.85</text><rect x="176" y="152" width="40" height="8" class="bar now"/><text x="196" y="146" text-anchor="middle" class="money">57¢</text>
+      <rect x="334" y="120" width="40" height="40" class="bar was"/><text x="354" y="114" text-anchor="middle" class="m">$2.85</text><rect x="386" y="54" width="40" height="106" class="bar now"/><text x="406" y="48" text-anchor="middle" class="money">$7.60</text>
+      <rect x="544" y="147" width="40" height="13" class="bar was"/><text x="564" y="141" text-anchor="middle" class="m">95¢</text><rect x="596" y="147" width="40" height="13" class="bar now"/><text x="616" y="141" text-anchor="middle" class="money">95¢</text>
+      <text x="170" y="180" text-anchor="middle">House 1</text><text x="170" y="196" text-anchor="middle" class="sub">and it pays House 2 $2.00</text>
+      <text x="380" y="180" text-anchor="middle">House 2</text><text x="380" y="196" text-anchor="middle" class="money">+$4.75 a day</text>
+      <text x="590" y="180" text-anchor="middle">House 3</text><text x="590" y="196" text-anchor="middle" class="sub">unchanged</text>
+    </svg></div>
+    <figcaption>Daily income after the burn. House 2's dish carries four houses instead of two and earns for all of them. House 1 earns a hop fee from House 1a and pays House 2 for its own traffic, so it ends the day behind, but connected.</figcaption>
   </figure>
 
   <h3>Prices and money, before and after</h3>
