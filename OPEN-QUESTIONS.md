@@ -1,6 +1,8 @@
 # $BANDWIDTH: Open Questions
 
 Status as of Oct 8, 2026, against whitepaper v0.2 (copyedited).
+
+**Status as of Oct 17, 2026, against v0.3.** Version 0.3 of the paper adopts the "default to start" of every item below, as written, and adds Section 9 (the pilot and the three forced tests of Oct 16), Section 10 (what remains open), Appendix A (the protocol as link parameters) and Section 5.1 (purchase commitments). This file stays as the record of the options and of what a build would reveal; B9 carries the lab's clock measurements. Items that v0.3 opened and this file does not number: whether a proving allowance attracts real testers, what an unused reservation pays, how a payer at a place holds a NYM, reconciliation between Mints in different settlement domains, and the price of custody across a contact that may never come. See the paper's Section 10.
 Each item records what is unresolved, the candidate answers, what a build would reveal, and a default to start from so the build is not blocked. Items are ordered by how much they decide. The first three determine whether the mechanism works at all.
 
 Legend for "Build reveals": **sim** = answerable with a simulation or spreadsheet, **proto** = needs the protocol running between real nodes, **market** = needs paying users, **decide** = a policy choice, no build will answer it.
@@ -102,6 +104,7 @@ Legend for "Build reveals": **sim** = answerable with a simulation or spreadshee
 **Options.** Tolerance in seconds, and what a relay does on violation (decline, or serve and flag).
 **Build reveals.** *proto.* Measure real clock drift across pilot sites.
 **Default to start.** 5 seconds, decline.
+**Measured (Oct 16, 2026).** The three Pi 3 B nodes of the Phase 0 lab, chrony-synced on one LAN, agree within a millisecond; their oscillators run 8.8 ppm fast (`bw-house`, from the pool), 2.4 to 3.0 ppm fast and 0.5 ppm slow (the other two, from `bw-house`). Free-running, 8.8 ppm is 0.76 s a day, so a node with no time source crosses 5 s in about a week. A 10 s step on the hop made it decline as designed; the window was lost, not paid, and chrony stepped the clock back 5 s after it was restarted. Across sites: not measured yet. Details in `PHASE0-SETUP.md`.
 
 ### B10. Attestation for the subsidy tier
 **Unresolved.** 3.4 requires a client-side attestation (TLSNotary-style) for traffic claiming a bonus. No protocol is named and the overhead is unknown.

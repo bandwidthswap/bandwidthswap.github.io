@@ -77,3 +77,20 @@ Adafruit, PiShop.us, and CanaKit for Pi accessories; Amazon or Mouser for Heltec
 ## What to buy first
 
 Phase 0 only. It's $75, it ships fast, and nothing in Phases 1 or 2 is useful until three Pis are on the network signing receipts. Order Phase 1 once you've decided line of sight versus trees.
+
+## Bought, October 16, 2026
+
+The decision came out as **through trees** (no line of sight from the house to the forest spot), so option B. What was ordered, and where it departs from the list above:
+
+| Item | What was bought | Note |
+|---|---|---|
+| LoRa boards ×3 | LILYGO T-Beam Supreme, 915 MHz, L76K GPS, Meshtastic preloaded, about $55 each | Chosen over the Heltec V3 the list names. Same SX1262 radio and Meshtastic support; the GPS and the 18650 holder are extras the nodes do not use. USB-C. |
+| Antennas ×3 | 915 MHz 3 dBi SMA with u.FL pigtails, a 4-pack (one spare) | Matches the T-Beam's u.FL socket. |
+| Cables ×3 | 1 ft USB-A to USB-C data cables, a 5-pack | Must be data cables, not charge-only. |
+| Cases ×3 | MakerNova T-Beam Supreme cases, one per node | Arriving Oct 23 to 29. |
+| Phase 2 wiring | A 12 V 250 A bus bar and a pair of ground bus bars | For the forest box: panel in, battery, load out, the two 5 V converters. |
+| Data plane | Heltec Wi-Fi HaLow dongle pair, AP+STA, 902 to 928 MHz, 27 dBm (V2), about $143 the pair | Chosen over the ALFA AHPI7292S HAT, which is not sold on Amazon (Rokland and SparkFun carry it at $70 to $83). An Ethernet bridge pair keeps the Pi's header free and matches the line-of-sight design: the Pi talks to the radio over Ethernet. Try the stock antennas before buying any 5 dBi one; if the forest link is marginal, the ALFA AOA-915-5ACM (N-male, outdoor) with an N-to-SMA pigtail, after confirming the dongle's connector is SMA, not RP-SMA. |
+
+Still to buy, for the house-side dongle outdoors on PoE (the UniFi Switch Ultra 60W supplies 802.3af/at on seven ports): a gigabit PoE-to-USB-C splitter, 5 V 2.4 A, 802.3af (never a passive 24 V injector); the outdoor shielded Ethernet from Phase 1A; a grounded Ethernet surge protector at the house entry; a small IP65 ABS box with a cable gland (the stock whip can stay inside the box, ABS barely attenuates 900 MHz); a J-mount or pole mount; UV zip ties and sealing tape. The forest-side dongle takes its 5 V from the Phase 2 battery box's buck converter instead.
+
+Not bought and not needed yet: Phase 2 power and enclosure, the 5 dBi outdoor antennas, 18650 cells for the T-Beams.
