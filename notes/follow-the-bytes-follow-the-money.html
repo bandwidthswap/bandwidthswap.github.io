@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Three maps of a bandwidth market, a street, a forest and four worlds, each with a switch that takes a link down, showing where the bytes go, what people pay before and after, and where the money flows. A field note from Bandwidth Swap.">
+<title>Follow the Bytes, Follow the Money · Bandwidth Swap</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="notes.css">
+<style>
+/* The three maps. Each figure has a state set by the radio buttons above it; groups inside the SVG show or hide by state. Colors are the site's tokens, so both themes work. */
+figure.map{margin:0 0 20px;max-width:100%}
+figure.map .figwrap{overflow-x:auto}
+figure.map svg{width:100%;min-width:640px;height:auto;display:block}
+figure.map figcaption{font-size:14px;color:var(--muted);margin-top:6px;max-width:65ch}
+.switch{display:flex;flex-wrap:wrap;gap:6px 10px;margin:0 0 10px;padding:0;border:0}
+.switch legend{font:600 12px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.switch label{font:600 13px/1.2 var(--display);letter-spacing:.03em;border:1px solid var(--line);border-radius:4px;padding:7px 11px;cursor:pointer;background:var(--panel);color:var(--fg)}
+.switch input{position:absolute;opacity:0;width:0;height:0}
+.switch input:checked+span{color:var(--accent-ink)}
+.switch label:has(input:checked){background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.switch label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+svg text{font-family:"IBM Plex Sans Condensed","Arial Narrow",sans-serif;font-size:13px;font-weight:600;fill:var(--fg)}
+svg text.m{font-family:"IBM Plex Mono",Menlo,monospace;font-size:11px;font-weight:400;fill:var(--muted)}
+svg text.money{font-family:"IBM Plex Mono",Menlo,monospace;font-size:11px;font-weight:500;fill:var(--signal)}
+svg text.data{font-family:"IBM Plex Mono",Menlo,monospace;font-size:11px;font-weight:500;fill:var(--accent)}
+svg text.sub{font-weight:400;font-size:11px;fill:var(--muted)}
+svg .box{fill:var(--panel);stroke:var(--line);stroke-width:2}
+svg .box.pay{stroke:var(--accent)}
+svg .box.mint{stroke:var(--signal)}
+svg .box.ghost{stroke-dasharray:4 4;stroke:var(--muted)}
+svg .link{stroke:var(--line);stroke-width:2;fill:none}
+svg .link.down{stroke:var(--muted);stroke-dasharray:3 5}
+svg .flow{stroke:var(--accent);stroke-width:3;fill:none}
+svg .cash{stroke:var(--signal);stroke-width:2;fill:none;stroke-dasharray:5 4}
+svg .x{stroke:var(--signal);stroke-width:3;fill:none}
+/* states */
+.map[data-state="normal"] .st-down,.map[data-state="normal"] .st-dark,.map[data-state="normal"] .st-posted,.map[data-state="normal"] .st-built{display:none}
+.map[data-state="down"] .st-normal,.map[data-state="down"] .st-dark,.map[data-state="down"] .st-posted,.map[data-state="down"] .st-built{display:none}
+.map[data-state="posted"] .st-built,.map[data-state="posted"] .st-dark,.map[data-state="posted"] .st-normal,.map[data-state="posted"] .st-down{display:none}
+.map[data-state="built"] .st-posted,.map[data-state="built"] .st-dark,.map[data-state="built"] .st-normal,.map[data-state="built"] .st-down{display:none}
+.map[data-state="dark"] .st-posted,.map[data-state="dark"] .st-built,.map[data-state="dark"] .st-normal,.map[data-state="dark"] .st-down{display:none}
+.flows th:first-child,.flows td:first-child{min-width:12ch}
+.cond{padding-left:1.2em}
+.cond li{margin-bottom:8px}
+.cond strong{font-weight:600}
+</style>
+</head>
+<body>
+
+<header class="masthead"><div class="wrap">
+  <p class="brand"><a href="../">Bandwidth<span>Swap</span></a></p>
+  <p class="tag">A bandwidth market where the payment is the proof.</p>
+  <p class="status">Field notes · Oct 2026</p>
+</div></header>
+
+<div class="wrap">
+<article>
+  <p class="eyebrow"><a href="./">Field notes</a></p>
+  <h1>Follow the Bytes, Follow the Money</h1>
+  <p class="meta">October 17, 2026 · about 12 minutes · three maps of the market, a street, a forest and four worlds, each with a switch that takes a link down, and the prices and money before and after</p>
+
+  <p>Every diagram of a network shows where the data goes. This note draws the other arrow too. In Bandwidth Swap the bytes go one way and the money goes the other, each hop is paid when the next one acknowledges, and five percent of every fee leaves the network for good. Three maps follow, at three scales. Each has a switch that takes something down, so you can watch what the protocol does when a link fails: who still gets through, what they pay before and after, and where the money ends up. The numbers are the pilot's, ten cents a gigabyte for an uplink, and made-up but plausible for everything else.</p>
+  <p>One convention throughout. Green is data. Orange is money, dashed, because in the pilot it is an invoice at the end of the month and in the design it is a payment channel; either way it moves after the bytes. Every payment shown has already lost its five percent to the burn, which is written beside it.</p>
+
+  <h2>1. A street with three dishes</h2>
+  <p>Three houses on one street each have a satellite dish. Each sells a share of its connection to one neighbor: House 1 to House 1a over a wire, House 2 to House 2a over Wi-Fi, House 3 to House 3a over a 915 MHz radio that goes through trees at a few megabits a second. The three dish houses are also linked to each other, Wi-Fi between 1 and 2 and 915 MHz between 2 and 3, and each posts a small price for carrying a neighbor's traffic across that link. A Raspberry Pi at House 2 is the street's Mint. Every hour each paying house signs a receipt for the bytes it bought, the house that carried them countersigns, and both copies go to the Pi.</p>
+
+  <figure class="map" id="map1" data-state="normal">
+    <fieldset class="switch" aria-controls="svg1"><legend>House 1's dish</legend>
+      <label><input type="radio" name="s1" value="normal" checked><span>Working</span></label>
+      <label><input type="radio" name="s1" value="down"><span>Down (snow on the dish)</span></label>
+    </fieldset>
+    <div class="figwrap"><svg id="svg1" viewBox="0 0 760 400" role="img" aria-label="Three dish houses on a street, each with a dependent house; when House 1's dish goes down, House 1a's traffic goes through House 1 to House 2's dish, and pays both" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="m1g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker>
+        <marker id="m1s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--signal)"/></marker>
+      </defs>
+      <!-- the internet -->
+      <rect x="40" y="14" width="680" height="26" rx="4" class="box"/>
+      <text x="380" y="31" text-anchor="middle">the internet</text>
+      <!-- dish houses -->
+      <rect x="70" y="120" width="120" height="50" rx="4" class="box"/>
+      <text x="130" y="140" text-anchor="middle">House 1</text><text x="130" y="157" text-anchor="middle" class="sub">dish · sells at $0.10/GB</text>
+      <rect x="320" y="120" width="120" height="50" rx="4" class="box"/>
+      <text x="380" y="140" text-anchor="middle">House 2</text><text x="380" y="157" text-anchor="middle" class="sub">dish · sells at $0.10/GB</text>
+      <rect x="570" y="120" width="120" height="50" rx="4" class="box"/>
+      <text x="630" y="140" text-anchor="middle">House 3</text><text x="630" y="157" text-anchor="middle" class="sub">dish · sells at $0.10/GB</text>
+      <!-- uplinks -->
+      <path d="M130 120V40" class="link"/><text x="136" y="80" class="m">dish · 150 Mbps</text>
+      <path d="M380 120V40" class="link"/><text x="386" y="80" class="m">dish · 150 Mbps</text>
+      <path d="M630 120V40" class="link"/><text x="636" y="80" class="m">dish · 150 Mbps</text>
+      <!-- street links -->
+      <path d="M190 145H320" class="link"/><text x="255" y="138" text-anchor="middle" class="m">Wi-Fi · 200 Mbps</text><text x="255" y="186" text-anchor="middle" class="m">$0.02/GB as a hop</text>
+      <path d="M440 145H570" class="link"/><text x="505" y="138" text-anchor="middle" class="m">915 MHz · 4 Mbps</text><text x="505" y="186" text-anchor="middle" class="m">$0.02/GB as a hop</text>
+      <!-- dependents -->
+      <rect x="70" y="250" width="120" height="50" rx="4" class="box pay"/>
+      <text x="130" y="270" text-anchor="middle">House 1a</text><text x="130" y="287" text-anchor="middle" class="sub">pays · 30 GB a day</text>
+      <rect x="320" y="250" width="120" height="50" rx="4" class="box pay"/>
+      <text x="380" y="270" text-anchor="middle">House 2a</text><text x="380" y="287" text-anchor="middle" class="sub">pays · 30 GB a day</text>
+      <rect x="570" y="250" width="120" height="50" rx="4" class="box pay"/>
+      <text x="630" y="270" text-anchor="middle">House 3a</text><text x="630" y="287" text-anchor="middle" class="sub">pays · 10 GB a day</text>
+      <path d="M130 170V250" class="link"/><text x="124" y="206" class="m" text-anchor="end">wire · 1 Gbps</text>
+      <path d="M380 170V250" class="link"/><text x="374" y="206" class="m" text-anchor="end">Wi-Fi · 200 Mbps</text>
+      <path d="M630 170V250" class="link"/><text x="624" y="206" class="m" text-anchor="end">915 MHz · 4 Mbps</text>
+      <!-- the Mint -->
+      <rect x="300" y="340" width="160" height="44" rx="4" class="box mint"/>
+      <text x="380" y="358" text-anchor="middle">Street Mint</text><text x="380" y="374" text-anchor="middle" class="sub">a Pi at House 2 · receipts hourly</text>
+      <text x="40" y="334" class="m">every payment: 5% burned first, the rest to the house that carried</text>
+
+      <!-- NORMAL: three independent markets -->
+      <g class="st-normal">
+        <path d="M118 248V172" class="flow" marker-end="url(#m1g)"/><path d="M118 118V44" class="flow" marker-end="url(#m1g)"/>
+        <path d="M142 172V246" class="cash" marker-end="url(#m1s)"/><text x="150" y="236" class="money">$0.10/GB</text>
+        <path d="M368 248V172" class="flow" marker-end="url(#m1g)"/><path d="M368 118V44" class="flow" marker-end="url(#m1g)"/>
+        <path d="M392 172V246" class="cash" marker-end="url(#m1s)"/><text x="400" y="236" class="money">$0.10/GB</text>
+        <path d="M618 248V172" class="flow" marker-end="url(#m1g)"/><path d="M618 118V44" class="flow" marker-end="url(#m1g)"/>
+        <path d="M642 172V246" class="cash" marker-end="url(#m1s)"/><text x="650" y="236" class="money">$0.10/GB</text>
+        <text x="40" y="318" class="data">bytes up, one hop each · three separate markets · the street links carry nothing</text>
+      </g>
+
+      <!-- DOWN: House 1's dish is out; 1a goes through House 1 to House 2 -->
+      <g class="st-down">
+        <path d="M130 120V40" class="link down"/>
+        <path d="M120 70L140 90M140 70L120 90" class="x"/><text x="108" y="104" class="money" text-anchor="end">down</text>
+        <path d="M118 248V172" class="flow" marker-end="url(#m1g)"/>
+        <path d="M190 154H318" class="flow" marker-end="url(#m1g)"/>
+        <path d="M368 118V44" class="flow" marker-end="url(#m1g)"/>
+        <path d="M142 172V246" class="cash" marker-end="url(#m1s)"/><text x="150" y="240" class="money">$0.12/GB</text>
+        <text x="150" y="222" class="m">$0.02 to House 1, $0.10 to House 2</text>
+        <path d="M318 126H192" class="cash" marker-end="url(#m1s)"/><text x="255" y="118" text-anchor="middle" class="money">$0.10 + $0.02 → House 2</text>
+        <text x="372" y="100" text-anchor="end" class="m">House 1's own traffic too, at $0.10</text>
+        <path d="M368 248V172" class="flow" marker-end="url(#m1g)"/>
+        <path d="M392 172V246" class="cash" marker-end="url(#m1s)"/><text x="400" y="236" class="money">$0.10/GB</text>
+        <path d="M618 248V172" class="flow" marker-end="url(#m1g)"/><path d="M618 118V44" class="flow" marker-end="url(#m1g)"/>
+        <path d="M642 172V246" class="cash" marker-end="url(#m1s)"/><text x="650" y="236" class="money">$0.10/GB</text>
+        <text x="392" y="98" class="money">House 2 may raise its price,</text><text x="392" y="114" class="money">up to the way around: $0.14</text>
+        <text x="40" y="318" class="data">1a's bytes: wire → House 1 → Wi-Fi → House 2's dish · two hops, two receipts, two payments</text>
+      </g>
+    </svg></div>
+    <figcaption>Working: three one-hop markets, each dependent paying its dish house. Down: House 1a's bytes cross the street link to House 2's dish and House 1a pays both houses; House 2 can charge up to what the way around through House 3 would cost ($0.02 + $0.02 + $0.10). Nothing is paid to House 1 for its dish being down, and nothing for standing by.</figcaption>
+  </figure>
+
+  <h3>Prices and money, before and after</h3>
+  <div class="tablewrap"><table class="flows">
+    <thead><tr><th>Who pays whom</th><th>Working</th><th>House 1's dish down</th></tr></thead>
+    <tbody>
+      <tr><td>House 1a → House 1</td><td class="num">$0.10/GB · $3.00 a day</td><td class="num">$0.02/GB as a hop · $0.60 a day</td></tr>
+      <tr><td>House 1a → House 2</td><td class="num">nothing</td><td class="num">$0.10/GB · $3.00 a day</td></tr>
+      <tr><td>House 1 → House 2 (its own use, 20 GB)</td><td class="num">nothing</td><td class="num">$0.10/GB · $2.00 a day</td></tr>
+      <tr><td>House 2a → House 2</td><td class="num">$0.10/GB · $3.00 a day</td><td class="num">$0.10/GB · $3.00 a day</td></tr>
+      <tr><td>House 3a → House 3</td><td class="num">$0.10/GB · $1.00 a day</td><td class="num">$0.10/GB · $1.00 a day</td></tr>
+      <tr><td>Burned (5% of every fee)</td><td class="num">$0.35 a day</td><td class="num">$0.48 a day</td></tr>
+      <tr><td>House 1's income</td><td class="num">$2.85 a day</td><td class="num">$0.57 a day, and it pays $2.00</td></tr>
+      <tr><td>House 2's income</td><td class="num">$2.85 a day</td><td class="num">$7.60 a day</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>The conditions</h3>
+  <ul class="cond">
+    <li><strong>Is there a way around?</strong> Only if the street links exist. Without them, House 1 and House 1a are dark, nothing moves and nothing is paid: a relay that is offline earns nothing, which is not a punishment, only the absence of a customer. The protocol does not create backup links. It makes them worth building.</li>
+    <li><strong>Who pays for the detour?</strong> The payer, per hop. House 1a's receipt names both hops; House 1 is paid its hop price when House 2 acknowledges, and House 2 is paid when the bytes reach the internet, which for endpoint service is House 1a's own closing signature. House 1 cannot charge House 1a for the dish it no longer provides.</li>
+    <li><strong>What bounds House 2's price?</strong> Nothing in the protocol. The market does: the way around through House 3 costs $0.14, so above that House 1a's software routes the other way, ranked by what previous payers actually settled on each path. The street's third link is what keeps the second one honest.</li>
+    <li><strong>What about the hour the dish failed?</strong> House 1a's window with House 1 settles at the smaller of the two counts, which is the bytes that crossed before the snow. The rest of the hour is on the new route, in a new receipt. No one adjudicates.</li>
+    <li><strong>How does House 1a know the detour works before it needs it?</strong> Routes are ranked by settled receipts, so a path nobody has used ranks nowhere. A purchase commitment on the route 1a → House 2, tiny, say a tenth of a gigabyte an hour with a proving allowance, keeps the street link exercised and in the receipt graph for a few cents a day. That is insurance bought as bandwidth, which is the only way this protocol sells insurance.</li>
+    <li><strong>The slow link.</strong> If House 3's dish fails instead, House 3a's way around runs over 915 MHz at four megabits: it works, and it settles a tenth of the bytes an hour. Quality is priced, not proven. House 3a pays less because less arrived.</li>
+  </ul>
+
+  <h2>2. A cabin in the forest</h2>
+  <p>Six kilometers from the end of that street, through trees, there is a cabin with no connection at all. Nobody will string a radio to it on a promise. So the cabin posts a purchase commitment, the paper's word for a bounty: a prepaid offer to buy bandwidth on a route that does not exist yet. The offer names the route, from the cabin to House 3's dish; a minimum rate, one gigabyte an hour, which is about two megabits a second; a premium of ten cents a gigabyte above whatever the relays post; 720 hourly windows, a month; a deadline of sixty days; and a proving allowance, ten windows a week that the escrow will reimburse for anyone else who tries the route. The value is escrowed with the street's Mint and announced. Then the cabin waits.</p>
+
+  <figure class="map" id="map2" data-state="posted">
+    <fieldset class="switch" aria-controls="svg2"><legend>The bounty</legend>
+      <label><input type="radio" name="s2" value="posted" checked><span>Posted, nobody has built</span></label>
+      <label><input type="radio" name="s2" value="built"><span>A neighbor built the ridge relay</span></label>
+      <label><input type="radio" name="s2" value="dark"><span>The ridge relay goes dark</span></label>
+    </fieldset>
+    <div class="figwrap"><svg id="svg2" viewBox="0 0 760 330" role="img" aria-label="A cabin in the forest, a ridge relay between it and a dish house; the cabin's bounty is escrowed with the Mint and paid out per window once the relay exists" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="m2g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker>
+        <marker id="m2s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--signal)"/></marker>
+      </defs>
+      <rect x="520" y="14" width="200" height="26" rx="4" class="box"/><text x="620" y="31" text-anchor="middle">the internet</text>
+      <path d="M665 120V40" class="link"/><text x="659" y="84" class="m" text-anchor="end">dish · $0.10/GB</text>
+      <!-- trees -->
+      <g fill="none" stroke="var(--line)" stroke-width="2">
+        <path d="M160 230l12-26 12 26zM200 100l12-26 12 26zM230 250l12-26 12 26zM270 90l12-26 12 26zM300 240l12-26 12 26zM470 100l12-26 12 26zM500 250l12-26 12 26zM540 235l12-26 12 26zM190 170l10-22 10 22zM440 190l10-22 10 22z"/>
+      </g>
+      <text x="30" y="285" class="m">6 km of trees · no line of sight</text>
+      <!-- cabin -->
+      <rect x="30" y="130" width="120" height="50" rx="4" class="box pay"/>
+      <text x="90" y="150" text-anchor="middle">The cabin</text><text x="90" y="167" text-anchor="middle" class="sub">pays · no connection</text>
+      <!-- house 3 -->
+      <rect x="600" y="120" width="130" height="50" rx="4" class="box"/>
+      <text x="665" y="140" text-anchor="middle">House 3</text><text x="665" y="157" text-anchor="middle" class="sub">dish · $0.10/GB</text>
+      <!-- the Mint -->
+      <rect x="300" y="250" width="170" height="50" rx="4" class="box mint"/>
+      <text x="385" y="270" text-anchor="middle">Street Mint</text>
+
+      <g class="st-posted">
+        <rect x="320" y="130" width="120" height="50" rx="4" class="box ghost"/>
+        <text x="380" y="150" text-anchor="middle" fill="var(--muted)">nobody yet</text><text x="380" y="167" text-anchor="middle" class="sub">a ridge, 3 km each way</text>
+        <path d="M150 155H320" class="link down"/><path d="M440 155H600" class="link down"/>
+        <text x="235" y="148" text-anchor="middle" class="m">no link</text><text x="520" y="148" text-anchor="middle" class="m">no link</text>
+        <path d="M90 180V275H298" class="cash" marker-end="url(#m2s)"/>
+        <text x="100" y="268" class="money">$180 escrowed</text>
+        <text x="385" y="287" text-anchor="middle" class="sub">holds the bounty · announces it</text>
+        <text x="30" y="318" class="data">bytes: none · money: $180 sits with the Mint · 720 windows × 1 GB × ($0.15 posted + $0.10 premium)</text>
+      </g>
+
+      <g class="st-built">
+        <rect x="320" y="130" width="120" height="50" rx="4" class="box"/>
+        <text x="380" y="150" text-anchor="middle">Ridge relay</text><text x="380" y="167" text-anchor="middle" class="sub">a neighbor · $0.05/GB</text>
+        <path d="M150 155H320" class="link"/><path d="M440 155H600" class="link"/>
+        <text x="235" y="148" text-anchor="middle" class="m">915 MHz · 3 km</text><text x="520" y="148" text-anchor="middle" class="m">915 MHz · 3 km</text>
+        <path d="M150 162H318" class="flow" marker-end="url(#m2g)"/><path d="M440 162H598" class="flow" marker-end="url(#m2g)"/><path d="M655 118V44" class="flow" marker-end="url(#m2g)"/>
+        <text x="235" y="178" text-anchor="middle" class="data">1.2 GB this hour</text>
+        <path d="M385 250V182" class="cash" marker-end="url(#m2s)"/><text x="392" y="220" class="money">$0.06 + $0.06 premium</text>
+        <path d="M470 275H640V172" class="cash" marker-end="url(#m2s)"/><text x="480" y="268" class="money">$0.12 + $0.06 premium</text>
+        <text x="385" y="287" text-anchor="middle" class="sub">pays each window out of the escrow</text>
+        <text x="30" y="318" class="data">a full window: $0.30 out of escrow, $0.015 burned · under 1 GB the premium prorates, the rest returns</text>
+      </g>
+
+      <g class="st-dark">
+        <rect x="320" y="130" width="120" height="50" rx="4" class="box ghost"/>
+        <text x="380" y="150" text-anchor="middle" fill="var(--muted)">Ridge relay</text><text x="380" y="167" text-anchor="middle" class="sub">dark · no receipts</text>
+        <path d="M370 95L390 115M390 95L370 115" class="x"/>
+        <path d="M150 155H320" class="link down"/><path d="M440 155H600" class="link down"/>
+        <text x="385" y="287" text-anchor="middle" class="sub">pays nothing · escrow waits for the deadline</text>
+        <text x="30" y="318" class="data">no bytes, no money · unpaid windows return at day 60 · the bounty stays open to a second path</text>
+      </g>
+    </svg></div>
+    <figcaption>Posted: the cabin's $180 sits with the Mint and the offer is announced; no bytes, no payments. Built: a neighbor on the ridge serves the route and each hour's receipt draws the posted prices and the premium out of the escrow. Dark: the relay stops, the receipts stop, the payments stop; nothing is paid for the relay having existed.</figcaption>
+  </figure>
+
+  <h3>Prices and money, window by window</h3>
+  <div class="tablewrap"><table class="flows">
+    <thead><tr><th>One hourly window</th><th>Bytes</th><th>Ridge relay gets</th><th>House 3 gets</th><th>Burned</th><th>Back to the cabin</th></tr></thead>
+    <tbody>
+      <tr><td>Above the minimum</td><td class="num">1.2 GB</td><td class="num">$0.06 + $0.06</td><td class="num">$0.12 + $0.06</td><td class="num">$0.015</td><td class="num">nothing</td></tr>
+      <tr><td>Rain on the radio</td><td class="num">0.5 GB</td><td class="num">$0.025 + $0.025</td><td class="num">$0.05 + $0.025</td><td class="num">$0.006</td><td class="num">$0.05 of premium</td></tr>
+      <tr><td>Cabin away, nothing sent</td><td class="num">0</td><td class="num">nothing</td><td class="num">nothing</td><td class="num">nothing</td><td class="num">the window's escrow, at the deadline</td></tr>
+      <tr><td>A hiker's phone tries the route</td><td class="num">0.3 GB</td><td class="num">$0.015</td><td class="num">$0.03</td><td class="num">$0.002</td><td class="num">the escrow reimburses the hiker's $0.045, up to ten times a week</td></tr>
+      <tr><td>Relay dark all month</td><td class="num">0</td><td class="num">nothing</td><td class="num">nothing</td><td class="num">nothing</td><td class="num">$180 at day 60</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>The conditions</h3>
+  <ul class="cond">
+    <li><strong>Who builds, and why?</strong> Whoever can see the arithmetic. The bounty guarantees a month of at least a gigabyte an hour at fifteen cents posted plus ten premium, which is at least $72 to the two relays for a $150 radio pair. The protocol does not pick the builder. It publishes the offer and pays whoever's receipts settle on the route.</li>
+    <li><strong>What does the cabin risk?</strong> Nothing but time. The escrow pays only on receipts; a month with no relay refunds in full at the deadline. What it cannot buy is a promise. A relay that goes dark has broken nothing it was paid for.</li>
+    <li><strong>What does the relay risk?</strong> The radio. It is paid per window, and only for windows the cabin's receipts settle. A rainy hour pays less; a quiet hour pays the carry, which on a link with no delay is nothing. The paper's own sentence that the posted price on a committed window is the poster's to lose, and its newer sentence that an unused reservation pays only the carry, do not yet say the same thing; this note follows the newer one, and the paper should pick.</li>
+    <li><strong>Is the ridge a monopoly?</strong> Yes, for as long as it is the only ridge. If it raises its price, the cabin's bounty is a bid against that toll: another neighbor can serve the same route and collect the same premium. The cabin does not have to post a second bounty. The first one is already an offer to anyone.</li>
+    <li><strong>How does the cabin trust a route it has never used?</strong> The proving allowance. Up to ten windows a week bought by other payers are reimbursed from the escrow, and their receipts put the route in the graph at a measured rate before the cabin relies on it. A relay cannot prove its own route through a second identity for more than the allowance, and loses the burn doing it.</li>
+    <li><strong>What the bounty cannot buy.</strong> Presence. A commitment can name a place and pay for people served there, within a radio's range, but it cannot pay a box for being in the forest. Only receipts from people who paid for bytes earn anything.</li>
+  </ul>
+
+  <h2>3. Earth, the Moon, Mars and Europa</h2>
+  <p>Now the same rules with the constants changed. Four worlds, four bookkeepers: a Mint on Earth, one on the Moon, one on Mars and one in the Jupiter system serving a lander on Europa through a relay orbiter. Light takes 1.3 seconds to the Moon, three to twenty-two minutes to Mars, and thirty-five to fifty-two minutes to Jupiter; Mars to Jupiter is about thirty to fifty-five. On every link the window is the contact, the clock tolerance is the base five seconds plus the light time both ways plus the drift since the last contact, windows are prepaid, and a relay that holds a bundle between contacts has signed for it. Each bridge relay is bonded with the Mint on both sides of its link, and the Mints reconcile their books whenever a link between them exists. An institution on Earth wants a terabyte from Europa.</p>
+
+  <figure class="map" id="map3" data-state="normal">
+    <fieldset class="switch" aria-controls="svg3"><legend>The Earth–Jupiter line</legend>
+      <label><input type="radio" name="s3" value="normal" checked><span>Clear</span></label>
+      <label><input type="radio" name="s3" value="down"><span>Solar conjunction (three weeks)</span></label>
+    </fieldset>
+    <div class="figwrap"><svg id="svg3" viewBox="0 0 760 430" role="img" aria-label="Earth, the Moon, Mars and Jupiter with Europa, each with a Mint; Europa's data reaches Earth directly through the Jupiter relay, or through a Mars relay when the Sun blocks the direct line" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="m3g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker>
+        <marker id="m3s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--signal)"/></marker>
+      </defs>
+      <!-- worlds -->
+      <circle cx="120" cy="300" r="22" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/><text x="120" y="340" text-anchor="middle">Earth</text><text x="120" y="356" text-anchor="middle" class="sub">Mint · pays</text>
+      <circle cx="190" cy="250" r="8" fill="var(--panel)" stroke="var(--line)" stroke-width="2"/><text x="214" y="247" class="sub">Moon · Mint</text>
+      <circle cx="430" cy="330" r="14" fill="var(--panel)" stroke="var(--line)" stroke-width="2"/><text x="430" y="362" text-anchor="middle">Mars</text><text x="430" y="378" text-anchor="middle" class="sub">Mint · bridge relay</text>
+      <circle cx="640" cy="150" r="30" fill="var(--panel)" stroke="var(--line)" stroke-width="2"/><text x="640" y="104" text-anchor="middle">Jupiter</text><text x="640" y="120" text-anchor="middle" class="sub">relay orbiter · Mint</text>
+      <circle cx="695" cy="190" r="7" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/><text x="695" y="215" text-anchor="middle" class="sub">Europa · the lander</text>
+      <circle cx="380" cy="210" r="26" fill="none" stroke="var(--signal)" stroke-width="2"/><text x="380" y="214" text-anchor="middle" fill="var(--signal)">Sun</text>
+      <!-- links -->
+      <path d="M138 286L184 256" class="link"/><text x="128" y="266" class="m" text-anchor="end">1.3 s</text>
+      <path d="M142 300L416 330" class="link"/><text x="320" y="296" class="m" text-anchor="middle">3 to 22 min · $20/GB a contact · carry $0.50/GB·h</text>
+      <path d="M442 320L616 168" class="link"/><text x="548" y="236" class="m">30 to 55 min · $40/GB</text>
+      <path d="M663 170L689 185" class="link"/><text x="640" y="196" class="m" text-anchor="end">short passes</text>
+
+      <g class="st-normal">
+        <path d="M140 288C260 150 420 60 612 140" class="link"/>
+        <text x="330" y="92" class="m" text-anchor="middle">35 to 52 min · $50/GB per contact</text>
+        <path d="M689 185L665 170" class="flow" marker-end="url(#m3g)"/>
+        <path d="M612 140C420 60 260 150 140 288" class="flow" marker-end="url(#m3g)"/>
+        <path d="M150 272C280 150 440 90 600 128" class="cash" marker-end="url(#m3s)"/>
+        <text x="300" y="72" class="money" text-anchor="middle">Earth pays $50/GB · 5% burned on Earth · Jupiter's Mint settles the lander hop</text>
+        <text x="20" y="406" class="data">a terabyte: Europa → relay orbiter → Earth · two receipts · closed on Earth 35 to 52 min after sending</text>
+        <text x="20" y="422" class="m">$50,000, $2,500 burned · the direct bridge can charge up to the way around through Mars, about $63/GB</text>
+      </g>
+
+      <g class="st-down">
+        <path d="M140 288L612 140" class="link down"/>
+        <path d="M366 196L394 224M394 196L366 224" class="x"/>
+        <text x="300" y="112" class="money" text-anchor="middle">Sun in the way · no Earth–Jupiter contact for three weeks</text>
+        <path d="M689 185L665 170" class="flow" marker-end="url(#m3g)"/>
+        <path d="M616 168L444 318" class="flow" marker-end="url(#m3g)"/>
+        <path d="M416 330L144 302" class="flow" marker-end="url(#m3g)"/>
+        <text x="456" y="318" class="data">custody at Mars, ~6 h</text>
+        <path d="M150 312L420 342" class="cash" marker-end="url(#m3s)"/>
+        <text x="300" y="356" class="money" text-anchor="middle">Earth pays Mars $20 + $3 carry</text>
+        <path d="M452 310L624 160" class="cash" marker-end="url(#m3s)"/>
+        <text x="600" y="262" class="money">Mars pays Jupiter $40</text>
+        <text x="750" y="280" class="m" text-anchor="end">in Mars's unit, at the bridge's rate</text>
+        <text x="20" y="406" class="data">the way around: Europa → orbiter → Mars (held for the next Earth contact) → Earth · three receipts · $63/GB</text>
+        <text x="20" y="422" class="m">Mars behind the Sun too: outboxes hold three weeks, every window settles after, nothing paid for the silence</text>
+      </g>
+    </svg></div>
+    <figcaption>Clear: Europa's lander sends to the Jupiter relay orbiter, which sends to Earth; the Earth institution pays the orbiter's posted price and the Jupiter Mint settles the lander's hop from the same receipts. Conjunction: the direct line is gone for three weeks, so the orbiter sends to a Mars relay, which holds the bundle under a custody receipt until its next Earth contact; Earth pays the Mars bridge, the Mars bridge pays the Jupiter bridge in Mars's unit at its own rate, and the two Mints that cannot see each other reconcile through Mars as paid traffic.</figcaption>
+  </figure>
+
+  <h3>Prices and money, per gigabyte</h3>
+  <div class="tablewrap"><table class="flows">
+    <thead><tr><th>Who pays whom</th><th>Line clear</th><th>Solar conjunction, Mars clear</th><th>Mars behind the Sun too</th></tr></thead>
+    <tbody>
+      <tr><td>Earth institution → Jupiter relay orbiter</td><td class="num">$50</td><td class="num">nothing directly</td><td class="num">nothing for three weeks</td></tr>
+      <tr><td>Earth institution → Mars bridge relay</td><td class="num">nothing</td><td class="num">$20 + $3 carry (six hours of custody)</td><td class="num">nothing</td></tr>
+      <tr><td>Mars bridge → Jupiter relay orbiter</td><td class="num">nothing</td><td class="num">$40, in Mars's unit at the bridge's rate</td><td class="num">nothing</td></tr>
+      <tr><td>Jupiter relay orbiter → Europa lander</td><td class="num">from the Jupiter Mint, per the same receipts</td><td class="num">the same</td><td class="num">settled when the link returns</td></tr>
+      <tr><td>Burned</td><td class="num">$2.50 on Earth</td><td class="num">$1.15 on Earth, $2.00 on Mars</td><td class="num">nothing</td></tr>
+      <tr><td>Earth pays in all</td><td class="num">$50</td><td class="num">$63</td><td class="num">nothing; the terabyte waits</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>The conditions</h3>
+  <ul class="cond">
+    <li><strong>Is there a way around?</strong> Only when Mars can see both Earth and Jupiter, which depends on where the three are in their orbits; some conjunctions have no detour. When there is none, nothing breaks. Receipts wait in outboxes, the clock tolerance has widened by three weeks of drift, and every window settles when the line returns. Nothing is paid for the silence, and nothing has to be.</li>
+    <li><strong>Who holds the bytes?</strong> The Mars relay, between the pass that brings them from Jupiter and its next contact with Earth, under a custody receipt it signed on take-up and for a holding term its contact plan published. If it loses the bundle, the loss is on paper and its bond on Mars pays for it. If its Earth contact never comes, Earth's prepaid window is refunded and the relay's carry on the windows that did settle is where it priced that risk.</li>
+    <li><strong>Whose money is it?</strong> Three units. Earth pays in Earth's; the Mars bridge, bonded with the Earth Mint and the Mars Mint, holds both and posts its prices in both, so the $40 it pays Jupiter's orbiter is its own conversion at its own rate. Earth cannot read Mars's unit and does not need to: the burn is five percent in any unit, and the smaller-count rule is in bytes.</li>
+    <li><strong>Who polices the bookkeepers?</strong> Nobody can reach another world's bond. If the Jupiter Mint under-burned during the silence, the Earth Mint finds it at the first reconciliation after, publishes the proof, stops reconciling, and slashes any relay on its side that keeps settling with Jupiter. The bridge relays, bonded on both sides, feel it first. That is a boycott, and it is the only enforcement that has ever worked across a distance.</li>
+    <li><strong>What bounds the direct bridge's price?</strong> The detour. Jupiter's orbiter is the only direct link, and it can charge up to about $63 a gigabyte, what Earth would pay to go around through Mars, before Earth's software routes that way even with the line clear. A toll is bounded by the cost of the next bridge, and this network always has one more bridge than the shortest path.</li>
+    <li><strong>Is this still commerce?</strong> Yes, everywhere on this map. The longest round trip here is under two hours, so the party that pays is the party that wanted the bytes and will be there to sign for them. The receipt's horizon is further out than Jupiter. It is not infinitely far, and the paper now says where it is.</li>
+  </ul>
+
+  <h2>What the three maps have in common</h2>
+  <p>In all three, taking a link down pays nobody for the outage and pays the way around exactly what its receipts settle. The street's detour costs two cents more a gigabyte and gives House 2 a price it can raise until House 3 undercuts it. The forest's bounty buys nothing until a relay exists, then buys exactly the windows that settle, and the escrow goes home when the deadline passes. The conjunction's detour costs thirteen dollars more and crosses two bookkeepers that cannot see each other, through a relay that signed for what it held. Different constants, one receipt, and the money always moving the other way from the bytes, five percent lighter.</p>
+
+  <p class="sources">Sources: <a href="../docs/paper.html">the Bandwidth Swap whitepaper, v0.4</a> (Section 3.6 for windows and the carry, Section 5 for posted prices and the sole bridge, Section 5.1 for purchase commitments, Appendix A for links with delay), <a href="../docs/paper-operators.html">the paper for operators</a>, <a href="../docs/OPEN-QUESTIONS.md">the open questions</a>, <a href="https://github.com/bandwidthswap/kit">the kit</a>. The numbers other than the pilot's ten cents a gigabyte are illustrative.</p>
+</article>
+
+<footer>Bandwidth Swap · <a href="./">all field notes</a> · <a href="../">home</a> · the paper is a draft, the kit is a lab, the numbers in the open questions are the ones to argue with.</footer>
+</div>
+<script>
+// Each map's radio buttons set its state; the stylesheet shows the matching groups.
+document.querySelectorAll('figure.map').forEach(function (fig) {
+  fig.querySelectorAll('input[type=radio]').forEach(function (r) {
+    r.addEventListener('change', function () { if (r.checked) fig.dataset.state = r.value; });
+  });
+});
+</script>
+</body>
+</html>
