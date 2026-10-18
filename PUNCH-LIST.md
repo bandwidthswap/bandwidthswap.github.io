@@ -2,6 +2,8 @@
 
 Work set aside to finish later, newest first. Each item says what it is, where it stopped, what blocks it, and how to pick it back up.
 
+The kit and the lab keep their own list, in the kit's `PUNCH-LIST.md`.
+
 ## The status Worker, made multi-tenant
 
 *Set aside Oct 18, 2026.*
