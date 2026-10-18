@@ -4,6 +4,8 @@ This is the handoff for the Phase 0 lab: how the three cards were made, how the 
 
 ## Where things stand
 
+**Oct 17, late:** the three nodes run bwkit 0.2.0 (the hourly commitment and the ledger rebuild); both tests ran and passed from the Mac (`CLAUDE.md`, State). The `wendi` account's key is on the nodes beside Grace's. Next is the fourth node at the neighbor's: `phase0/NEIGHBOR.md` in the kit.
+
 As of the evening of October 16, 2026:
 
 - Three Raspberry Pi 3 Model B nodes are up on the home LAN, wired, on 2.5 A supplies: `bw-house` at 192.168.0.74 (`b8:27:eb:9b:c7:6e`), `bw-forest` at 192.168.0.226 (`b8:27:eb:83:7c:6b`), `bw-mint` at 192.168.0.61 (`b8:27:eb:6b:1b:09`), DHCP from the UniFi gateway (a Cloud Gateway Ultra) at 192.168.0.1, no reservations yet: that is Grace's step, under "DHCP reservations on the gateway" below. The nodes find each other by `.local` name (avahi and nss-mdns are on the image), so a lease change only affects notes like this one.
