@@ -80,6 +80,8 @@ The build is deterministic: running it on an unchanged source produces no git di
 
 ## Next step
 
+Work set aside for later, with where it stopped and what blocks it, is in `PUNCH-LIST.md`; read it first. The numbered list below is the Oct 17 plan and is partly done.
+
 In order, for whoever picks this up:
 
 1. **Read the ledger.** The receipt timer on `bw-house` fires at the top of every hour. On `bw-mint`, `sudo -u bwkit bwkit ledger` and `sudo -u bwkit bwkit invoice 2026-10` should show the six test windows of Oct 16 (four settled, two disputed), then one settled window an hour of keepalive-sized traffic and no disputes; `bwkit status` there says `1 receipts without ack` (the clock test's receipt, which never settles) and `outbox: 0 waiting`. `phase0/provision.sh check` in the kit verifies time, tunnel and bwkit without changing anything. The public summary is at https://status.bandwidthswap.com/status and drawn at https://bandwidthswap.com/#lab.
