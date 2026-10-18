@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What an operator sees · Bandwidth Swap</title>
+<meta name="description" content="The dashboards every bwkit node serves, as snapshots of the lab's nodes on October 18, 2026: the Mint's view, a hop's, a payer's, and the fleet's.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#f2f4f0;--panel:#fbfcfa;--fg:#182019;--muted:#5d685f;--line:#d5dbd4;--accent:#1d6a58;--signal:#b9561c;--code-bg:#e9ede7;
+  --display:"IBM Plex Sans Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif;--body:"IBM Plex Serif",Georgia,"Times New Roman",serif;--mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121715;--panel:#181f1c;--fg:#e6ebe6;--muted:#9aa89e;--line:#2a3430;--accent:#5fc3a6;--signal:#e8955a;--code-bg:#1f2824;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121715;--panel:#181f1c;--fg:#e6ebe6;--muted:#9aa89e;--line:#2a3430;--accent:#5fc3a6;--signal:#e8955a;--code-bg:#1f2824;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.55}
+.wrap{max-width:860px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}.brand a{color:inherit;text-decoration:none}
+h1{font-family:var(--display);font-weight:700;font-size:40px;line-height:1.05;margin:0 0 12px;letter-spacing:-.01em;text-wrap:balance}
+p{max-width:68ch;margin:0 0 12px}.note{color:var(--muted);font-size:15px}
+.views{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:14px;margin:22px 0;padding:0;list-style:none}
+.views li{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.views h2{font-family:var(--display);font-weight:700;font-size:21px;margin:0 0 6px}.views h2 a{color:var(--accent);text-decoration:none}.views h2 a:hover{text-decoration:underline}
+.views p{font-size:15px;margin:0}.views .m{font-family:var(--mono);font-size:12px;color:var(--muted);display:block;margin-top:8px}
+code{font-family:var(--mono);font-size:14px;background:var(--code-bg);border-radius:3px;padding:0 4px}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="brand"><a href="../../">Bandwidth<span>Swap</span></a> · Lab</p>
+  <h1>What an operator sees</h1>
+  <p>Every node that runs the kit serves its own dashboard at its own address, offline, with nothing loaded from anywhere else. There is one page and three views of it: the Mint's operator reads books, a node's operator reads a link, and someone running several nodes reads health and position across all of them. The pages below are snapshots of the lab's four nodes, taken on October 18, 2026, drawn by the same code a node serves; nothing on them is live.</p>
+  <ul class="views">
+    <li><h2><a href="mint/">The Mint's view</a></h2><p>bw-mint's books: what it sees now, what needs attention, the hour as it closed, seven days of traffic, each link's gap against its margin, the settled windows (a row opens to its receipt and its ack), the chain of committed hours with a proof you can verify in the page, the map with the Steward's offers, purchases, the Steward, the month's money and invoice.</p><span class="m">drag the "as of" slider to see the books as they stood at any hour</span></li>
+    <li><h2><a href="hop/">A hop's view</a></h2><p>bw-neighbor, the relay at the neighbor's house: my month and what I am owed, my link and each payer's standing against my patience, my windows as the Mint settled them, the purchases that govern my link, and the Mint from my side.</p></li>
+    <li><h2><a href="payer/">A payer's view</a></h2><p>bw-house, the node that buys: what I signed and what I owe, the hop I buy from and the terms my windows settled under, my purchases and their progress.</p></li>
+    <li><h2><a href="fleet/">The fleet's view</a></h2><p>All four nodes from one operator's browser: the grid, attention across the fleet, the hour across every Mint, position (what my payers paid, what my hops earned, the net), and the map with my places marked. The list of nodes lives in the browser, never on a node.</p></li>
+  </ul>
+  <p class="note">To see your own nodes this way, run the kit: <a href="https://github.com/bandwidthswap/kit">github.com/bandwidthswap/kit</a>. A node's page is at <code>http://&lt;the node&gt;:8710/</code>, the fleet page at <code>/fleet</code> on any of your nodes, and <code>/snapshot</code> saves the page with its data as one file, which is what these are. The public views of the lab, the <a href="../../#lab">Lab status</a> and the <a href="../steward.html">Steward's book</a>, are fed by the Mint's public feed and carry names, roles, times and byte counts only.</p>
+</div>
+</body>
+</html>
