@@ -104,6 +104,7 @@ figcaption{font-size:14px;color:var(--muted);margin-top:6px;max-width:65ch}
 .lab .lbl.tb{left:200px;right:200px;top:78px}
 .lab .lbl.la{left:196px;top:169px;text-align:left}.lab .lbl.lb{right:196px;top:169px;text-align:right}
 .lab .lbl.cm{left:0;right:0;top:296px}
+.lab .lbl.ck{left:0;right:0;top:314px;font-size:12px}.lab .lbl.ck.ok{color:var(--accent)}.lab .lbl.ck.bad{color:var(--signal)}
 .lab .pulse{position:absolute;left:181px;top:107px;width:10px;height:10px;border-radius:50%;background:var(--accent);opacity:0;pointer-events:none}
 .lab-ledger{display:grid;grid-template-columns:140px repeat(12,minmax(0,1fr));gap:6px;align-items:end;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px 12px;min-width:640px}
 .lab-ledger:empty{display:none}
@@ -121,7 +122,7 @@ figcaption{font-size:14px;color:var(--muted);margin-top:6px;max-width:65ch}
 .lab-legend .up{color:var(--accent)}.lab-legend .stale{color:var(--signal)}.lab-legend .idle{color:var(--muted)}
 .lab .note{font:400 13px/1.5 var(--mono);color:var(--muted);margin:10px 0 8px;max-width:none}
 @media (max-width:1000px){.lab-map{height:auto;display:flex;flex-direction:column;gap:10px}.lab .node,.lab .node.mint,.lab .node.quiet{position:static;width:100%;min-height:0;margin:0}
-.lab .ln,.lab .head,.lab .pulse,.lab .lbl.la,.lab .lbl.lb{display:none}.lab .lbl.ta,.lab .lbl.tb,.lab .lbl.cm{position:static;text-align:left;white-space:normal}.lab .lbl.tb,.lab .lbl.cm{margin-top:-6px}.lab-sum{text-align:left}}
+.lab .ln,.lab .head,.lab .pulse,.lab .lbl.la,.lab .lbl.lb{display:none}.lab .lbl.ta,.lab .lbl.tb,.lab .lbl.cm,.lab .lbl.ck{position:static;text-align:left;white-space:normal}.lab .lbl.tb,.lab .lbl.cm,.lab .lbl.ck{margin-top:-6px}.lab-sum{text-align:left}}
 .callout{border-left:3px solid var(--signal);padding:4px 0 4px 14px;margin:0 0 16px;max-width:65ch}
 .callout p{margin-bottom:8px}
 .contact{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 14px}
@@ -299,6 +300,7 @@ signed by payer</code></pre>
   <noscript><p class="note">The map and the ledger need JavaScript. The feed itself is plain JSON at <a href="https://status.bandwidthswap.com/status">status.bandwidthswap.com/status</a>.</p></noscript>
   <p>A node is <strong>up</strong> when the Mint has a receipt from it within the last 90 minutes (receipts are hourly); the Mint is up when its report is under five minutes old and its ledger service answers. A hop is <strong>idle</strong> when it is not the one the house pays and has had no receipt in that time. A <strong>disputed</strong> window is one where the two signed counts differed by more than one percent; it settles at the smaller count, like every other window. Under the Mint is its latest <strong>commitment</strong>, a signed root over the hour's settlements that anyone holding the receipts can rebuild with the kit and check. The feed carries names, roles, times and byte counts, and nothing about the networks the boards sit on.</p>
   <p><a href="docs/verify.html">Check a proof in your browser</a>: paste a proof from the Mint's <code>bwkit prove</code> and a second implementation of the rules, sharing no code with the kit, checks the Mint's signature on the hour's root and each settlement's place in it, sending nothing anywhere.</p>
+  <p><a href="docs/steward.html">The Steward's book</a>: the rule that takes five percent of every fee and can only spend it as offers to buy bandwidth on links the network wants; its balances, open offers and payouts, drawn from the feed once it runs.</p>
 </section>
 
 <section id="roadmap">
@@ -308,7 +310,7 @@ signed by payer</code></pre>
     <li><span class="ph">Phase 0<small>one evening</small></span><span>Three Pis on the home network. Time, tunnel, receipts, one Mint. You pay yourself. Proves the receipt code and the clock rule.</span></li>
     <li><span class="ph">Phase 1<small>one weekend</small></span><span>Radios in. House to forest over a 5 GHz or HaLow pair, receipts and liveness over LoRa. Unplug the house's internet mid-window and show settlement still closes.</span></li>
     <li><span class="ph">Phase 2<small>a month</small></span><span>A neighbor operates the ridge. The Steward's rule runs for the first time, by hand: it matches the first bounty someone posts and offers a second path around the ridge. Paid in dollars on receipts. First real dispute.</span></li>
-    <li><span class="ph">Phase 3<small>open</small></span><span>Open-source the kit and the Steward, which is the bounty board. Anyone can post a purchase commitment on a named link or a mapped place and fund it, the Steward matches it, and the paper's Section 5.1 says how one settles and refunds. Anyone can build it.</span></li>
+    <li><span class="ph">Phase 3<small>open</small></span><span>Open-source the kit and the Steward, which is <a href="docs/steward.html">the bounty board</a>. Anyone can post a purchase commitment on a named link or a mapped place and fund it, the Steward matches it, and the paper's Section 5.1 says how one settles and refunds. Anyone can build it.</span></li>
     <li><span class="ph">Phase 4<small>north star</small></span><span>Links into places where the internet is forbidden. This is the right long-term target and the wrong next step: receipts prove delivery, not location, and paying for a node in a hostile jurisdiction needs a location proof that doesn't exist yet, legal review, and an incentive design that never makes a border crossing the thing being paid for.</span></li>
   </ul>
 </section>
@@ -402,7 +404,10 @@ signed by payer</code></pre>
 (function(){
   /* Lab status: the map and the ledger from the Mint's report, drawn from the nodes the feed lists. The last good report is kept in this browser for when the feed is away. */
   var sec=document.getElementById('lab'); if(!sec||!window.fetch) return;
-  var SRC=sec.getAttribute('data-src')||'https://status.bandwidthswap.com/status', UP_S=90*60, MINT_S=5*60, KEY='bw.lab.status', COLS=12, H=3600;
+  var q=null;try{q=new URLSearchParams(location.search).get('feed');}catch(e){}
+  var OVERRIDE=q&&/^(?!\/\/)[\w./-]+$/.test(q)?q:null;   /* ?feed=<relative path> draws a fixture instead of the live feed, for testing; nothing is saved then */
+  var SRC=OVERRIDE||sec.getAttribute('data-src')||'https://status.bandwidthswap.com/status', UP_S=90*60, MINT_S=5*60, KEY='bw.lab.status', COLS=12, H=3600;
+  var drawSeq=0, bspLoad=null;
   var ROLE={payer:'gateway, payer',hop:'relay, hop',mint:'settles at the smaller count',peer:'peer'};
   var SUB={payer:'bytes signed',hop:'bytes counted',mint:'windows settled',peer:'no receipts yet'};
   var FALLBACK=[{name:'bw-house',role:'payer'},{name:'bw-neighbor',role:'hop'},{name:'bw-forest',role:'hop'},{name:'bw-mint',role:'mint'}];
@@ -491,6 +496,17 @@ signed by payer</code></pre>
       cm.title='the Mint\'s signed root over the settlements of the hour starting '+when(C.window)+': '+plural(C.count||0,'settlement')+(C.t?', made '+hms(C.t):'')+'; root '+C.root;
     }else cm.textContent='commitment · none yet';
     map.appendChild(cm);
+    /* The check mark: when the feed carries the Mint's NYM and the committed hour's proof, verify them in this browser with docs/bsp.js (the signature on the root, every settlement's path to it). The feed's text is used, not the parsed report, so the numbers hash as the Mint wrote them. Without those fields nothing new is drawn. */
+    var mintNym=rep&&(rep.mint||(C&&C.mint)), seq=++drawSeq;
+    if(rep&&C&&C.root&&rep.proof&&mintNym&&A.text){
+      var ck=el('div','lbl ck','checking the proof in your browser…');map.appendChild(ck);height=Math.max(height,336);
+      verifyFeed(A.text,mintNym).then(function(res){
+        if(seq!==drawSeq)return;
+        ck.textContent=res.ok?'✓ verified in your browser against the Mint\'s key: '+plural(res.count,'settlement')+' in the root':'✗ not verified: '+res.reason;
+        ck.className='lbl ck '+(res.ok?'ok':'bad');
+        ck.title=(res.ok?'docs/bsp.js checked the Mint\'s Ed25519 signature on this hour\'s root and each settlement\'s Merkle path to it, with no code from the kit':'the feed\'s proof did not check out')+' · '+mintNym;
+      });
+    }
     function arrow(side){
       var s=side==='payer'?'l':'r', head=document.createElementNS('http://www.w3.org/2000/svg','svg');
       map.appendChild(el('div','ln drop '+s));map.appendChild(el('div','ln arrow '+s));
@@ -508,6 +524,17 @@ signed by payer</code></pre>
     if(idle.length)parts.push(idle.join(', ')+' idle');
     map.setAttribute('aria-label',parts.join('; ')||'no nodes reported');
     return states;
+  }
+  function verifyFeed(text,mintNym){
+    bspLoad=bspLoad||import('./docs/bsp.js');
+    return bspLoad.then(function(bsp){
+      var rep=bsp.parse(text), C=rep.commitment, P=rep.proof;
+      if(!P||typeof P!=='object')return {ok:false,reason:'the feed carries no proof'};
+      if(P.window!==C.window||P.root!==C.root||P.count!==C.count||P.signature!==C.signature)return {ok:false,reason:'the proof is for a different commitment than the one shown'};
+      return bsp.verifyProof(P,{mint:mintNym}).then(function(r){
+        return {ok:r.ok,count:r.settlements.length,reason:r.reason||(r.commitment&&r.commitment.reason)||'the proof did not check out'};
+      });
+    }).catch(function(e){return {ok:false,reason:'the verifier could not run ('+(e&&e.message||e)+')'};});
   }
   function buckets(n){
     var b={};(n&&n.history||[]).forEach(function(w){
@@ -554,8 +581,9 @@ signed by payer</code></pre>
     var dx=mint.getBoundingClientRect().left-map.getBoundingClientRect().left-DROP_X;
     dot.animate([{transform:'translate(0,0)',opacity:0},{transform:'translate(0,20px)',opacity:1,offset:.15},{transform:'translate(0,130px)',opacity:1,offset:.5},{transform:'translate('+(dx-6)+'px,130px)',opacity:1,offset:.95},{transform:'translate('+dx+'px,130px)',opacity:0}],{duration:1800,easing:'ease-in-out'});
   }
-  function draw(rep,now,fetched){
-    var A=arrange(rep), states=drawMap(rep,now,A), all=Object.keys(states);
+  function draw(rep,now,fetched,text){
+    var A=arrange(rep);A.text=text||null;
+    var states=drawMap(rep,now,A), all=Object.keys(states);
     var idle=all.filter(function(k){return states[k]==='idle';}).length, up=all.filter(function(k){return states[k]==='up';}).length, counted=all.length-idle;
     sum.classList.toggle('off',!rep||up<counted);
     sum.querySelector('.k').textContent=!rep?'status unavailable':(up===counted?'all '+count(counted)+' up':count(up)+' of '+count(counted)+' up')+(idle?', '+count(idle)+' idle':'');
@@ -568,19 +596,22 @@ signed by payer</code></pre>
       if(L.receipts_without_ack)parts.push(plural(L.receipts_without_ack,'receipt')+' without an ack');
       parts.push('reported '+ago(rep.generated_at,now));
       if(fetched)parts.push('status feed unavailable right now; this is the last good report, fetched '+when(fetched));
+      if(OVERRIDE)parts.push('drawn from '+OVERRIDE+', not the live feed');
     }
     note.textContent=parts.join(' · ');
     var payer=A.payer;
     if(rep&&payer&&payer.last_receipt){if(seen!==null&&payer.last_receipt>seen)pulse();seen=payer.last_receipt;}
   }
   function load(){
-    fetch(SRC,{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(rep){
-      var now=Math.floor(Date.now()/1000);draw(rep,now,null);
-      try{localStorage.setItem(KEY,JSON.stringify({fetched:now,report:rep}));}catch(e){}
+    fetch(SRC,{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();}).then(function(text){
+      var rep=JSON.parse(text), now=Math.floor(Date.now()/1000);draw(rep,now,null,text);
+      if(!OVERRIDE){try{localStorage.setItem(KEY,JSON.stringify({fetched:now,text:text}));}catch(e){}}
     }).catch(function(){
       var saved=null;try{saved=JSON.parse(localStorage.getItem(KEY));}catch(e){}
       var now=Math.floor(Date.now()/1000);
-      if(saved&&saved.report)draw(saved.report,now,saved.fetched);else draw(null,now,null);
+      if(saved&&saved.text&&!OVERRIDE)draw(JSON.parse(saved.text),now,saved.fetched,saved.text);
+      else if(saved&&saved.report&&!OVERRIDE)draw(saved.report,now,saved.fetched,null);
+      else draw(null,now,null,null);
     });
   }
   load();

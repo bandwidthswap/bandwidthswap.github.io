@@ -141,7 +141,7 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding-top:16px;font-si
     <p>The Mint posts a summary of its ledger to the status feed every two minutes, and the summary carries its latest hourly commitment. This fetches the feed and checks the signature on that commitment, in your browser, against the Mint's NYM.</p>
     <div class="row"><button type="button" id="live">Check the live commitment</button></div>
     <div id="liveout"></div>
-    <p class="note" id="livenote">The feed does not yet carry the Mint's NYM or the hour's proofs. Until it does, the signature is checked against the NYM printed on this page; once the feed names its Mint and carries the hour's proof, the page uses those and says so.</p>
+    <p class="note" id="livenote">Since bwkit 0.3.0 the feed names its Mint on the commitment and carries the committed hour's proof; both are checked when present, and the Lab status section does the same on every load. If a feed carries neither, the signature is checked against the NYM printed on this page.</p>
   </section>
 
   <h2>What this checks, and what it cannot</h2>
@@ -402,7 +402,7 @@ $('live').addEventListener('click', async () => {
     put('Report', 'generated ' + hms(rep.generated_at) + ', ' + day(rep.generated_at) + ' · bwkit ' + rep.bwkit);
     if (rep.proof && typeof rep.proof === 'object') {
       const p = await bsp.verifyProof(rep.proof, { mint: LAB_MINT });
-      put('Proofs', (p.ok ? 'every one of the ' : 'FAIL: ') + plural(p.settlements.length, 'settlement') + (p.ok ? ' is in the root' : ' · ' + p.reason));
+      put('Proof', p.ok ? (p.settlements.length === 1 ? 'its one settlement is in the root' : 'all ' + p.settlements.length + ' settlements are in the root') : 'FAIL · ' + p.reason);
       note.textContent = 'The feed carries the Mint\'s NYM and the hour\'s proofs; both were checked here. ' + backendLine();
     } else {
       note.textContent = (fromFeed ? 'The feed names its Mint; the signature was checked against that NYM. ' : 'The feed does not yet carry the Mint\'s NYM or the hour\'s proofs, so the signature was checked against the NYM on this page, read from bw-mint on October 18, 2026. ') + backendLine();

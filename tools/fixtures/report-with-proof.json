@@ -1,0 +1,412 @@
+{
+ "bwkit": "0.3.0",
+ "commitment": {
+  "count": 1,
+  "mint": "ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM",
+  "root": "556062fce495b6990dcc81a7fe47816427c90af8fcc485d94f4e01b45d182b5c",
+  "signature": "5cfQPFeD3SaiLu-N8VYliX_8Vl8WBXDHaJOZDl2J6oWLjH_z-TO8b4ddZKukzQ-zUek3skUs4wctKXse06sfAw",
+  "t": 1792306801,
+  "window": 1792303200
+ },
+ "generated_at": 1792308604,
+ "ledger": {
+  "acks": 42,
+  "acks_without_receipt": 0,
+  "disputed": 6,
+  "receipts": 43,
+  "receipts_without_ack": 1,
+  "settlements": 42
+ },
+ "nodes": [
+  {
+   "disputed": 6,
+   "history": [
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792267200,
+     "t_last": 1792270800
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792270800,
+     "t_last": 1792274400
+    },
+    {
+     "bytes": 13872,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792274400,
+     "t_last": 1792278000
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792278000,
+     "t_last": 1792281600
+    },
+    {
+     "bytes": 13872,
+     "disputed": false,
+     "settled_bytes": 13872,
+     "t_first": 1792281600,
+     "t_last": 1792285200
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792285200,
+     "t_last": 1792288800
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792288800,
+     "t_last": 1792292400
+    },
+    {
+     "bytes": 13872,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792292400,
+     "t_last": 1792296000
+    },
+    {
+     "bytes": 4592,
+     "disputed": false,
+     "settled_bytes": 4576,
+     "t_first": 1792296000,
+     "t_last": 1792296546
+    },
+    {
+     "bytes": 11792,
+     "disputed": false,
+     "settled_bytes": 11792,
+     "t_first": 1792296546,
+     "t_last": 1792299601
+    },
+    {
+     "bytes": 21993809,
+     "disputed": true,
+     "settled_bytes": 21993809,
+     "t_first": 1792300550,
+     "t_last": 1792301002
+    },
+    {
+     "bytes": 117428796,
+     "disputed": true,
+     "settled_bytes": 117428796,
+     "t_first": 1792301002,
+     "t_last": 1792303201
+    },
+    {
+     "bytes": 235762985,
+     "disputed": true,
+     "settled_bytes": 235762985,
+     "t_first": 1792303201,
+     "t_last": 1792306801
+    },
+    {
+     "bytes": 116140102,
+     "disputed": true,
+     "settled_bytes": 116140102,
+     "t_first": 1792306801,
+     "t_last": 1792310401
+    }
+   ],
+   "last_receipt": 1792310401,
+   "name": "bw-house",
+   "receipts": 43,
+   "role": "payer",
+   "total_bytes": 557601224,
+   "window_bytes": 116140102,
+   "window_t_first": 1792306801,
+   "window_t_last": 1792310401,
+   "windows": 42
+  },
+  {
+   "disputed": 2,
+   "history": [
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792267200,
+     "t_last": 1792270800
+    },
+    {
+     "bytes": 13872,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792270800,
+     "t_last": 1792274400
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792274400,
+     "t_last": 1792278000
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792278000,
+     "t_last": 1792281600
+    },
+    {
+     "bytes": 13872,
+     "disputed": false,
+     "settled_bytes": 13872,
+     "t_first": 1792281600,
+     "t_last": 1792285200
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792285200,
+     "t_last": 1792288800
+    },
+    {
+     "bytes": 13872,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792288800,
+     "t_last": 1792292400
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792292400,
+     "t_last": 1792296000
+    },
+    {
+     "bytes": 4576,
+     "disputed": false,
+     "settled_bytes": 4576,
+     "t_first": 1792296000,
+     "t_last": 1792296546
+    },
+    {
+     "bytes": 12064,
+     "disputed": false,
+     "settled_bytes": 11792,
+     "t_first": 1792296546,
+     "t_last": 1792299601
+    }
+   ],
+   "last_receipt": 1792299601,
+   "name": "bw-forest",
+   "receipts": 38,
+   "role": "hop",
+   "total_bytes": 66280652,
+   "window_bytes": 12064,
+   "window_t_first": 1792296546,
+   "window_t_last": 1792299601,
+   "windows": 38
+  },
+  {
+   "disputed": 4,
+   "history": [
+    {
+     "bytes": 24119909,
+     "disputed": true,
+     "settled_bytes": 21993809,
+     "t_first": 1792300550,
+     "t_last": 1792301002
+    },
+    {
+     "bytes": 121792892,
+     "disputed": true,
+     "settled_bytes": 117428796,
+     "t_first": 1792301002,
+     "t_last": 1792303201
+    },
+    {
+     "bytes": 252446350,
+     "disputed": true,
+     "settled_bytes": 235762985,
+     "t_first": 1792303201,
+     "t_last": 1792306801
+    },
+    {
+     "bytes": 123678715,
+     "disputed": true,
+     "settled_bytes": 116140102,
+     "t_first": 1792306801,
+     "t_last": 1792310401
+    }
+   ],
+   "last_receipt": 1792310401,
+   "name": "bw-neighbor",
+   "receipts": 4,
+   "role": "hop",
+   "total_bytes": 522037866,
+   "window_bytes": 123678715,
+   "window_t_first": 1792306801,
+   "window_t_last": 1792310401,
+   "windows": 4
+  },
+  {
+   "disputed": 6,
+   "history": [
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792267200,
+     "t_last": 1792270800
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792270800,
+     "t_last": 1792274400
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792274400,
+     "t_last": 1792278000
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792278000,
+     "t_last": 1792281600
+    },
+    {
+     "bytes": 13872,
+     "disputed": false,
+     "settled_bytes": 13872,
+     "t_first": 1792281600,
+     "t_last": 1792285200
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792285200,
+     "t_last": 1792288800
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792288800,
+     "t_last": 1792292400
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792292400,
+     "t_last": 1792296000
+    },
+    {
+     "bytes": 4576,
+     "disputed": false,
+     "settled_bytes": 4576,
+     "t_first": 1792296000,
+     "t_last": 1792296546
+    },
+    {
+     "bytes": 11792,
+     "disputed": false,
+     "settled_bytes": 11792,
+     "t_first": 1792296546,
+     "t_last": 1792299601
+    },
+    {
+     "bytes": 21993809,
+     "disputed": true,
+     "settled_bytes": 21993809,
+     "t_first": 1792300550,
+     "t_last": 1792301002
+    },
+    {
+     "bytes": 117428796,
+     "disputed": true,
+     "settled_bytes": 117428796,
+     "t_first": 1792301002,
+     "t_last": 1792303201
+    },
+    {
+     "bytes": 235762985,
+     "disputed": true,
+     "settled_bytes": 235762985,
+     "t_first": 1792303201,
+     "t_last": 1792306801
+    },
+    {
+     "bytes": 116140102,
+     "disputed": true,
+     "settled_bytes": 116140102,
+     "t_first": 1792306801,
+     "t_last": 1792310401
+    }
+   ],
+   "last_receipt": 1792310401,
+   "name": "bw-mint",
+   "receipts": 85,
+   "role": "mint",
+   "total_bytes": 535653524,
+   "window_bytes": 116140102,
+   "window_t_first": 1792306801,
+   "window_t_last": 1792310401,
+   "windows": 42
+  }
+ ],
+ "phase": 0,
+ "proof": {
+  "bwkit": "0.2.0",
+  "count": 1,
+  "kind": "proof",
+  "mint": "ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM",
+  "root": "556062fce495b6990dcc81a7fe47816427c90af8fcc485d94f4e01b45d182b5c",
+  "settlements": [
+   {
+    "index": 0,
+    "leaf": "556062fce495b6990dcc81a7fe47816427c90af8fcc485d94f4e01b45d182b5c",
+    "path": [],
+    "settlement": {
+     "ack_sig": "hEZRyRYUEVXq8CslQJgL6Al1Ogal9gi5dIJspRQl9f1-PztUJ7YIQwGEFiKgy28Ep93Pl_NLKdJ2qIDKJrV5Dw",
+     "amount_usd": 0.023576,
+     "hop": "ed25519:Y_rtP6d0teob8J1qJttIOoZ17FLi5PG29HaZ-tE7IoY",
+     "hop_bytes": 252446350,
+     "hop_index": 1,
+     "kind": "settlement",
+     "payer": "ed25519:fz1ziSB-Ggpq4gRkskV0phBwkSDfHoR0vDqeY42wSx0",
+     "payer_bytes": 235762985,
+     "price_usd_per_gb": 0.1,
+     "receipt_sig": "_feqfSZjDUWs9GAUaaY9kD2dsIThkPpHfkndBt1Cv2-uFgcaOzByyyaGYnRYIo_ZIEkNlfQ8COHIjKPlU5uQDg",
+     "rule": "the smaller of the two signed counts; neither party is bound beyond what it signed",
+     "settled_bytes": 235762985,
+     "status": "disputed",
+     "t": 1792306801,
+     "t_first": 1792303201,
+     "t_last": 1792306801
+    }
+   }
+  ],
+  "signature": "5cfQPFeD3SaiLu-N8VYliX_8Vl8WBXDHaJOZDl2J6oWLjH_z-TO8b4ddZKukzQ-zUek3skUs4wctKXse06sfAw",
+  "window": 1792303200
+ },
+ "proto": 1,
+ "service": true,
+ "since": 1792185254,
+ "v": 1,
+ "window_s": 3600
+}

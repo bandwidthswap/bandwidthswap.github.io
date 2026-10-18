@@ -1,0 +1,596 @@
+{
+ "bwkit": "0.3.0",
+ "commitment": {
+  "count": 1,
+  "mint": "ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM",
+  "root": "556062fce495b6990dcc81a7fe47816427c90af8fcc485d94f4e01b45d182b5c",
+  "signature": "5cfQPFeD3SaiLu-N8VYliX_8Vl8WBXDHaJOZDl2J6oWLjH_z-TO8b4ddZKukzQ-zUek3skUs4wctKXse06sfAw",
+  "t": 1792306801,
+  "window": 1792303200
+ },
+ "generated_at": 1792308604,
+ "ledger": {
+  "acks": 42,
+  "acks_without_receipt": 0,
+  "disputed": 6,
+  "receipts": 43,
+  "receipts_without_ack": 1,
+  "settlements": 42
+ },
+ "nodes": [
+  {
+   "disputed": 6,
+   "history": [
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792267200,
+     "t_last": 1792270800
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792270800,
+     "t_last": 1792274400
+    },
+    {
+     "bytes": 13872,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792274400,
+     "t_last": 1792278000
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792278000,
+     "t_last": 1792281600
+    },
+    {
+     "bytes": 13872,
+     "disputed": false,
+     "settled_bytes": 13872,
+     "t_first": 1792281600,
+     "t_last": 1792285200
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792285200,
+     "t_last": 1792288800
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792288800,
+     "t_last": 1792292400
+    },
+    {
+     "bytes": 13872,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792292400,
+     "t_last": 1792296000
+    },
+    {
+     "bytes": 4592,
+     "disputed": false,
+     "settled_bytes": 4576,
+     "t_first": 1792296000,
+     "t_last": 1792296546
+    },
+    {
+     "bytes": 11792,
+     "disputed": false,
+     "settled_bytes": 11792,
+     "t_first": 1792296546,
+     "t_last": 1792299601
+    },
+    {
+     "bytes": 21993809,
+     "disputed": true,
+     "settled_bytes": 21993809,
+     "t_first": 1792300550,
+     "t_last": 1792301002
+    },
+    {
+     "bytes": 117428796,
+     "disputed": true,
+     "settled_bytes": 117428796,
+     "t_first": 1792301002,
+     "t_last": 1792303201
+    },
+    {
+     "bytes": 235762985,
+     "disputed": true,
+     "settled_bytes": 235762985,
+     "t_first": 1792303201,
+     "t_last": 1792306801
+    },
+    {
+     "bytes": 116140102,
+     "disputed": true,
+     "settled_bytes": 116140102,
+     "t_first": 1792306801,
+     "t_last": 1792310401
+    }
+   ],
+   "last_receipt": 1792310401,
+   "name": "bw-house",
+   "receipts": 43,
+   "role": "payer",
+   "total_bytes": 557601224,
+   "window_bytes": 116140102,
+   "window_t_first": 1792306801,
+   "window_t_last": 1792310401,
+   "windows": 42
+  },
+  {
+   "disputed": 2,
+   "history": [
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792267200,
+     "t_last": 1792270800
+    },
+    {
+     "bytes": 13872,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792270800,
+     "t_last": 1792274400
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792274400,
+     "t_last": 1792278000
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792278000,
+     "t_last": 1792281600
+    },
+    {
+     "bytes": 13872,
+     "disputed": false,
+     "settled_bytes": 13872,
+     "t_first": 1792281600,
+     "t_last": 1792285200
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792285200,
+     "t_last": 1792288800
+    },
+    {
+     "bytes": 13872,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792288800,
+     "t_last": 1792292400
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792292400,
+     "t_last": 1792296000
+    },
+    {
+     "bytes": 4576,
+     "disputed": false,
+     "settled_bytes": 4576,
+     "t_first": 1792296000,
+     "t_last": 1792296546
+    },
+    {
+     "bytes": 12064,
+     "disputed": false,
+     "settled_bytes": 11792,
+     "t_first": 1792296546,
+     "t_last": 1792299601
+    }
+   ],
+   "last_receipt": 1792299601,
+   "name": "bw-forest",
+   "receipts": 38,
+   "role": "hop",
+   "total_bytes": 66280652,
+   "window_bytes": 12064,
+   "window_t_first": 1792296546,
+   "window_t_last": 1792299601,
+   "windows": 38
+  },
+  {
+   "disputed": 4,
+   "history": [
+    {
+     "bytes": 24119909,
+     "disputed": true,
+     "settled_bytes": 21993809,
+     "t_first": 1792300550,
+     "t_last": 1792301002
+    },
+    {
+     "bytes": 121792892,
+     "disputed": true,
+     "settled_bytes": 117428796,
+     "t_first": 1792301002,
+     "t_last": 1792303201
+    },
+    {
+     "bytes": 252446350,
+     "disputed": true,
+     "settled_bytes": 235762985,
+     "t_first": 1792303201,
+     "t_last": 1792306801
+    },
+    {
+     "bytes": 123678715,
+     "disputed": true,
+     "settled_bytes": 116140102,
+     "t_first": 1792306801,
+     "t_last": 1792310401
+    }
+   ],
+   "last_receipt": 1792310401,
+   "name": "bw-neighbor",
+   "receipts": 4,
+   "role": "hop",
+   "total_bytes": 522037866,
+   "window_bytes": 123678715,
+   "window_t_first": 1792306801,
+   "window_t_last": 1792310401,
+   "windows": 4
+  },
+  {
+   "disputed": 6,
+   "history": [
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792267200,
+     "t_last": 1792270800
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792270800,
+     "t_last": 1792274400
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792274400,
+     "t_last": 1792278000
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792278000,
+     "t_last": 1792281600
+    },
+    {
+     "bytes": 13872,
+     "disputed": false,
+     "settled_bytes": 13872,
+     "t_first": 1792281600,
+     "t_last": 1792285200
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792285200,
+     "t_last": 1792288800
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792288800,
+     "t_last": 1792292400
+    },
+    {
+     "bytes": 13600,
+     "disputed": false,
+     "settled_bytes": 13600,
+     "t_first": 1792292400,
+     "t_last": 1792296000
+    },
+    {
+     "bytes": 4576,
+     "disputed": false,
+     "settled_bytes": 4576,
+     "t_first": 1792296000,
+     "t_last": 1792296546
+    },
+    {
+     "bytes": 11792,
+     "disputed": false,
+     "settled_bytes": 11792,
+     "t_first": 1792296546,
+     "t_last": 1792299601
+    },
+    {
+     "bytes": 21993809,
+     "disputed": true,
+     "settled_bytes": 21993809,
+     "t_first": 1792300550,
+     "t_last": 1792301002
+    },
+    {
+     "bytes": 117428796,
+     "disputed": true,
+     "settled_bytes": 117428796,
+     "t_first": 1792301002,
+     "t_last": 1792303201
+    },
+    {
+     "bytes": 235762985,
+     "disputed": true,
+     "settled_bytes": 235762985,
+     "t_first": 1792303201,
+     "t_last": 1792306801
+    },
+    {
+     "bytes": 116140102,
+     "disputed": true,
+     "settled_bytes": 116140102,
+     "t_first": 1792306801,
+     "t_last": 1792310401
+    }
+   ],
+   "last_receipt": 1792310401,
+   "name": "bw-mint",
+   "receipts": 85,
+   "role": "mint",
+   "total_bytes": 535653524,
+   "window_bytes": 116140102,
+   "window_t_first": 1792306801,
+   "window_t_last": 1792310401,
+   "windows": 42
+  }
+ ],
+ "phase": 0,
+ "proof": {
+  "bwkit": "0.2.0",
+  "count": 1,
+  "kind": "proof",
+  "mint": "ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM",
+  "root": "556062fce495b6990dcc81a7fe47816427c90af8fcc485d94f4e01b45d182b5c",
+  "settlements": [
+   {
+    "index": 0,
+    "leaf": "556062fce495b6990dcc81a7fe47816427c90af8fcc485d94f4e01b45d182b5c",
+    "path": [],
+    "settlement": {
+     "ack_sig": "hEZRyRYUEVXq8CslQJgL6Al1Ogal9gi5dIJspRQl9f1-PztUJ7YIQwGEFiKgy28Ep93Pl_NLKdJ2qIDKJrV5Dw",
+     "amount_usd": 0.023576,
+     "hop": "ed25519:Y_rtP6d0teob8J1qJttIOoZ17FLi5PG29HaZ-tE7IoY",
+     "hop_bytes": 252446350,
+     "hop_index": 1,
+     "kind": "settlement",
+     "payer": "ed25519:fz1ziSB-Ggpq4gRkskV0phBwkSDfHoR0vDqeY42wSx0",
+     "payer_bytes": 235762985,
+     "price_usd_per_gb": 0.1,
+     "receipt_sig": "_feqfSZjDUWs9GAUaaY9kD2dsIThkPpHfkndBt1Cv2-uFgcaOzByyyaGYnRYIo_ZIEkNlfQ8COHIjKPlU5uQDg",
+     "rule": "the smaller of the two signed counts; neither party is bound beyond what it signed",
+     "settled_bytes": 235762985,
+     "status": "disputed",
+     "t": 1792306801,
+     "t_first": 1792303201,
+     "t_last": 1792306801
+    }
+   }
+  ],
+  "signature": "5cfQPFeD3SaiLu-N8VYliX_8Vl8WBXDHaJOZDl2J6oWLjH_z-TO8b4ddZKukzQ-zUek3skUs4wctKXse06sfAw",
+  "window": 1792303200
+ },
+ "proto": 1,
+ "service": true,
+ "since": 1792185254,
+ "steward": {
+  "cap_margin": 0.01,
+  "escrow_usd": 0.0,
+  "f": 0.05,
+  "first_link_usd": 1.0,
+  "held_by_cap_usd": 0.0,
+  "income_usd": 0.0021,
+  "last_run": 1792310400,
+  "links": [
+   {
+    "bytes": 44330000,
+    "fee_usd": 0.00022,
+    "from": "bw-house",
+    "paid_usd": 0.00442,
+    "place_from": "house",
+    "place_to": "house",
+    "to": "bw-forest",
+    "windows": 38
+   },
+   {
+    "bytes": 375190000,
+    "fee_usd": 0.00188,
+    "from": "bw-house",
+    "paid_usd": 0.03752,
+    "place_from": "house",
+    "place_to": "next-door",
+    "to": "bw-neighbor",
+    "windows": 3
+   }
+  ],
+  "m": 0.04,
+  "map": {
+   "domain": "earth",
+   "mint": "bw-mint",
+   "places": [
+    {
+     "linked": [
+      "house",
+      "next-door"
+     ],
+     "mapped": true,
+     "medium": "wire, Wi-Fi",
+     "name": "house",
+     "range_class": "building"
+    },
+    {
+     "linked": [
+      "house"
+     ],
+     "mapped": true,
+     "medium": "2.4 GHz Wi-Fi",
+     "name": "next-door",
+     "range_class": "building"
+    },
+    {
+     "linked": [],
+     "mapped": true,
+     "medium": "915 MHz",
+     "name": "cabin",
+     "range_class": "hill"
+    }
+   ],
+   "unit": "USD"
+  },
+  "nym": "ed25519:K4oQ7mJv2yF8hR1pL6tXa9cNdUeWbGzS0iHqVkMoPjE",
+  "paid_usd": 8e-05,
+  "payouts": [
+   {
+    "from_poster_usd": 0.00019,
+    "from_steward_usd": 0.0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.00019,
+    "purchase": "pur-7f3a",
+    "refund_usd": 0.00025,
+    "settled_bytes": 21993809,
+    "t": 1792301002,
+    "window": 1792299600
+   },
+   {
+    "from_poster_usd": 0.00235,
+    "from_steward_usd": 0.0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.00235,
+    "purchase": "pur-7f3a",
+    "refund_usd": 0.0,
+    "settled_bytes": 117428796,
+    "t": 1792303201,
+    "window": 1792303200
+   },
+   {
+    "from_poster_usd": 0.00202,
+    "from_steward_usd": 8e-05,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.0021,
+    "purchase": "pur-7f3a",
+    "refund_usd": 0.0,
+    "settled_bytes": 104857600,
+    "t": 1792306801,
+    "window": 1792306800
+   }
+  ],
+  "posted_usd": 0.00202,
+  "program_windows": 168,
+  "purchases": [
+   {
+    "deadline": 1792900800,
+    "escrow_usd": 1.0,
+    "id": "pur-7f3a",
+    "min_bytes": 50000000,
+    "paid_usd": 0.00456,
+    "poster": "bw-house",
+    "premium_per_gb": 0.02,
+    "program": "payer",
+    "refunded_usd": 0.00025,
+    "route": {
+     "from": "bw-house",
+     "not_via": [],
+     "to": "bw-neighbor"
+    },
+    "status": "open",
+    "windows_left": 165
+   },
+   {
+    "deadline": 1792900800,
+    "escrow_usd": 8e-05,
+    "id": "pur-7f3a-m",
+    "matches": "pur-7f3a",
+    "min_bytes": 50000000,
+    "paid_usd": 8e-05,
+    "poster": "steward",
+    "premium_per_gb": 0.02,
+    "program": "match",
+    "route": {
+     "from": "bw-house",
+     "not_via": [],
+     "to": "bw-neighbor"
+    },
+    "status": "open",
+    "windows_left": 165
+   },
+   {
+    "deadline": null,
+    "escrow_usd": 0.00012,
+    "id": "pur-9c01",
+    "min_bytes": 0,
+    "paid_usd": 0.0,
+    "poster": "steward",
+    "premium_per_gb": 0.05,
+    "program": "first_link",
+    "route": {
+     "from": null,
+     "not_via": [],
+     "to": "cabin"
+    },
+    "status": "standing",
+    "target_usd": 1.0,
+    "windows_left": null
+   },
+   {
+    "deadline": 1792900800,
+    "escrow_usd": 0.0019,
+    "id": "pur-b2d4",
+    "min_bytes": 0,
+    "paid_usd": 0.0,
+    "poster": "steward",
+    "premium_per_gb": 0.005,
+    "program": "second_bridge",
+    "route": {
+     "from": "house",
+     "not_via": [
+      "house",
+      "next-door"
+     ],
+     "to": "next-door"
+    },
+    "status": "open",
+    "windows_left": 168
+   }
+  ],
+  "refunded_usd": 0.0
+ },
+ "v": 1,
+ "window_s": 3600
+}
