@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="The first rule in the Bandwidth Swap paper broken by running it rather than arguing about it: how a wash trader could collect the Steward's second-bridge bounty through a second place it owned, and the cap that closed it. A field note from Bandwidth Swap.">
+<title>The Wash Trader's Second Hill · Bandwidth Swap</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="notes.css">
+<style>
+figure.map{margin:0 0 20px;max-width:100%}
+figure.map .figwrap{overflow-x:auto}
+figure.map svg{width:100%;min-width:640px;height:auto;display:block}
+figure.map figcaption{font-size:14px;color:var(--muted);margin-top:6px;max-width:65ch}
+svg text{font-family:"IBM Plex Sans Condensed","Arial Narrow",sans-serif;font-size:13px;font-weight:600;fill:var(--fg)}
+svg text.m{font-family:"IBM Plex Mono",Menlo,monospace;font-size:11px;font-weight:400;fill:var(--muted)}
+svg text.money{font-family:"IBM Plex Mono",Menlo,monospace;font-size:11px;font-weight:500;fill:var(--signal)}
+svg text.data{font-family:"IBM Plex Mono",Menlo,monospace;font-size:11px;font-weight:500;fill:var(--accent)}
+svg text.sub{font-weight:400;font-size:11px;fill:var(--muted)}
+svg .bar.loss{fill:var(--accent)}
+svg .bar.gain{fill:var(--signal)}
+</style>
+</head>
+<body>
+
+<header class="masthead"><div class="wrap">
+  <p class="brand"><a href="../">Bandwidth<span>Swap</span></a></p>
+  <p class="tag">A bandwidth market where the payment is the proof.</p>
+  <p class="status">Field notes · Oct 2026</p>
+</div></header>
+
+<div class="wrap">
+<article>
+  <p class="eyebrow"><a href="./">Field notes</a></p>
+  <h1>The Wash Trader's Second Hill</h1>
+  <p class="meta">October 17, 2026 · about 5 minutes · the first rule in the paper broken by running it, and the cap that closed it</p>
+
+  <p>Version 0.5 of the paper made two changes at once. The five percent of every fee that earlier versions burned now goes to the Network Steward, and the Steward stopped being a treasury and became a rule: its only act is to post bounties, prepaid offers to buy bandwidth on routes that do not exist yet. One of its programs is the second bridge. Wherever a link is the only way across a gap and carries fees, the Steward offers a bounty for a second path through a different place on the map, so that a sole bridge's toll becomes the money that funds its competitor.</p>
+  <p>The same day, the rules were written as code for the first time: a simulator in the kit that runs the paper over the five installations from the field notes, with every payment counted. Its first job was to attack the rule it had just been given. It broke it within the hour.</p>
+
+  <h2>The attack</h2>
+  <p>The paper's defense against fake traffic is that paying yourself loses money. Five percent of every fee leaves the payer's reach, and the Steward can match a payer's own bounty only below that five percent, so a wash trader who runs the payer, the relay and the Mint in one hand loses the difference on every dollar it sends to itself. That part held: at the paper's defaults the trader loses two and a half cents a dollar, and no match multiple up to three times the fee turns it positive.</p>
+  <p>The second-bridge program did not hold. As written, the bounty was "sized from the fees the sole link carried." A wash trader whose own link is a sole bridge saw a bounty posted for a second path around it, worth the whole of the fees its own traffic had paid. The map stops a second key on the same hill, because the route has to pass through a different place. It does not stop a second hill. The trader built an anchor on a second place it also owned, moved its own traffic across, and collected. Net: about eight cents gained on every dollar it washed. The protocol cannot see ownership, and the paper says so in Section 10, so nothing in the rule could tell the trader's second hill from a neighbor's.</p>
+
+  <h2>The cap</h2>
+  <p>Two changes closed it, and both are now in the paper. The second-bridge bounty is sized from the Steward's income on the sole link, five percent of its fees, not the fees themselves. And the condition in Section 3.3 is enforced at every payout rather than only in the match: the Steward never pays out, on receipts whose payer is a given identity, more than the fee fraction less a margin of what that identity has paid in, whichever program posted the bounty. That needs no view of ownership, because every Steward payout is against a receipt and every receipt names its payer. Splitting traffic across several identities gains nothing, since the caps add up to the same bound.</p>
+
+  <figure class="map">
+    <div class="figwrap"><svg viewBox="0 0 760 260" role="img" aria-label="The wash trader's net per dollar at the paper's defaults: washing alone, minus 2.5 cents before and minus 2.62 after the cap; building the Steward's second path on its own second hill, plus 8 cents before and minus 2.11 after" xmlns="http://www.w3.org/2000/svg">
+      <text x="60" y="22">What a wash trader nets per dollar, at the paper's defaults</text>
+      <text x="700" y="22" text-anchor="end" class="m">f = 5% · m = 2.5%</text>
+      <path d="M60 150H700" stroke="var(--line)" stroke-width="1.5"/>
+      <text x="56" y="154" text-anchor="end" class="m">0¢</text>
+      <!-- washing alone: before, after -->
+      <rect x="150" y="150" width="44" height="25" class="bar loss"/><text x="172" y="190" text-anchor="middle" class="data">−2.50¢</text>
+      <rect x="206" y="150" width="44" height="26" class="bar loss"/><text x="228" y="190" text-anchor="middle" class="data">−2.62¢</text>
+      <text x="200" y="215" text-anchor="middle">Washing alone</text>
+      <text x="200" y="231" text-anchor="middle" class="sub">before · after the cap</text>
+      <!-- second hill: before, after -->
+      <rect x="470" y="70" width="44" height="80" class="bar gain"/><text x="492" y="62" text-anchor="middle" class="money">+8¢</text>
+      <rect x="526" y="150" width="44" height="21" class="bar loss"/><text x="548" y="190" text-anchor="middle" class="data">−2.11¢</text>
+      <text x="520" y="215" text-anchor="middle">Building its own second hill</text>
+      <text x="520" y="231" text-anchor="middle" class="sub">before · after the cap</text>
+      <text x="380" y="254" text-anchor="middle" class="m">a bar's height is cents per dollar washed · green loses, orange gains · from the kit's sim/attacks wash</text>
+    </svg></div>
+    <figcaption>Washing alone was never profitable; the match could not make the trader whole. Building the second path the Steward asked for, on a second place the trader owned, paid about eight cents a dollar under the rule as first written. With the bounty sized from the Steward's income and every payout capped per payer, the trader's best play loses 2.11¢ a dollar, and splitting its traffic across one, two or four identities moves that by nothing.</figcaption>
+  </figure>
+
+  <h2>What it says about the method</h2>
+  <p>Every version of this paper has had rules that were argued about. This is the first one that was broken by being run. The simulator is a few hundred lines that do nothing the paper does not say, and that is the point: writing a rule so that a program can execute it forces every "sized from the fees" to become a number, and the number was wrong. The same run left thirty-four smaller ambiguities in a notes file, each with the section it came from, which is the honest list of what the prose had been hiding.</p>
+  <p>The cap is a better rule than the one it replaced, and not only because it closes this hole. It says in one sentence what Section 3.3 was reaching for: nobody gets back from the Steward as much as the Steward took from them, whatever the Steward was doing with it. The three programs can be as clever as the map allows, and the sentence still holds.</p>
+  <p>The simulator and its scenarios are in the kit at <a href="https://github.com/bandwidthswap/kit/tree/main/sim">sim/</a>; <code>python3 -m sim.attacks wash</code> prints the sweep this note's figure is drawn from, and <code>python3 -m sim.tests</code> runs the twenty-nine tests, which now include the trader never turning positive.</p>
+
+  <p class="sources">Sources: <a href="../docs/paper.html">the Bandwidth Swap whitepaper, v0.5</a> (Section 3.3 for the fee and the cap, Section 7 for the Steward's three programs, Section 10 for what the protocol cannot see), <a href="https://github.com/bandwidthswap/kit/tree/main/sim">the simulator</a> and its NOTES.md, <a href="follow-the-bytes-follow-the-money.html">Follow the Bytes, Follow the Money</a> for the installations it runs.</p>
+</article>
+
+<footer>Bandwidth Swap · <a href="./">all field notes</a> · <a href="../">home</a> · the paper is a draft, the kit is a lab, the numbers in the open questions are the ones to argue with.</footer>
+</div>
+</body>
+</html>

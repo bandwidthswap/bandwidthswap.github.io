@@ -243,16 +243,32 @@ matches a payer’s commitments at a multiple <em>m</em>, self-dealing is
 unprofitable only while <em>m</em> is strictly below <em>f</em>. The
 difference, <em>f</em> minus <em>m</em>, is what a wash trade loses on
 every unit, and it is the part of the fee that is unrecoverable. The
-rest of the Steward’s income is spent on routes chosen by the shape of
-the receipt graph and not by any payer’s fees (Section 7), so no payer
-can direct it back to itself except by building what the Steward wants
-built. At <em>f</em> of 5% and <em>m</em> of 2.5%, the most the Steward
-adds to a link in proportion to its own traffic is two and a half cents
-on every dollar paid across it, and a wash trade loses the other two and
-a half. Whether a match that small still moves anyone to build a link is
-the first question the pilot’s economics must answer (Section 10).
-Lifting the cap by charging for payer identity rather than counting fees
-is recorded there and not adopted.</p>
+condition is enforced at every Steward payout and not only in the match:
+the Steward never pays out, on receipts whose payer is a given NYM, more
+than <em>f</em> less a margin of the fees that NYM has paid in, across
+all of its programs. Ownership is not needed for that, since every
+Steward payout is against a receipt and every receipt names its payer,
+and splitting traffic across identities gains nothing, since the caps
+add to the same bound. A simulation of the rule (the kit’s
+<code>sim/</code>) found, before this version was published, that
+without the cap a wash trader who owned a sole bridge could build a
+second anchor on a second place it also owned and collect a
+second-bridge bounty worth more than the fee it had paid, about eight
+cents on the dollar. With the cap, and with that bounty sized from the
+Steward’s income on the link rather than the link’s fees, it loses
+between two and three cents on every dollar at the paper’s defaults
+however it plays, and no match multiple up to three times <em>f</em>
+turns it positive. The rest of the Steward’s income is spent on routes
+chosen by the shape of the receipt graph and not by any payer’s fees
+(Section 7), so no payer can direct it back to itself except by building
+what the Steward wants built. At <em>f</em> of 5% and <em>m</em> of
+2.5%, the most the Steward adds to a link in proportion to its own
+traffic is two and a half cents on every dollar paid across it, and a
+wash trade loses the other two and a half. Whether a match that small
+still moves anyone to build a link is the first question the pilot’s
+economics must answer (Section 10). Lifting the cap by charging for
+payer identity rather than counting fees is recorded there and not
+adopted.</p>
 <ul>
 <li>Block rewards do not exist. Nothing is issued for availability,
 uptime, or capacity.</li>
@@ -631,15 +647,15 @@ the map (Appendix A.5) shows no second path between its ends through a
 different mapped place, the Steward posts a commitment for one. The
 route is named in places, not nodes: from one end to the other through a
 place that is not on the existing path. The commitment is sized from the
-fees the sole link carried over the program’s window, and whoever serves
-the route collects it, divided by opportunity cost (Section 5).
-Collecting requires the anchor exchanges of Section 5.1 at the new
-place, so a second key on the same hill earns nothing and a second radio
-on another hill earns the bounty. The money comes from fees on the link
-that exists and is spent on the link that does not, so the payer of
-those fees can recover it only by building the second path, which is the
-purpose. A sole bridge’s toll is thereby the bounty for the next bridge,
-as Section 5 says.</li>
+Steward’s income on the sole link over the program’s window, <em>f</em>
+of the fees it carried, and whoever serves the route collects it,
+divided by opportunity cost (Section 5). Collecting requires the anchor
+exchanges of Section 5.1 at the new place, so a second key on the same
+hill earns nothing and a second radio on another hill earns the bounty.
+The money comes from fees on the link that exists and is spent on the
+link that does not, so the payer of those fees can recover it only by
+building the second path, which is the purpose. A sole bridge’s toll is
+thereby the bounty for the next bridge, as Section 5 says.</li>
 <li><em>The first link.</em> Every mapped place with no link gets a
 standing commitment for one, sized by a parameter and renewed until a
 receipt settles across it. There is no sole bridge to tax for it, so it
@@ -651,10 +667,14 @@ map, by Mint consensus, and nowhere in the money.</li>
 <p>The matching program spends at most <em>m</em> of the Steward’s
 income; the second-bridge and first-link programs spend the rest, second
 bridges first. None of the three scales with any one payer’s fees beyond
-<em>m</em>. Escrow that a commitment returns, by a refund on shortfall,
-by an unused window, or at a deadline, goes back to the Steward’s escrow
-and is posted again. Nothing is swept to anyone, and the Steward’s funds
-can be taken only by delivering bandwidth on the routes it wants.</p>
+<em>m</em>, and none of the three can return to any one payer, on that
+payer’s receipts, more than <em>f</em> less a margin of the fees it paid
+in: the cap of Section 3.3 is applied at every payout, whichever program
+posted the commitment. Escrow that a commitment returns, by a refund on
+shortfall, by an unused window, or at a deadline, goes back to the
+Steward’s escrow and is posted again. Nothing is swept to anyone, and
+the Steward’s funds can be taken only by delivering bandwidth on the
+routes it wants.</p>
 <p><strong>Execution.</strong> The rule is deterministic over the
 receipt graph and the commitments that Mints publish, so any Mint can
 run it, and a Mint’s Steward postings are audited at reconciliation like
@@ -805,7 +825,13 @@ which is the only resolution the paper claims. A monopolist that builds
 anchors on two hills has built two bridges, which is the purpose, even
 if one party owns both, and the protocol cannot see ownership. The
 simulation that sets <em>f</em> and <em>m</em> has to run the programs
-on a map.</li>
+on a map, and now does: the kit’s <code>sim/</code> runs the three
+programs over the five installations and three attacks, and it found the
+first hole by running them, a second-bridge bounty sized from a link’s
+whole fees that paid a sole bridge’s owner back more than its fee
+through a second place it owned. Sizing the bounty from the Steward’s
+income on the link and capping every payout per payer closed it, and the
+simulation is now part of the paper’s test.</li>
 <li><strong>The customer.</strong> Site-to-site backhaul between
 locations that already overbuy capacity is the pilot’s use case because
 the authors can supply both sides of it. Whether anyone chooses this
