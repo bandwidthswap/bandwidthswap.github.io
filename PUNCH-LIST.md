@@ -19,6 +19,4 @@ The kit and the lab keep their own list, in the kit's `PUNCH-LIST.md`.
 **To pick it up.**
 1. Log in and confirm `whoami`.
 2. Deploy the pending shape check: `npx -y wrangler@3 deploy` from `worker/`, then check that https://status.bandwidthswap.com/status still answers and the Lab status still draws.
-3. Build phase 1 from worker/PLAN.md Section 3, all of it tested locally first (`wrangler dev --local`, `wrangler d1 execute --local`).
-4. Create the database: `npx -y wrangler@3 d1 create bandwidthswap-status`. Put its id in `wrangler.toml`. Set `DEFAULT_MINT` to the lab Mint's NYM (`ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM`) and `ADMIN_MINTS`. Apply `migrations/0001.sql` remotely, then deploy.
-5. Done when `GET /status` is served from D1 with its shape unchanged and the Lab status draws as before.
+3. Work through [worker/P1-PUNCHLIST.md](worker/P1-PUNCHLIST.md), the step-by-step list for phase 1. Read its "Found while reading" section before writing any code: it records the traps, such as `JSON.parse` breaking the signature on whole-valued floats, and D1 counting rows rather than requests. Its last section is the database and the deploy.
