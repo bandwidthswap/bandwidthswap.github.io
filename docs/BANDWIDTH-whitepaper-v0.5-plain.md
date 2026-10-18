@@ -4,7 +4,7 @@
 bandwidthswap@pm.me
 
 Oct 17th 2026
-Version 0.4 (draft), plain reading
+Version 0.5 (draft), plain reading
 
 ---
 
@@ -34,9 +34,9 @@ Everything else in the paper exists to make faking that one note cost more than 
 
 **Payment is the proof.** Only the party who paid can sign for delivery. A carrier cannot write itself a receipt.
 
-**Nothing earns more than the fee that produced it.** Five percent of every fee is destroyed. If you run both ends of a connection and send traffic to yourself all day, you lose five cents of every dollar you pay yourself, and no rule anywhere pays you more than a dollar back.
+**Nothing earns more than the fee that produced it.** Five percent of every fee goes to the Network Steward, which is not a committee but a rule, and the rule can hand a payer back at most half of what it took. If you run both ends of a connection and send traffic to yourself all day, you lose at least two and a half cents of every dollar you pay yourself, and no rule anywhere pays you more than a dollar back.
 
-**The treasury is the first customer.** Most networks like this hand out bonuses for building, and the bonuses are where the radio in the closet comes back. This one has a treasury that buys bandwidth on links it wants to exist, at a posted price for a posted term, and never pays for being online. Anyone can post the same kind of offer, a bounty on a link that does not exist yet, which is how the second link across a valley gets funded when the first one charges too much.
+**The Steward can only post bounties.** Most networks like this hand out bonuses for building, and the bonuses are where the radio in the closet comes back. This one gives the five percent to a Steward that cannot decide anything. It can only post prepaid offers to buy bandwidth, and only in three ways. It adds to bounties that people have posted themselves. Wherever a link is the only way across a gap, it offers the fees that link collected to whoever builds a second path through a different place on the map. And it keeps a standing offer open for the first link to any mapped place that has none. It never pays for being online, and nobody can take its money except by delivering bandwidth where it wants some.
 
 **Quality is priced, not proven.** A slow carrier settles fewer bytes an hour and earns less. Nobody has to measure its speed; the market does.
 
@@ -66,7 +66,7 @@ There is a limit, and the paper names that too. When no reply can come back whil
 
 ## What nobody knows yet
 
-The paper keeps its own list of what it cannot settle. The biggest item is the bonus. With the treasury's subsidy capped at five cents on the dollar, nobody knows whether that moves anyone to string a radio across a valley. The second is the customer: the lab's use case is two sites that already overbuy capacity, and whether anyone picks this over a carrier contract or a satellite is a question only paying traffic answers. The rest, from how two bookkeepers on different worlds trade notes to how long a signature stays believable, are listed with the same honesty.
+The paper keeps its own list of what it cannot settle. The biggest item is the bounty. With the Steward's match capped below the five percent it takes, and its other offers sized by what a sole link already earns, nobody knows whether that moves anyone to string a radio across a valley. The second is the customer: the lab's use case is two sites that already overbuy capacity, and whether anyone picks this over a carrier contract or a satellite is a question only paying traffic answers. The rest, from how two bookkeepers on different worlds trade notes to how long a signature stays believable, are listed with the same honesty.
 
 ## Where to go next
 

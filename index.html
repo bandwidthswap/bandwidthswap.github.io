@@ -138,13 +138,13 @@ nav.rail ol{border-left:0;display:flex;flex-wrap:wrap;gap:2px 6px}nav.rail a{pad
 <header class="masthead"><div class="wrap">
   <p class="brand">Bandwidth<span>Swap</span></p>
   <p class="tag">A bandwidth market where the payment is the proof.</p>
-  <p class="status">Paper v0.4 draft · Pilot phase 0 · Oct 2026</p>
+  <p class="status">Paper v0.5 draft · Pilot phase 0 · Oct 2026</p>
 </div></header>
 
 <div class="wrap">
 <div class="hero">
   <h1>Build a link where there isn't one. Get paid on receipts.</h1>
-  <p class="lede">Bandwidth Swap is a protocol and a sixty-dollar kit for selling network capacity to your neighbors, and a treasury that buys capacity on links it wants to exist. Nothing is rewarded for being online. Only delivered bytes, signed for by the person who paid for them, earn anything.</p>
+  <p class="lede">Bandwidth Swap is a protocol and a sixty-dollar kit for selling network capacity to your neighbors, and a Steward that can only post bounties for links it wants to exist. Nothing is rewarded for being online. Only delivered bytes, signed for by the person who paid for them, earn anything.</p>
 </div>
 
 <div class="layout">
@@ -218,7 +218,7 @@ signed by payer</code></pre>
   <div class="rules">
     <div class="rule"><h4>Payment is the proof</h4><p>The only party who can't be fooled about whether bytes arrived is the one who paid for them. So the payer's settled payment is the proof, and no validator ever has to measure a relay.</p></div>
     <div class="rule"><h4>No reward may exceed its fee</h4><p>If a relay could earn more for carrying a byte than the byte cost to generate, it would carry bytes to itself. Every subsidy is bounded by this rule.</p></div>
-    <div class="rule"><h4>The treasury is the first customer</h4><p>The treasury doesn't hand out bonuses. It buys bandwidth on links it wants to exist, at a posted price for a posted term. Whoever builds the link gets paid on receipts the treasury signs. Anyone can post the same kind of commitment, a bounty with a minimum rate that refunds on shortfall (paper, Section 5.1).</p></div>
+    <div class="rule"><h4>The Steward can only post bounties</h4><p>Five percent of every fee goes to the Network Steward, a rule with no discretion. It adds to bounties people post themselves, offers a sole link's fees to whoever builds a second path through a different place on the map, and keeps an offer open for the first link to any mapped place that has none. It never pays for being online, and its money can be taken only by delivering bandwidth (paper, Section 7).</p></div>
     <div class="rule"><h4>Quality is priced, not proven</h4><p>A slow relay settles fewer bytes per window and earns less. Speed proofs are required only where a subsidy is claimed, which is the one place a false claim would pay.</p></div>
   </div>
 </section>
@@ -314,8 +314,8 @@ signed by payer</code></pre>
   <ul class="phases">
     <li><span class="ph">Phase 0<small>one evening</small></span><span>Three Pis on the home network. Time, tunnel, receipts, one Mint. You pay yourself. Proves the receipt code and the clock rule.</span></li>
     <li><span class="ph">Phase 1<small>one weekend</small></span><span>Radios in. House to forest over a 5 GHz or HaLow pair, receipts and liveness over LoRa. Unplug the house's internet mid-window and show settlement still closes.</span></li>
-    <li><span class="ph">Phase 2<small>a month</small></span><span>A neighbor operates the ridge. The treasury posts its first purchase commitment: this much data a day across this link, at this price, for this long. Paid in dollars on receipts. First real dispute.</span></li>
-    <li><span class="ph">Phase 3<small>open</small></span><span>Open-source the kit and the bounty board. Anyone can post a purchase commitment on a named link or a place and fund it; the paper's Section 5.1 says how one settles and refunds. Anyone can build it.</span></li>
+    <li><span class="ph">Phase 2<small>a month</small></span><span>A neighbor operates the ridge. The Steward's rule runs for the first time, by hand: it matches the first bounty someone posts and offers a second path around the ridge. Paid in dollars on receipts. First real dispute.</span></li>
+    <li><span class="ph">Phase 3<small>open</small></span><span>Open-source the kit and the Steward, which is the bounty board. Anyone can post a purchase commitment on a named link or a mapped place and fund it, the Steward matches it, and the paper's Section 5.1 says how one settles and refunds. Anyone can build it.</span></li>
     <li><span class="ph">Phase 4<small>north star</small></span><span>Links into places where the internet is forbidden. This is the right long-term target and the wrong next step: receipts prove delivery, not location, and paying for a node in a hostile jurisdiction needs a location proof that doesn't exist yet, legal review, and an incentive design that never makes a border crossing the thing being paid for.</span></li>
   </ul>
 </section>
@@ -323,22 +323,23 @@ signed by payer</code></pre>
 <section id="open">
   <p class="eyebrow">Honesty</p>
   <h2>What we don't know yet</h2>
-  <p>Version 0.4 of the paper took the default on every question in the backlog, built Phase 0 on them, and then said what seven essays on commerce across long delays made it say. What it still cannot settle is its Section 10; this is that list, in the paper's order. The backlog keeps the options behind each default.</p>
+  <p>Version 0.5 of the paper took the default on every question in the backlog, built Phase 0 on them, said what seven essays on commerce across long delays made it say, and then sent the five percent to a Steward that can only post bounties. What it still cannot settle is its Section 10; this is that list, in the paper's order. The backlog keeps the options behind each default.</p>
   <ul>
-    <li><strong>Whether a bounded subsidy moves anyone.</strong> The treasury can add to a link at most the burned fraction of what users pay across it. If that doesn't get a link built, the choices are grants from a treasury that doesn't depend on traffic, or lifting the cap by charging for payer identity instead of counting fees, which needs a figure for what a fake payer costs to manufacture. A simulation of one operator running payer, relays and Mint decides between them.</li>
+    <li><strong>Whether a bounded match moves anyone.</strong> The Steward can add to a link in proportion to its own traffic only below the five percent it takes, and the rest of its income goes to second bridges chosen by the map. If neither gets a link built, what is left is lifting the cap by charging for payer identity instead of counting fees, which needs a figure for what a fake payer costs to manufacture. A simulation of one operator running payer, relays and Mint decides it.</li>
+    <li><strong>The placement rule.</strong> The Steward's programs read the map, so their judgment comes down to how a place proves it is distinct from its neighbor, and the anchor mechanism answers that at the resolution of a radio. Someone who builds anchors on two hills has built two bridges even if one party owns both, and the protocol cannot see ownership.</li>
     <li><strong>The customer.</strong> The pilot's use case is backhaul between two sites that already overbuy capacity, because the authors can supply both ends. Whether anyone picks this over a carrier contract, a satellite or a VPN, only paying traffic answers.</li>
     <li><strong>Receipts under route privacy.</strong> Whether a Mint can verify a chain of receipts without learning the route.</li>
     <li><strong>The settlement layer.</strong> The paper names three candidates and picks one when an untrusted party joins. The cost of each hasn't been measured.</li>
     <li><strong>The Mint committee.</strong> One proposer and four attesters is the target. The pilot has one Mint and fraud proofs.</li>
     <li><strong>Attestation for the subsidy tier,</strong> or replacing it with bond age and diversity.</li>
     <li><strong>Open relays.</strong> Relay service is between members. Carrying strangers' traffic to the public internet raises liability the paper doesn't address, and it isn't in the pilot.</li>
-    <li><strong>The token,</strong> its status and the treasury's legal form, all deferred until there is traffic to denominate. The unit question itself comes back earlier, at the first bridge between two worlds' bookkeepers, and the paper now names the three answers; which one a bridge uses is the bridge's to announce.</li>
+    <li><strong>The token,</strong> its status and the Steward's legal shell, all deferred until there is traffic to denominate. Nothing in v0.5 creates or destroys a unit, which lets the books close in dollars and is not a peg. The unit question itself comes back earlier, at the first bridge between two worlds' bookkeepers, and the paper now names the three answers; which one a bridge uses is the bridge's to announce.</li>
     <li><strong>Clock drift between sites,</strong> measured once the relay leaves the bench.</li>
     <li><strong>The levels.</strong> The paper now says what the carry is for, what custody costs and what a bridge relay's two bonds do. It does not know the numbers: how large the bonds must be against what a bridge earns, or the carry at which a prepaid window on a contact that may never come is worth opening.</li>
     <li><strong>How Mints' reconciliation is encoded.</strong> What it carries and what it is for are now stated. The bytes on the wire are not.</li>
     <li><strong>Whether proving allowances attract real testers</strong> (Section 5.1), or only a relay's second identities.</li>
     <li><strong>Payers at a place.</strong> Whoever connects at an access point is a payer with a NYM, or the poster pays for them through the commitment. That is an application as much as a rule, and it is the Phase 2 work.</li>
-    <li><strong>Readmission.</strong> An excluded bookkeeper may return once it reconciles and burns what it owed. Who decides that it has, with no committee, is governance, and the pilot has none.</li>
+    <li><strong>Readmission.</strong> An excluded bookkeeper may return once it reconciles and remits what it owed to its Steward. Who decides that it has, with no committee, is governance, and the pilot has none.</li>
     <li><strong>The lifetime of a receipt.</strong> A link now names its signature scheme and how long a receipt stays presentable. What a Mint does with one presented too late, and how a network moves every link to a stronger scheme before the old one breaks, are not written.</li>
     <li><strong>The horizon for institutions.</strong> Payment is the proof inside the payer's horizon, which for an institution is the institution's life. What the protocol does with a window whose payer's Mint outlives the payer is the question every estate has had to answer, and the paper has not.</li>
   </ul>
@@ -362,17 +363,19 @@ signed by payer</code></pre>
   <p class="eyebrow">Reading</p>
   <h2>The paper</h2>
   <ul class="docs">
-    <li><a href="docs/paper.html" target="_blank" rel="noopener">Bandwidth Swap v0.4 (draft)</a><span class="d">Oct 17, 2026 · the paper aligned with the essays on commerce across long delays: the carry, custody receipts, exclusion between worlds, the sole bridge, and the horizon of the receipt · opens in a new tab, downloadable as plain text</span></li>
-    <li><a href="docs/paper-plain.html">The paper in plain words</a><span class="d">v0.4 · the argument without the machinery, for anyone · 10 min</span></li>
-    <li><a href="docs/paper-operators.html">The paper for operators</a><span class="d">v0.4 · what you run, announce, sign, earn and can lose, for anyone who would run a node · 15 min</span></li>
+    <li><a href="docs/paper.html" target="_blank" rel="noopener">Bandwidth Swap v0.5 (draft)</a><span class="d">Oct 17, 2026 · the fee goes to a Steward that can only post bounties, with a map of bodies and places · opens in a new tab, downloadable as plain text</span></li>
+    <li><a href="docs/paper-plain.html">The paper in plain words</a><span class="d">v0.5 · the argument without the machinery, for anyone · 10 min</span></li>
+    <li><a href="docs/paper-operators.html">The paper for operators</a><span class="d">v0.5 · what you run, announce, sign, earn and can lose, for anyone who would run a node · 15 min</span></li>
     <li><a href="docs/BANDWIDTH-whitepaper-v0.1-original.pdf">Bandwidth Swap v0.1</a><span class="d">Aug 2021 · Robert Douglas and Chris Odom · as published</span></li>
+    <li><a href="docs/whitepaper-diff-v0.5.html">What changed in v0.5, side by side</a><span class="d">every edit from v0.4 to v0.5</span></li>
+    <li><a href="docs/BANDWIDTH-whitepaper-v0.4.md">Bandwidth Swap v0.4 (draft)</a><span class="d">Oct 17, 2026 · the paper aligned with the essays on commerce across long delays · Markdown</span></li>
     <li><a href="docs/whitepaper-diff-v0.4.html">What changed in v0.4, side by side</a><span class="d">every edit from v0.3 to v0.4</span></li>
     <li><a href="docs/BANDWIDTH-whitepaper-v0.3.md">Bandwidth Swap v0.3 (draft)</a><span class="d">Oct 17, 2026 · the open questions resolved, the pilot, and Appendix A on links with delay · Markdown</span></li>
     <li><a href="docs/whitepaper-diff-v0.3.html">What changed in v0.3, side by side</a><span class="d">every edit from v0.2 to v0.3</span></li>
     <li><a href="docs/BANDWIDTH-whitepaper-v0.2.md">Bandwidth Swap v0.2 (draft)</a><span class="d">Oct 8, 2026 · receipt-based proof of bandwidth, new Section 3 · Markdown</span></li>
     <li><a href="docs/whitepaper-diff.html">What changed in v0.2, side by side</a><span class="d">every edit from v0.1 to v0.2</span></li>
   </ul>
-  <p>If you read one section, read Section 3 of v0.4. It is the argument that a settled payment is a proof, and the one condition under which that argument holds. The same paper is written three ways: in full, in plain words, and for the person who would run a node.</p>
+  <p>If you read one section, read Section 3 of v0.5. It is the argument that a settled payment is a proof, and the one condition under which that argument holds. The same paper is written three ways: in full, in plain words, and for the person who would run a node.</p>
 </section>
 
 <section id="join">

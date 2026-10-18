@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bandwidth Swap for operators</title>
 <meta name="description" content="Bandwidth Swap for
-operators. Version 0.4 (draft), for operators.">
+operators. Version 0.5 (draft), for operators.">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/latex.css@1.10.0/style.min.css">
 <style>
 body{max-width:80ch;padding-top:1.5rem}
@@ -40,8 +40,8 @@ sup{font-size:.7em}
 <body>
 <nav class="toolbar" aria-label="Paper tools">
   <span class="lead">Rendered from Markdown</span>
-  <a href="BANDWIDTH-whitepaper-v0.4-operators.md" download>Download .md</a>
-  <a href="BANDWIDTH-whitepaper-v0.4-operators.txt" download>Download .txt</a>
+  <a href="BANDWIDTH-whitepaper-v0.5-operators.md" download>Download .md</a>
+  <a href="BANDWIDTH-whitepaper-v0.5-operators.txt" download>Download .txt</a>
   <a href="BANDWIDTH-whitepaper-v0.1-original.pdf">Original 2021 PDF</a>
   <a href="../">bandwidthswap.com</a>
 </nav>
@@ -50,7 +50,7 @@ sup{font-size:.7em}
   <h1>Bandwidth Swap for operators</h1>
   <p class="authors">Robert Douglas and Chris Odom</p>
   <p class="affil"><a href="mailto:bandwidthswap@pm.me">bandwidthswap@pm.me</a></p>
-  <p class="date">October 17, 2026 · Version 0.4 (draft), for
+  <p class="date">October 17, 2026 · Version 0.5 (draft), for
 operators</p>
 </header>
 <p><em>This is the whitepaper read from the side of someone who would
@@ -123,7 +123,8 @@ your bond.</li>
 ten cents a gigabyte. The protocol does not cap it. If you are the only
 way across a gap you will earn the whole route, and you should know that
 this makes you a monopoly until someone funds the second link, which the
-protocol is designed to let them do (Section 5).</p>
+protocol is designed to let them do and which the Steward funds from the
+fees your link collects (Sections 5 and 7).</p>
 <h2 id="what-you-sign">What you sign</h2>
 <p>The receipt is one tuple: payer NYM, hop NYM, hop index, Merkle root,
 bytes, first and last timestamp, and the previous receipt’s signature,
@@ -156,10 +157,12 @@ disputed and settles by the same rule, at the smaller count. You cannot
 be paid for more than the payer signed for. In the lab, a hop that
 signed for twenty-two megabytes against a payer’s 272 bytes was paid for
 272 bytes (Section 9).</p>
-<p>Five percent of every fee is burned before anyone is paid. That is
-not a Mint’s cut; it leaves the network, and it is what makes carrying
-traffic to yourself a loss (Section 3.3). The Mint takes a share of the
-settlement fee on what it publishes.</p>
+<p>Five percent of every fee goes to the Network Steward before anyone
+is paid. That is not a Mint’s cut and not a treasury: the Steward is a
+rule that can spend only by posting bounties, and it can match a bounty
+of your own only up to a cap set below the five percent, so carrying
+traffic to yourself is still a loss (Sections 3.3 and 7). The Mint takes
+a share of the settlement fee on what it publishes.</p>
 <p>In the pilot there is no payment rail. The invoice at the end of the
 month is the settlement, which means you have lent the payer every
 window’s value from the hour it settled until the invoice is paid. The
@@ -251,15 +254,18 @@ declined window, on the record, governed by the sending Mint’s count
 (Appendix A.5).</p>
 <h2 id="what-the-paper-does-not-promise-you">What the paper does not
 promise you</h2>
-<p>That the treasury’s bonus will be worth building for: it is capped at
-the burn, five cents on the dollar, and whether that moves anyone is the
-first thing the pilot’s economics must answer. That your monopoly, if
-you have one, will last: the toll you charge is the bounty for the
-second bridge. That a window past a payer’s horizon proves anything to
-the party that wanted the bytes: when no reply can return while the
-payer is there to receive it, you are still paid per link, honestly, for
-carriage toward silence (Appendix A.7). And that any of this has run
-beyond three boards on a bench.</p>
+<p>That the Steward’s bounties will be worth building for: its match on
+your own bounty is capped below the five percent it takes, and its
+second-bridge offers are sized by what a sole link already earns, and
+whether that moves anyone is the first thing the pilot’s economics must
+answer. That your monopoly, if you have one, will last: the fees your
+sole link collects become the Steward’s bounty for a second path through
+a different place on the map, and a second key on your own hill will not
+collect it, while a radio on another hill will. That a window past a
+payer’s horizon proves anything to the party that wanted the bytes: when
+no reply can return while the payer is there to receive it, you are
+still paid per link, honestly, for carriage toward silence (Appendix
+A.7). And that any of this has run beyond three boards on a bench.</p>
 <h2 id="before-you-sign-anything-with-a-second-party">Before you sign
 anything with a second party</h2>
 <ol type="1">

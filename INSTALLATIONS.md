@@ -1,6 +1,6 @@
 # Example installations: the protocol at five scales
 
-Status as of Oct 17, 2026, against whitepaper v0.3 and the findings in [PRESSURE-TESTS.md](PRESSURE-TESTS.md).
+Status as of Oct 17, 2026, against whitepaper v0.3 and the findings in [PRESSURE-TESTS.md](PRESSURE-TESTS.md). The paper is now v0.5, which pays the fee to the Network Steward instead of burning it and makes the Steward a bounty rule with a map; where this file says "burn", read "the Steward's fee". The valley's bounty is now matched by the Steward, and the street's sole bridge draws a second-path bounty from its own fees.
 
 Five installations, from the bench that runs today to a link between stars. Each is written the same way: who the parties are and why one of them pays; the link's parameters in the terms of Appendix A.1; one window worked through with numbers and a timeline; then the seven findings from the essays, each marked **silent** (nothing to say here), **marginal** (present but the numbers make it harmless) or **bites** (the paper's silence has a cost here, and what the cost is); and the tests that would show it, in the style of the Phase 0 forced tests.
 

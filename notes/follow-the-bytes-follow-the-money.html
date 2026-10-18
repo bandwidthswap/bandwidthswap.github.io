@@ -66,9 +66,9 @@ svg .bar.now{fill:var(--signal)}
   <h1>Follow the Bytes, Follow the Money</h1>
   <p class="meta">October 17, 2026 · about 12 minutes</p>
 
-  <p>Every diagram of a network shows where the data goes. These three also show where the money goes. In Bandwidth Swap the two move in opposite directions: bytes go out one hop at a time, and payment comes back the same way, each hop paid when the next one acknowledges. Five percent of every payment is burned on the way, a defense against fake traffic, so sending traffic to yourself costs the fee.</p>
+  <p>Every diagram of a network shows where the data goes. These three also show where the money goes. In Bandwidth Swap the two move in opposite directions: bytes go out one hop at a time, and payment comes back the same way, each hop paid when the next one acknowledges. Five percent of every payment goes to the Network Steward on the way, a rule that can spend only by posting bounties for links that do not exist yet. That is the defense against fake traffic: the Steward can never hand a payer back as much as it took, so sending traffic to yourself costs the fee.</p>
   <p>The three maps are a street, a forest, and four planets. Each has a switch that takes a link down, so you can see who still gets through, what they pay before and after, and where the money ends up. Only one price here is real: ten cents a gigabyte for an uplink, the price the pilot charges. The pilot is the protocol as it runs today, three small computers on one bench, settling in dollars with an invoice at the end of the month. Every other number is made up, and kept plausible.</p>
-  <p>Green arrows are data. Orange dashed arrows are money. They are dashed because the money moves after the bytes: in the pilot as an invoice at the end of the month, in the design as a payment channel. Every payment shown has already lost its five percent to the burn, and the burn is written beside it.</p>
+  <p>Green arrows are data. Orange dashed arrows are money. They are dashed because the money moves after the bytes: in the pilot as an invoice at the end of the month, in the design as a payment channel. Every payment shown has already paid its five percent to the Steward, and that fee is written beside it.</p>
 
   <h2>1. A street with three dishes</h2>
   <p>Three houses on one street each have a satellite dish, and each sells a share of its connection to one neighbor. The street looks like this.</p>
@@ -179,7 +179,7 @@ svg .bar.now{fill:var(--signal)}
       <!-- the Mint -->
       <rect x="300" y="340" width="160" height="44" rx="4" class="box mint"/>
       <text x="380" y="358" text-anchor="middle">Street Mint</text><text x="380" y="374" text-anchor="middle" class="sub">a Pi at House 2 · receipts hourly</text>
-      <text x="40" y="334" class="m">every payment: 5% burned first, the rest to the house that carried</text>
+      <text x="40" y="334" class="m">every payment: 5% to the Steward first, the rest to the house that carried</text>
 
       <!-- NORMAL: three independent markets -->
       <g class="st-normal">
@@ -235,7 +235,7 @@ svg .bar.now{fill:var(--signal)}
       <text x="380" y="180" text-anchor="middle">House 2</text><text x="380" y="196" text-anchor="middle" class="money">+$4.75 a day</text>
       <text x="590" y="180" text-anchor="middle">House 3</text><text x="590" y="196" text-anchor="middle" class="sub">unchanged</text>
     </svg></div>
-    <figcaption>Daily income after the burn. House 2's dish carries four houses instead of two and earns for all of them. House 1 earns a hop fee from House 1a and pays House 2 for its own traffic, so it ends the day behind, but connected.</figcaption>
+    <figcaption>Daily income after the Steward's five percent. House 2's dish carries four houses instead of two and earns for all of them. House 1 earns a hop fee from House 1a and pays House 2 for its own traffic, so it ends the day behind, but connected.</figcaption>
   </figure>
 
   <h3>Prices and money, before and after</h3>
@@ -253,7 +253,7 @@ svg .bar.now{fill:var(--signal)}
       <rect x="159" y="62" width="52" height="16" rx="3" class="pill"/><text x="185" y="74" text-anchor="middle" class="money">$3.00</text>
       <rect x="159" y="122" width="52" height="16" rx="3" class="pill"/><text x="185" y="134" text-anchor="middle" class="money">$3.00</text>
       <rect x="159" y="182" width="52" height="16" rx="3" class="pill"/><text x="185" y="194" text-anchor="middle" class="money">$1.00</text>
-      <text x="185" y="236" text-anchor="middle" class="m">$7.00 a day paid · $0.35 burned · $6.65 earned</text>
+      <text x="185" y="236" text-anchor="middle" class="m">$7.00 a day paid · $0.35 to the Steward · $6.65 earned</text>
       <!-- Down -->
       <text x="575" y="22" text-anchor="middle">House 1's dish down</text>
       <rect x="410" y="43" width="100" height="34" rx="4" class="box pay"/><text x="460" y="64" text-anchor="middle">House 1a</text>
@@ -275,8 +275,8 @@ svg .bar.now{fill:var(--signal)}
       <rect x="549" y="117" width="52" height="16" rx="3" class="pill"/><text x="575" y="129" text-anchor="middle" class="money">$2.00</text>
       <rect x="549" y="152" width="52" height="16" rx="3" class="pill"/><text x="575" y="164" text-anchor="middle" class="money">$3.00</text>
       <rect x="549" y="208" width="52" height="16" rx="3" class="pill"/><text x="575" y="220" text-anchor="middle" class="money">$1.00</text>
-      <text x="575" y="250" text-anchor="middle" class="m">$9.60 a day paid · $0.48 burned · $9.12 earned</text>
-      <text x="380" y="272" text-anchor="middle" class="m">a band's thickness is dollars a day · what each house earns is after the five percent burn</text>
+      <text x="575" y="250" text-anchor="middle" class="m">$9.60 a day paid · $0.48 to the Steward · $9.12 earned</text>
+      <text x="380" y="272" text-anchor="middle" class="m">a band's thickness is dollars a day · what each house earns is after the Steward's five percent</text>
     </svg></div>
     <figcaption>Working: three one-hop markets, each dependent paying its own dish house. Down: House 1a pays House 1 sixty cents a day as a hop and House 2 three dollars for the dish, House 1 pays House 2 two dollars for its own twenty gigabytes, and House 2's income goes from $2.85 to $7.60 a day while House 1 is left with fifty-seven cents and a two-dollar bill.</figcaption>
   </figure>
@@ -285,7 +285,7 @@ svg .bar.now{fill:var(--signal)}
   <ul class="cond">
     <li><strong>Is there a way around?</strong> Only if the street links exist. Without them, House 1 and House 1a are dark, nothing moves and nothing is paid: a relay that is offline earns nothing, which is not a punishment, only the absence of a customer. The protocol does not create backup links. It makes them worth building.</li>
     <li><strong>Who pays for the detour?</strong> The payer, per hop. House 1a's receipt names both hops. House 1 is paid its hop price when House 2 acknowledges, and House 2 is paid when the bytes reach the internet; for traffic to the internet, the payer's own signature closes the receipt. House 1 cannot charge House 1a for a dish it no longer provides.</li>
-    <li><strong>What bounds House 2's price?</strong> Nothing in the protocol. The market does: the way around through House 3 costs $0.14, so above that House 1a's software routes the other way, ranked by what previous payers actually settled on each path. The street's third link is what keeps the second one honest.</li>
+    <li><strong>What bounds House 2's price?</strong> Nothing in the protocol. The market does: the way around through House 3 costs $0.14, so above that House 1a's software routes the other way, ranked by what previous payers actually settled on each path. The street's third link is what keeps the second one honest. And the Steward's rule sees a sole bridge carrying fees: it offers those fees as a bounty for a second path through a different place on the map, which on this street is House 3's hill.</li>
     <li><strong>What about the hour the dish failed?</strong> House 1a's window with House 1 settles at the smaller of the two counts, which is the bytes that crossed before the snow. The rest of the hour is on the new route, in a new receipt. No one adjudicates.</li>
     <li><strong>How does House 1a know the detour works before it needs it?</strong> Routes are ranked by settled receipts, so a path nobody has used ranks nowhere. A small purchase commitment on the route from House 1a to House 2, a tenth of a gigabyte an hour with a proving allowance, keeps the street link in use and in the receipt graph for a few cents a day. That is insurance bought as bandwidth, and it is the only kind of insurance this protocol sells.</li>
     <li><strong>The slow link.</strong> If House 3's dish fails instead, House 3a's way around runs over 915 MHz at four megabits: it works, and it settles a tenth of the bytes an hour. Quality is priced, not proven. House 3a pays less because less arrived.</li>
@@ -343,7 +343,7 @@ svg .bar.now{fill:var(--signal)}
         <path d="M385 250V182" class="cash" marker-end="url(#m2s)"/><text x="392" y="220" class="money">$0.06 + $0.06 premium</text>
         <path d="M470 275H640V172" class="cash" marker-end="url(#m2s)"/><text x="480" y="268" class="money">$0.12 + $0.06 premium</text>
         <text x="385" y="287" text-anchor="middle" class="sub">pays each window out of the escrow</text>
-        <text x="30" y="318" class="data">a full window: $0.30 out of escrow, $0.015 burned · under 1 GB the premium prorates, the rest returns</text>
+        <text x="30" y="318" class="data">a full window: $0.30 out of escrow, $0.015 to the Steward · under 1 GB the premium prorates, the rest returns</text>
       </g>
 
       <g class="st-dark">
@@ -368,7 +368,7 @@ svg .bar.now{fill:var(--signal)}
       <rect x="250" y="170" width="100" height="40" rx="4" class="box ghost"/><text x="300" y="186" text-anchor="middle">Back to the cabin</text><text x="300" y="202" text-anchor="middle" class="sub">nothing</text>
       <g class="band"><path d="M130 100C190 100 190 70 250 70" stroke-width="12"/><path d="M130 120C190 120 190 130 250 130" stroke-width="18"/></g>
       <rect x="157" y="76" width="66" height="16" rx="3" class="pill"/><text x="190" y="88" text-anchor="middle" class="money">6¢ + 6¢</text><rect x="155" y="118" width="70" height="16" rx="3" class="pill"/><text x="190" y="130" text-anchor="middle" class="money">12¢ + 6¢</text>
-      <text x="185" y="236" text-anchor="middle" class="m">30¢ paid · 1.5¢ burned · 28.5¢ kept</text>
+      <text x="185" y="236" text-anchor="middle" class="m">30¢ paid · 1.5¢ to the Steward · 28.5¢ kept</text>
 
       <text x="575" y="22" text-anchor="middle">Rain · 0.5 GB</text>
       <rect x="410" y="90" width="110" height="40" rx="4" class="box mint"/><text x="465" y="106" text-anchor="middle">The escrow</text><text x="465" y="122" text-anchor="middle" class="sub">pays 12.5¢</text>
@@ -377,7 +377,7 @@ svg .bar.now{fill:var(--signal)}
       <rect x="640" y="170" width="100" height="40" rx="4" class="box pay"/><text x="690" y="186" text-anchor="middle">Back to the cabin</text><text x="690" y="202" text-anchor="middle" class="sub">5¢ of premium</text>
       <g class="band"><path d="M520 98C580 98 580 70 640 70" stroke-width="5"/><path d="M520 110C580 110 580 130 640 130" stroke-width="7.5"/><path d="M520 122C580 122 580 190 640 190" stroke-width="5"/></g>
       <rect x="540" y="74" width="80" height="16" rx="3" class="pill"/><text x="580" y="86" text-anchor="middle" class="money">2.5¢ + 2.5¢</text><rect x="545" y="112" width="70" height="16" rx="3" class="pill"/><text x="580" y="124" text-anchor="middle" class="money">5¢ + 2.5¢</text><rect x="550" y="162" width="60" height="16" rx="3" class="pill"/><text x="580" y="174" text-anchor="middle" class="money">5¢ back</text>
-      <text x="575" y="236" text-anchor="middle" class="m">12.5¢ paid · 0.6¢ burned · 5¢ returned to the cabin</text>
+      <text x="575" y="236" text-anchor="middle" class="m">12.5¢ paid · 0.6¢ to the Steward · 5¢ back to the cabin</text>
 
       <text x="185" y="292" text-anchor="middle">A hiker tries the route · 0.3 GB</text>
       <rect x="20" y="320" width="110" height="40" rx="4" class="box pay"/><text x="75" y="336" text-anchor="middle">A hiker's phone</text><text x="75" y="352" text-anchor="middle" class="sub">pays 4.5¢</text>
@@ -395,18 +395,18 @@ svg .bar.now{fill:var(--signal)}
       <text x="575" y="366" text-anchor="middle" class="m">and returns to the cabin at day 60.</text>
       <text x="575" y="396" text-anchor="middle" class="m">A relay dark all month returns all $180.</text>
       <text x="575" y="414" text-anchor="middle" class="m">The bounty stays open to a second path.</text>
-      <text x="380" y="532" text-anchor="middle" class="m">a band's thickness is cents per window · what each relay keeps is after the five percent burn</text>
+      <text x="380" y="532" text-anchor="middle" class="m">a band's thickness is cents per window · what each relay keeps is after the Steward's five percent</text>
     </svg></div>
     <figcaption>Each window draws its own amounts out of the escrow. Above the minimum the relays get their posted prices and the full premium. In rain the premium prorates and the rest goes back to the cabin. A hiker's window is reimbursed from the escrow, so the route is proved by use. A window with nothing sent, or a relay gone dark, moves nothing, and its escrow returns at the deadline.</figcaption>
   </figure>
 
   <h3>The conditions</h3>
   <ul class="cond">
-    <li><strong>Who builds, and why?</strong> Whoever can see the arithmetic. The bounty guarantees a month of at least a gigabyte an hour at fifteen cents posted plus ten premium, which is at least $72 to the two relays for a $150 radio pair. The protocol does not pick the builder. It publishes the offer and pays whoever's receipts settle on the route.</li>
+    <li><strong>Who builds, and why?</strong> Whoever can see the arithmetic. The bounty guarantees a month of at least a gigabyte an hour at fifteen cents posted plus ten premium, which is at least $72 to the two relays for a $150 radio pair. The protocol does not pick the builder. It publishes the offer and pays whoever's receipts settle on the route. The Steward adds to the cabin's escrow, up to a cap set below the five percent it takes from every fee, so the offer is a little larger than the cabin alone could make it.</li>
     <li><strong>What does the cabin risk?</strong> Nothing but time. The escrow pays only on receipts; a month with no relay refunds in full at the deadline. What it cannot buy is a promise. A relay that goes dark has broken nothing it was paid for.</li>
     <li><strong>What does the relay risk?</strong> The radio. It is paid per window, and only for windows the cabin's receipts settle. A rainy hour pays less; a quiet hour pays the carry, which on a link with no delay is nothing. The paper's own sentence that the posted price on a committed window is the poster's to lose, and its newer sentence that an unused reservation pays only the carry, do not yet say the same thing; this note follows the newer one, and the paper should pick.</li>
     <li><strong>Is the ridge a monopoly?</strong> Yes, for as long as it is the only ridge. If it raises its price, the cabin's bounty is a bid against that toll: another neighbor can serve the same route and collect the same premium. The cabin does not have to post a second bounty. The first one is already an offer to anyone.</li>
-    <li><strong>How does the cabin trust a route it has never used?</strong> The proving allowance. Up to ten windows a week bought by other payers are reimbursed from the escrow, and their receipts put the route in the graph at a measured rate before the cabin relies on it. A relay cannot prove its own route through a second identity for more than the allowance, and loses the burn doing it.</li>
+    <li><strong>How does the cabin trust a route it has never used?</strong> The proving allowance. Up to ten windows a week bought by other payers are reimbursed from the escrow, and their receipts put the route in the graph at a measured rate before the cabin relies on it. A relay cannot prove its own route through a second identity for more than the allowance, and pays the Steward's fee doing it.</li>
     <li><strong>What the bounty cannot buy.</strong> Presence. A commitment can name a place and pay for people served there, within a radio's range, but it cannot pay a box for being in the forest. Only receipts from people who paid for bytes earn anything.</li>
   </ul>
 
@@ -442,9 +442,9 @@ svg .bar.now{fill:var(--signal)}
         <path d="M689 185L665 170" class="flow" marker-end="url(#m3g)"/>
         <path d="M612 140C420 60 260 150 140 288" class="flow" marker-end="url(#m3g)"/>
         <path d="M150 272C280 150 440 90 600 128" class="cash" marker-end="url(#m3s)"/>
-        <text x="300" y="72" class="money" text-anchor="middle">Earth pays $50/GB · 5% burned on Earth · Jupiter's Mint settles the lander hop</text>
+        <text x="300" y="72" class="money" text-anchor="middle">Earth pays $50/GB · 5% to Earth's Steward · Jupiter's Mint settles the lander hop</text>
         <text x="20" y="406" class="data">a terabyte: Europa → relay orbiter → Earth · two receipts · closed on Earth 35 to 52 min after sending</text>
-        <text x="20" y="422" class="m">$50,000, $2,500 burned · the direct bridge can charge up to the way around through Mars, about $63/GB</text>
+        <text x="20" y="422" class="m">$50,000, $2,500 to the Steward · the direct bridge can charge up to the way around via Mars, about $63/GB</text>
       </g>
 
       <g class="st-down">
@@ -476,7 +476,7 @@ svg .bar.now{fill:var(--signal)}
       <rect x="240" y="210" width="130" height="40" rx="4" class="box"/><text x="305" y="226" text-anchor="middle">Europa lander</text><text x="305" y="242" text-anchor="middle" class="sub">paid by the Jupiter Mint</text>
       <g class="band"><path d="M130 90C190 90 190 70 250 70" stroke-width="20"/><path d="M305 90V210" stroke-width="6"/></g>
       <rect x="164" y="72" width="52" height="16" rx="3" class="pill"/><text x="190" y="84" text-anchor="middle" class="money">$50</text><rect x="270" y="142" width="70" height="16" rx="3" class="pill"/><text x="305" y="154" text-anchor="middle" class="money">its share</text>
-      <text x="185" y="276" text-anchor="middle" class="m">$50 paid · $2.50 burned · $47.50 to Jupiter</text>
+      <text x="185" y="276" text-anchor="middle" class="m">$50 paid · $2.50 to Earth's Steward · $47.50 to Jupiter</text>
 
       <text x="575" y="22" text-anchor="middle">Solar conjunction, Mars clear</text>
       <rect x="410" y="90" width="110" height="40" rx="4" class="box pay"/><text x="465" y="106" text-anchor="middle">Earth institution</text><text x="465" y="122" text-anchor="middle" class="sub">pays $63 a gigabyte</text>
@@ -485,21 +485,21 @@ svg .bar.now{fill:var(--signal)}
       <rect x="630" y="210" width="130" height="40" rx="4" class="box"/><text x="695" y="226" text-anchor="middle">Europa lander</text><text x="695" y="242" text-anchor="middle" class="sub">paid by the Jupiter Mint</text>
       <g class="band"><path d="M520 110C580 110 580 70 640 70" stroke-width="25"/><path d="M695 90V130" stroke-width="16"/><path d="M695 170V210" stroke-width="6"/></g>
       <rect x="554" y="82" width="52" height="16" rx="3" class="pill"/><text x="580" y="94" text-anchor="middle" class="money">$63</text><rect x="639" y="102" width="112" height="16" rx="3" class="pill"/><text x="695" y="114" text-anchor="middle" class="money">$40 in Mars's unit</text><rect x="660" y="182" width="70" height="16" rx="3" class="pill"/><text x="695" y="194" text-anchor="middle" class="money">its share</text>
-      <text x="575" y="276" text-anchor="middle" class="m">$63 paid · $3.15 burned · $59.85 to the relays</text>
+      <text x="575" y="276" text-anchor="middle" class="m">$63 paid · $3.15 to two Stewards · $59.85 to the relays</text>
 
       <text x="380" y="314" text-anchor="middle" class="m">Mars behind the Sun too: nothing moves for three weeks. Receipts wait in outboxes,</text>
       <text x="380" y="330" text-anchor="middle" class="m">every window settles when the line returns, and nothing is paid for the silence.</text>
-      <text x="380" y="352" text-anchor="middle" class="m">a band's thickness is dollars a gigabyte · what each relay keeps is after the five percent burn</text>
+      <text x="380" y="352" text-anchor="middle" class="m">a band's thickness is dollars a gigabyte · what each relay keeps is after each Steward's five percent</text>
     </svg></div>
-    <figcaption>With the line clear, Earth pays the Jupiter orbiter directly and the Jupiter Mint pays the lander its share from the same receipts. In conjunction Earth pays the Mars bridge $63: it keeps its $20 and $3 of carry and passes $40 to the Jupiter orbiter in Mars's unit at its own rate, with the burn taken on each side. When Mars is behind the Sun too, nothing moves and nothing is paid.</figcaption>
+    <figcaption>With the line clear, Earth pays the Jupiter orbiter directly and the Jupiter Mint pays the lander its share from the same receipts. In conjunction Earth pays the Mars bridge $63: it keeps its $20 and $3 of carry and passes $40 to the Jupiter orbiter in Mars's unit at its own rate, with each side's Steward taking its five percent. When Mars is behind the Sun too, nothing moves and nothing is paid.</figcaption>
   </figure>
 
   <h3>The conditions</h3>
   <ul class="cond">
     <li><strong>Is there a way around?</strong> Only when Mars can see both Earth and Jupiter, which depends on where the three are in their orbits; some conjunctions have no detour. When there is none, nothing breaks. Receipts wait in outboxes, the clock tolerance has widened by three weeks of drift, and every window settles when the line returns. Nothing is paid for the silence, and nothing has to be.</li>
     <li><strong>Who holds the bytes?</strong> The Mars relay, between the pass that brings them from Jupiter and its next contact with Earth, under a custody receipt it signed on take-up and for a holding term its contact plan published. If it loses the bundle, the loss is on paper and its bond on Mars pays for it. If its Earth contact never comes, Earth's prepaid window is refunded and the relay's carry on the windows that did settle is where it priced that risk.</li>
-    <li><strong>Whose money is it?</strong> Three units. Earth pays in Earth's; the Mars bridge, bonded with the Earth Mint and the Mars Mint, holds both and posts its prices in both, so the $40 it pays Jupiter's orbiter is its own conversion at its own rate. Earth cannot read Mars's unit and does not need to: the burn is five percent in any unit, and the smaller-count rule is in bytes.</li>
-    <li><strong>Who polices the bookkeepers?</strong> Nobody can reach another world's bond. If the Jupiter Mint under-burned during the silence, the Earth Mint finds it at the first reconciliation after, publishes the proof, stops reconciling, and slashes any relay on its side that keeps settling with Jupiter. The bridge relays, bonded on both sides, feel it first. That is a boycott, and it is the only enforcement that has ever worked across a distance.</li>
+    <li><strong>Whose money is it?</strong> Three units. Earth pays in Earth's; the Mars bridge, bonded with the Earth Mint and the Mars Mint, holds both and posts its prices in both, so the $40 it pays Jupiter's orbiter is its own conversion at its own rate. Earth cannot read Mars's unit and does not need to: the Steward's fee is five percent in any unit, and the smaller-count rule is in bytes.</li>
+    <li><strong>Who polices the bookkeepers?</strong> Nobody can reach another world's bond. If the Jupiter Mint under-remitted to its Steward during the silence, the Earth Mint finds it at the first reconciliation after, publishes the proof, stops reconciling, and slashes any relay on its side that keeps settling with Jupiter. The bridge relays, bonded on both sides, feel it first. That is a boycott, and it is the only enforcement that has ever worked across a distance.</li>
     <li><strong>What bounds the direct bridge's price?</strong> The detour. Jupiter's orbiter is the only direct link, and it can charge up to about $63 a gigabyte, what Earth would pay to go around through Mars, before Earth's software routes that way even with the line clear. A toll is bounded by the cost of the next bridge, and this network always has one more bridge than the shortest path.</li>
     <li><strong>Is this still commerce?</strong> Yes, everywhere on this map. The longest round trip here is under two hours, so the party that pays is the party that wanted the bytes and will be there to sign for them. The receipt's horizon is further out than Jupiter. It is not infinitely far, and the paper now says where it is.</li>
   </ul>

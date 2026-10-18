@@ -4,7 +4,7 @@
 bandwidthswap@pm.me
 
 Oct 17th 2026
-Version 0.4 (draft), for operators
+Version 0.5 (draft), for operators
 
 ---
 
@@ -40,7 +40,7 @@ A relay announces, over a gossip layer that never touches settlement, its NYM, w
 - the signature scheme your receipts use and how long a receipt stays presentable to a Mint;
 - the settlement domain you settle in, which is the Mint that holds your bond.
 
-Your posted price governs every payment made to you. In the lab it is ten cents a gigabyte. The protocol does not cap it. If you are the only way across a gap you will earn the whole route, and you should know that this makes you a monopoly until someone funds the second link, which the protocol is designed to let them do (Section 5).
+Your posted price governs every payment made to you. In the lab it is ten cents a gigabyte. The protocol does not cap it. If you are the only way across a gap you will earn the whole route, and you should know that this makes you a monopoly until someone funds the second link, which the protocol is designed to let them do and which the Steward funds from the fees your link collects (Sections 5 and 7).
 
 ## What you sign
 
@@ -56,7 +56,7 @@ Keep every signed copy. Your proof of what you are owed is the receipt in your h
 
 A window settles at the smaller of the two signed counts, yours and the payer's, times your posted price. If the counts are within one percent the window is settled; if they differ by more it is recorded as disputed and settles by the same rule, at the smaller count. You cannot be paid for more than the payer signed for. In the lab, a hop that signed for twenty-two megabytes against a payer's 272 bytes was paid for 272 bytes (Section 9).
 
-Five percent of every fee is burned before anyone is paid. That is not a Mint's cut; it leaves the network, and it is what makes carrying traffic to yourself a loss (Section 3.3). The Mint takes a share of the settlement fee on what it publishes.
+Five percent of every fee goes to the Network Steward before anyone is paid. That is not a Mint's cut and not a treasury: the Steward is a rule that can spend only by posting bounties, and it can match a bounty of your own only up to a cap set below the five percent, so carrying traffic to yourself is still a loss (Sections 3.3 and 7). The Mint takes a share of the settlement fee on what it publishes.
 
 In the pilot there is no payment rail. The invoice at the end of the month is the settlement, which means you have lent the payer every window's value from the hour it settled until the invoice is paid. The paper now calls that what it is, a credit term, bounded by membership: a payer that does not pay an invoice is out (Section 2). When you set your price, price the month.
 
@@ -90,7 +90,7 @@ If your link crosses from one Mint's domain to another's, you post a bond with e
 
 ## What the paper does not promise you
 
-That the treasury's bonus will be worth building for: it is capped at the burn, five cents on the dollar, and whether that moves anyone is the first thing the pilot's economics must answer. That your monopoly, if you have one, will last: the toll you charge is the bounty for the second bridge. That a window past a payer's horizon proves anything to the party that wanted the bytes: when no reply can return while the payer is there to receive it, you are still paid per link, honestly, for carriage toward silence (Appendix A.7). And that any of this has run beyond three boards on a bench.
+That the Steward's bounties will be worth building for: its match on your own bounty is capped below the five percent it takes, and its second-bridge offers are sized by what a sole link already earns, and whether that moves anyone is the first thing the pilot's economics must answer. That your monopoly, if you have one, will last: the fees your sole link collects become the Steward's bounty for a second path through a different place on the map, and a second key on your own hill will not collect it, while a radio on another hill will. That a window past a payer's horizon proves anything to the party that wanted the bytes: when no reply can return while the payer is there to receive it, you are still paid per link, honestly, for carriage toward silence (Appendix A.7). And that any of this has run beyond three boards on a bench.
 
 ## Before you sign anything with a second party
 
