@@ -116,6 +116,12 @@ Legend for "Build reveals": **sim** = answerable with a simulation or spreadshee
 
 ---
 
+### B11. The agreement margin on a lossy link
+**Unresolved.** Section 3.6 marks a window disputed when the two signed counts differ by more than one percent. That number came from a wired bench where the payer's and hop's counters agree within a few bytes. On the first link that was not a wire, the house to the neighbor's Pi over a Tailscale tunnel relayed through DERP with an 87 ms round trip, the counts differed by about ten percent on every window (Oct 18, 2026: payer 21.99 MB, hop 24.12 MB; a 10 MB purchase measured as 10.65 MB received and 11.73 MB sent), because the hop's interface counts its retransmissions and the payer's does not. Every window settles at the payer's count, which is the rule's intent, but every window is also marked disputed, which makes the mark meaningless on such a link.
+**Options.** (a) Keep one percent and accept that the disputed mark means "lossy link" there. (b) Make the margin a link parameter (Appendix A.1) beside the clock tolerance, set by the relay from the path it sees and accepted by the payer. (c) Count at a layer that excludes retransmissions, which needs the chunked data plane of Section 3.1 and a Merkle root over delivered chunks rather than interface counters.
+**Build reveals.** *proto.* A month on the neighbor's link gives the distribution of the gap; the Phase 1 radio link gives a second one.
+**Default to start.** (b), with the pilot's value on that link set from the first week's gaps, and (a) until then.
+
 ## C. Legal and market
 
 ### C1. Operator liability for third-party payloads
