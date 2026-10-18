@@ -1,0 +1,10 @@
+{
+  "name": "bandwidthswap-site",
+  "private": true,
+  "type": "module",
+  "description": "Node runs the site's JavaScript as ES modules: docs/bsp.js is the browser verifier, tools/check-vectors.mjs holds it to the kit's vectors. The site itself has no build step.",
+  "scripts": {
+    "check-vectors": "node tools/check-vectors.mjs",
+    "test": "node worker/test.mjs && node tools/check-vectors.mjs"
+  }
+}

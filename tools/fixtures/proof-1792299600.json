@@ -1,0 +1,67 @@
+{
+ "bwkit": "0.2.0",
+ "count": 2,
+ "kind": "proof",
+ "mint": "ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM",
+ "root": "39db2cb0f79754d7d6da919f41ff784fceb5e104abbf30137bf7e946c31527de",
+ "settlements": [
+  {
+   "index": 0,
+   "leaf": "1d6bf0482c54596935ab1bec6d520c680ff7cd43c2d3dadd93855b2e145078d0",
+   "path": [
+    [
+     "R",
+     "acc5d9e38e9ae0f1e3addb26c4c892fb4e7aa0fe4a2047b762f8773191d93b91"
+    ]
+   ],
+   "settlement": {
+    "ack_sig": "S5fib-2N0y5vGkuvKLK9eiKut6OJV35rlhg7W45mm8Hxa_95SekD1UxRD-4aaXpixasg9xZEByuyhAmKdGVlDw",
+    "amount_usd": 0.002199,
+    "hop": "ed25519:Y_rtP6d0teob8J1qJttIOoZ17FLi5PG29HaZ-tE7IoY",
+    "hop_bytes": 24119909,
+    "hop_index": 1,
+    "kind": "settlement",
+    "payer": "ed25519:fz1ziSB-Ggpq4gRkskV0phBwkSDfHoR0vDqeY42wSx0",
+    "payer_bytes": 21993809,
+    "price_usd_per_gb": 0.1,
+    "receipt_sig": "nkz66DlFGztxBFvkNfYQbvg7lGq4FCGY1m95BBr3Hk32YXsndeaN9Vww-FPun02Jl8Jv1TMKJ9H2INGNrwxmDw",
+    "rule": "the smaller of the two signed counts; neither party is bound beyond what it signed",
+    "settled_bytes": 21993809,
+    "status": "disputed",
+    "t": 1792301002,
+    "t_first": 1792300550,
+    "t_last": 1792301002
+   }
+  },
+  {
+   "index": 1,
+   "leaf": "acc5d9e38e9ae0f1e3addb26c4c892fb4e7aa0fe4a2047b762f8773191d93b91",
+   "path": [
+    [
+     "L",
+     "1d6bf0482c54596935ab1bec6d520c680ff7cd43c2d3dadd93855b2e145078d0"
+    ]
+   ],
+   "settlement": {
+    "ack_sig": "gkPvwGe-kuuU7p7eq0vVoJMD7BpDMO3FTUL6sDO6HOnhPvV3Lmqy3bUXdbfEK6nA6b4OewEDuY6nFEf0XHPMCw",
+    "amount_usd": 0.011743,
+    "hop": "ed25519:Y_rtP6d0teob8J1qJttIOoZ17FLi5PG29HaZ-tE7IoY",
+    "hop_bytes": 121792892,
+    "hop_index": 1,
+    "kind": "settlement",
+    "payer": "ed25519:fz1ziSB-Ggpq4gRkskV0phBwkSDfHoR0vDqeY42wSx0",
+    "payer_bytes": 117428796,
+    "price_usd_per_gb": 0.1,
+    "receipt_sig": "Cp84athNEpgLMGkgNnszOoVHYHHK2I4yTf98_peHJYbed1c1iSCbRu-NiE9G5hqRLbcc_1cTLDPQh3Oor3ypBQ",
+    "rule": "the smaller of the two signed counts; neither party is bound beyond what it signed",
+    "settled_bytes": 117428796,
+    "status": "disputed",
+    "t": 1792303201,
+    "t_first": 1792301002,
+    "t_last": 1792303201
+   }
+  }
+ ],
+ "signature": "_ugkdudMZ6MCv_pqNEfCznhxa8Hh9QYSMcMEDz6HutoyrwC_1_T_KWl9O5NQugf_8rgPDlzYBSWGCpt6ipS6DQ",
+ "window": 1792299600
+}

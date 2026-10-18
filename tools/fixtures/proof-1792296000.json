@@ -1,0 +1,67 @@
+{
+ "bwkit": "0.2.0",
+ "count": 2,
+ "kind": "proof",
+ "mint": "ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM",
+ "root": "d09fb28633553bf93552b635a750a727a569a0fd6f15abff771b90c70be59f7d",
+ "settlements": [
+  {
+   "index": 0,
+   "leaf": "d23a7a10cfde0b395a6fa98b2750e31a1d5b2f6efef527b2cd890980a9d0f1c2",
+   "path": [
+    [
+     "R",
+     "49552d013ed54174b3e5bc22f2e709a4c5b6f7d6b35557c45961f18a0372e8e9"
+    ]
+   ],
+   "settlement": {
+    "ack_sig": "QVYTz_z_xbp8Mjq8Dr4__5NND7QU1y17Mov9kTI-25cQ1oa1fCCWVdlrTabatbm7-PCxjX8MigWTeGQ-jcf1BA",
+    "amount_usd": 0.0,
+    "hop": "ed25519:qThF_FFwT-T1zaxmEya005WylZoo9rkMaolxZtrczPk",
+    "hop_bytes": 4576,
+    "hop_index": 1,
+    "kind": "settlement",
+    "payer": "ed25519:fz1ziSB-Ggpq4gRkskV0phBwkSDfHoR0vDqeY42wSx0",
+    "payer_bytes": 4592,
+    "price_usd_per_gb": 0.1,
+    "receipt_sig": "SR3dr-DR8sCLVNrnOXx1EVdKE8pjhW7COUYLV93eFyx6gJMFxEGaJ3WQR67II0etmlwas8aX-DuC8rvHccYjCg",
+    "rule": "the smaller of the two signed counts; neither party is bound beyond what it signed",
+    "settled_bytes": 4576,
+    "status": "settled",
+    "t": 1792296546,
+    "t_first": 1792296000,
+    "t_last": 1792296546
+   }
+  },
+  {
+   "index": 1,
+   "leaf": "49552d013ed54174b3e5bc22f2e709a4c5b6f7d6b35557c45961f18a0372e8e9",
+   "path": [
+    [
+     "L",
+     "d23a7a10cfde0b395a6fa98b2750e31a1d5b2f6efef527b2cd890980a9d0f1c2"
+    ]
+   ],
+   "settlement": {
+    "ack_sig": "mPdWCeVOsohDBnZhigr0AjrfyDfnuJtO8U_LMqukJ-U0NPxWIiKD9AFvwNkBWHaKb41-6pU4rbAkNSoekKoiCg",
+    "amount_usd": 1e-06,
+    "hop": "ed25519:qThF_FFwT-T1zaxmEya005WylZoo9rkMaolxZtrczPk",
+    "hop_bytes": 12064,
+    "hop_index": 1,
+    "kind": "settlement",
+    "payer": "ed25519:fz1ziSB-Ggpq4gRkskV0phBwkSDfHoR0vDqeY42wSx0",
+    "payer_bytes": 11792,
+    "price_usd_per_gb": 0.1,
+    "receipt_sig": "iDzPVbrlBos9D7Y1NZgKGNJEeyWgFzfOd2sHZSdlQXEZtIZfdA5MwpYGzdxPtRIpno5v2IU0hQI0IJF6UOHkAQ",
+    "rule": "the smaller of the two signed counts; neither party is bound beyond what it signed",
+    "settled_bytes": 11792,
+    "status": "settled",
+    "t": 1792299601,
+    "t_first": 1792296546,
+    "t_last": 1792299601
+   }
+  }
+ ],
+ "signature": "WlzUZ01uVojwXnXAkjKFSzRhXJQEwfxmNx-AQoIvu7Zno-9uPeAzfijpHoqOvaxfU6WAUJYeuepnD2gwfup1Dg",
+ "window": 1792296000
+}

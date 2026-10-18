@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Check a Bandwidth Swap proof in your browser: is the Mint's hourly commitment signed by the Mint, and is every settlement in its root? Nothing you paste leaves the page.">
+<title>Check a proof · Bandwidth Swap</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* The site's tokens and type (index.html), for one tool page: a form, a verdict, a table. */
+:root{
+  --bg:#f2f4f0; --panel:#fbfcfa; --fg:#182019; --muted:#5d685f; --line:#d5dbd4;
+  --accent:#1d6a58; --accent-ink:#ffffff; --signal:#b9561c; --code-bg:#e9ede7;
+  --display:"IBM Plex Sans Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --body:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121715; --panel:#181f1c; --fg:#e6ebe6; --muted:#9aa89e; --line:#2a3430;
+  --accent:#5fc3a6; --accent-ink:#0f1a16; --signal:#e8955a; --code-bg:#1f2824; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121715; --panel:#181f1c; --fg:#e6ebe6; --muted:#9aa89e; --line:#2a3430;
+  --accent:#5fc3a6; --accent-ink:#0f1a16; --signal:#e8955a; --code-bg:#1f2824; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.6 var(--body);padding-block:0 64px}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px}
+header.masthead{border-bottom:1px solid var(--line);padding-block:28px 22px}
+.masthead .wrap{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 28px}
+.brand{font:700 30px/1 var(--display);letter-spacing:.01em;margin:0}
+.brand a{color:inherit;text-decoration:none}
+.brand span{color:var(--accent)}
+.tag{font:400 15px/1.4 var(--body);color:var(--muted);font-style:italic;margin:0}
+.status{margin-left:auto;font:500 12px/1 var(--mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+main{max-width:860px;margin:0 auto;padding-top:36px}
+.eyebrow{font:600 12px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--signal);margin:0 0 10px}
+.eyebrow a{color:inherit;text-decoration:none}
+h1{font:700 clamp(32px,5vw,48px)/1.08 var(--display);margin:0 0 12px;text-wrap:balance}
+.meta{font:400 13px/1.5 var(--mono);color:var(--muted);margin:0 0 28px}
+h2{font:700 26px/1.15 var(--display);margin:40px 0 12px;text-wrap:balance}
+p{margin:0 0 16px;max-width:65ch}
+ul{padding-left:1.3em;margin:0 0 16px;max-width:65ch}
+li{margin-bottom:6px}
+a{color:var(--accent)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+strong{font-weight:600}
+code,pre,kbd,textarea,input{font-family:var(--mono)}
+code{font-size:.92em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
+pre{background:var(--code-bg);padding:12px 14px;border-radius:4px;overflow-x:auto;font-size:14px;line-height:1.5;margin:0 0 14px}
+pre code{background:none;padding:0}
+/* The form */
+label.lbl{display:block;font:600 13px/1.3 var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+textarea{display:block;width:100%;min-height:220px;resize:vertical;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:4px;padding:12px 14px;font-size:13px;line-height:1.5;tab-size:1}
+textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0 8px}
+button,.btn{font:600 13px/1 var(--display);letter-spacing:.04em;text-transform:uppercase;border-radius:3px;padding:10px 14px;cursor:pointer;border:1px solid var(--accent);background:var(--panel);color:var(--accent);display:inline-block}
+button.go{background:var(--accent);color:var(--accent-ink)}
+button:focus-visible,.btn:focus-within{outline:2px solid var(--fg);outline-offset:2px}
+button[disabled]{opacity:.5;cursor:default}
+.btn input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.btn{position:relative}
+.expect{margin:14px 0 0;font-size:15px}
+.expect summary{cursor:pointer;color:var(--muted);font:600 13px/1.4 var(--display);letter-spacing:.04em;text-transform:uppercase}
+.expect input{display:block;width:100%;max-width:60ch;margin:8px 0;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:4px;padding:8px 10px;font-size:13px}
+.expect p{font-size:14px;color:var(--muted);margin:0 0 6px}
+/* The verdict */
+.out{margin-top:28px}
+.verdict{font:700 26px/1.2 var(--display);margin:0 0 14px;text-wrap:balance;max-width:none}
+.verdict.ok{color:var(--accent)}.verdict.bad{color:var(--signal)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:0 0 18px}
+.card.ok{border-color:var(--accent)}.card.bad{border-color:var(--signal)}
+dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:0;font-size:15px}
+dt{font:600 12px/1.6 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+dd{margin:0;min-width:0;overflow-wrap:anywhere;font-family:var(--mono);font-size:13.5px;line-height:1.6}
+dd .y{color:var(--accent);font-weight:500}dd .n{color:var(--signal);font-weight:500}
+dd small{color:var(--muted)}
+.tablewrap{overflow-x:auto;margin:0 0 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:760px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font:600 11px/1.3 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}th.num{text-align:right}
+td.id{font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+td.st{font:500 11px/1.6 var(--mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+td.st.settled{color:var(--accent)}td.st.disputed{color:var(--signal)}
+td.in{white-space:nowrap}td.in .y{color:var(--accent);font-weight:600}td.in .n{color:var(--signal);font-weight:600}
+td .day{display:block;color:var(--muted);font:400 12px/1.4 var(--mono)}
+td .why{display:block;font:400 12.5px/1.4 var(--body);color:var(--signal);white-space:normal;max-width:34ch}
+.note{font:400 13px/1.5 var(--mono);color:var(--muted);margin:8px 0 14px;max-width:none}
+.live .card{margin-top:12px}
+.rules dt{text-transform:none;letter-spacing:0;font:600 15px/1.5 var(--body);color:var(--fg)}
+.rules dd{font-family:var(--body);font-size:15px}
+footer{border-top:1px solid var(--line);margin-top:40px;padding-top:16px;font-size:14px;color:var(--muted);max-width:860px;margin-inline:auto}
+@media (max-width:820px){.status{margin-left:0}dl{grid-template-columns:1fr;gap:2px 0}dt{margin-top:8px}}
+@media (prefers-reduced-motion:no-preference){a,button{transition:color .15s,background-color .15s}}
+</style>
+</head>
+<body>
+
+<header class="masthead"><div class="wrap">
+  <p class="brand"><a href="../">Bandwidth<span>Swap</span></a></p>
+  <p class="tag">A bandwidth market where the payment is the proof.</p>
+  <p class="status">Check a proof · Oct 2026</p>
+</div></header>
+
+<div class="wrap">
+<main>
+  <p class="eyebrow"><a href="../#lab">Lab status</a></p>
+  <h1>Check a proof</h1>
+  <p class="meta">October 18, 2026 · the receipt is the proof, checked in your browser · nothing you paste leaves this page</p>
+  <p>Every hour the Mint signs a root over the windows it settled, and <code>bwkit prove</code> on the Mint prints the proof that each settlement is under that root. Paste one here. This page recomputes every leaf and the path up to the root, and checks the Mint's signature on the root, using none of the kit's code: it is a second reading of the same rules, written so that a proof has to satisfy two implementations, not one. It runs in your browser and sends nothing anywhere.</p>
+
+  <form id="form" autocomplete="off" onsubmit="return false">
+    <label class="lbl" for="doc">A proof document from <code>bwkit prove</code>, or a commitment record</label>
+    <textarea id="doc" spellcheck="false" placeholder='{"kind": "proof", "mint": "ed25519:…", "window": 1792299600, "root": "…", "count": 2, "signature": "…", "settlements": [ … ]}'></textarea>
+    <div class="row">
+      <button type="submit" class="go" id="check">Check</button>
+      <label class="btn">Open a file<input type="file" id="file" accept=".json,application/json"></label>
+      <button type="button" id="example">Load an example</button>
+      <button type="button" id="clear">Clear</button>
+    </div>
+    <details class="expect">
+      <summary>The Mint you expect</summary>
+      <input id="mint" value="ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM" aria-label="The NYM the commitment must be signed by">
+      <p>Filled with the lab Mint's NYM, read from <code>bw-mint</code> with <code>bwkit nym</code> on October 18, 2026. A proof signed by any other key then fails here, as it should when you meant this Mint. Empty the field to accept any Mint's signature; the page then says whose it is.</p>
+    </details>
+  </form>
+
+  <section class="out" id="out" hidden aria-live="polite">
+    <p class="verdict" id="verdict"></p>
+    <div class="card" id="ccard"><dl id="cdl"></dl></div>
+    <div class="tablewrap" id="twrap" hidden><table id="table">
+      <thead><tr><th>#</th><th>Window (your time)</th><th>Payer</th><th>Hop</th><th class="num">Payer signed</th><th class="num">Hop signed</th><th class="num">Settled</th><th>Status</th><th class="num">Amount</th><th>In the root</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+    <p class="note" id="onote"></p>
+  </section>
+  <noscript><p class="note">This page needs JavaScript: the checking happens in your browser. Without it, <code>bwkit verify-proof proof.json</code> in the kit does the same offline.</p></noscript>
+
+  <section class="live">
+    <h2>The live commitment</h2>
+    <p>The Mint posts a summary of its ledger to the status feed every two minutes, and the summary carries its latest hourly commitment. This fetches the feed and checks the signature on that commitment, in your browser, against the Mint's NYM.</p>
+    <div class="row"><button type="button" id="live">Check the live commitment</button></div>
+    <div id="liveout"></div>
+    <p class="note" id="livenote">The feed does not yet carry the Mint's NYM or the hour's proofs. Until it does, the signature is checked against the NYM printed on this page; once the feed names its Mint and carries the hour's proof, the page uses those and says so.</p>
+  </section>
+
+  <h2>What this checks, and what it cannot</h2>
+  <dl class="rules">
+    <dt>The commitment's signature</dt>
+    <dd>Ed25519 by the Mint's key over <code>bandwidthswap/commitment/v1</code>, a newline, and the JSON array <code>[mint, window, root, count]</code> in canonical form. The Mint's NYM is <code>ed25519:</code> followed by its 32-byte public key in base64url. A valid signature means that Mint said this root, over this many settlements, for this hour, and cannot later say otherwise.</dd>
+    <dt>Every settlement's place in the root</dt>
+    <dd>A leaf is SHA-256 over a zero byte and the settlement in canonical JSON, without its field <code>t</code>, the Mint's own clock. Canonical means keys sorted, no whitespace, every non-ASCII character escaped, numbers written as the kit writes them. An inner node is SHA-256 over a one byte and its two children; the tree splits at the largest power of two below the count, as in RFC 6962. The proof's path is the list of siblings from the leaf up; the page climbs it and must arrive at the root.</dd>
+    <dt>What it does not check</dt>
+    <dd>Whether the settlements are right. A settlement is the Mint's reading of two signed receipts, and those signatures are not in the proof, only their values; the kit's <code>bwkit rebuild</code> redoes the settling from the parties' own copies. Whether the Mint left a window out: that needs your receipt and the hour's commitment, and is what <code>bwkit prove</code> on your copy is for. Who the Mint is. A key is a key; the NYM above is the lab's because this page says so, not because anything proves it.</dd>
+  </dl>
+
+  <h2>Getting a proof</h2>
+  <p>On a Mint, for the hour starting at midnight local time on October 18, 2026 (the example above):</p>
+  <pre><code>sudo -u bwkit bwkit prove 2026-10-18T00 &gt; proof.json
+bwkit verify-proof proof.json --mint "$(sudo -u bwkit bwkit nym)"</code></pre>
+  <p>The second line is the kit's own check. This page is the other implementation: <a href="bsp.js">bsp.js</a>, one ES module with no dependencies, SHA-256 and Ed25519 from the browser's WebCrypto. Where a browser's WebCrypto has no Ed25519 yet, the page loads a pinned copy of noble-ed25519 from jsDelivr for that one step, and says so under the result. In the site's repository, <code>node tools/check-vectors.mjs</code> runs the same module over real proofs from the lab's Mint and tampered copies of them, and over the kit's test vectors once those exist, so the two implementations are held to the same bytes.</p>
+</main>
+
+<footer>Bandwidth Swap · <a href="../#lab">lab status</a> · <a href="../notes/the-receipt-is-the-proof.html">the receipt is the proof</a> · <a href="paper.html">the paper</a> · <a href="../">home</a></footer>
+</div>
+
+<script type="application/json" id="example-doc">{
+ "bwkit": "0.2.0",
+ "count": 2,
+ "kind": "proof",
+ "mint": "ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM",
+ "root": "39db2cb0f79754d7d6da919f41ff784fceb5e104abbf30137bf7e946c31527de",
+ "settlements": [
+  {
+   "index": 0,
+   "leaf": "1d6bf0482c54596935ab1bec6d520c680ff7cd43c2d3dadd93855b2e145078d0",
+   "path": [
+    [
+     "R",
+     "acc5d9e38e9ae0f1e3addb26c4c892fb4e7aa0fe4a2047b762f8773191d93b91"
+    ]
+   ],
+   "settlement": {
+    "ack_sig": "S5fib-2N0y5vGkuvKLK9eiKut6OJV35rlhg7W45mm8Hxa_95SekD1UxRD-4aaXpixasg9xZEByuyhAmKdGVlDw",
+    "amount_usd": 0.002199,
+    "hop": "ed25519:Y_rtP6d0teob8J1qJttIOoZ17FLi5PG29HaZ-tE7IoY",
+    "hop_bytes": 24119909,
+    "hop_index": 1,
+    "kind": "settlement",
+    "payer": "ed25519:fz1ziSB-Ggpq4gRkskV0phBwkSDfHoR0vDqeY42wSx0",
+    "payer_bytes": 21993809,
+    "price_usd_per_gb": 0.1,
+    "receipt_sig": "nkz66DlFGztxBFvkNfYQbvg7lGq4FCGY1m95BBr3Hk32YXsndeaN9Vww-FPun02Jl8Jv1TMKJ9H2INGNrwxmDw",
+    "rule": "the smaller of the two signed counts; neither party is bound beyond what it signed",
+    "settled_bytes": 21993809,
+    "status": "disputed",
+    "t": 1792301002,
+    "t_first": 1792300550,
+    "t_last": 1792301002
+   }
+  },
+  {
+   "index": 1,
+   "leaf": "acc5d9e38e9ae0f1e3addb26c4c892fb4e7aa0fe4a2047b762f8773191d93b91",
+   "path": [
+    [
+     "L",
+     "1d6bf0482c54596935ab1bec6d520c680ff7cd43c2d3dadd93855b2e145078d0"
+    ]
+   ],
+   "settlement": {
+    "ack_sig": "gkPvwGe-kuuU7p7eq0vVoJMD7BpDMO3FTUL6sDO6HOnhPvV3Lmqy3bUXdbfEK6nA6b4OewEDuY6nFEf0XHPMCw",
+    "amount_usd": 0.011743,
+    "hop": "ed25519:Y_rtP6d0teob8J1qJttIOoZ17FLi5PG29HaZ-tE7IoY",
+    "hop_bytes": 121792892,
+    "hop_index": 1,
+    "kind": "settlement",
+    "payer": "ed25519:fz1ziSB-Ggpq4gRkskV0phBwkSDfHoR0vDqeY42wSx0",
+    "payer_bytes": 117428796,
+    "price_usd_per_gb": 0.1,
+    "receipt_sig": "Cp84athNEpgLMGkgNnszOoVHYHHK2I4yTf98_peHJYbed1c1iSCbRu-NiE9G5hqRLbcc_1cTLDPQh3Oor3ypBQ",
+    "rule": "the smaller of the two signed counts; neither party is bound beyond what it signed",
+    "settled_bytes": 117428796,
+    "status": "disputed",
+    "t": 1792303201,
+    "t_first": 1792301002,
+    "t_last": 1792303201
+   }
+  }
+ ],
+ "signature": "_ugkdudMZ6MCv_pqNEfCznhxa8Hh9QYSMcMEDz6HutoyrwC_1_T_KWl9O5NQugf_8rgPDlzYBSWGCpt6ipS6DQ",
+ "window": 1792299600
+}</script>
+<script type="module">
+import * as bsp from './bsp.js';
+
+const LAB_MINT = 'ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM';
+const FEED = 'https://status.bandwidthswap.com/status';
+const $ = (id) => document.getElementById(id);
+const doc = $('doc'), out = $('out'), verdict = $('verdict'), ccard = $('ccard'), cdl = $('cdl'), twrap = $('twrap'), tbody = $('table').tBodies[0], onote = $('onote');
+
+const pad2 = (n) => (n < 10 ? '0' : '') + n;
+const hms = (t) => { const d = new Date(t * 1000); return pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds()); };
+const day = (t) => new Date(t * 1000).toLocaleDateString(undefined, { dateStyle: 'medium' });
+const when = (t) => new Date(t * 1000).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+const tz = () => { try { return new Intl.DateTimeFormat(undefined, { timeZoneName: 'short' }).formatToParts(new Date()).find((p) => p.type === 'timeZoneName').value; } catch (e) { return ''; } };
+const bytes = (n) => { if (typeof n !== 'number' && typeof n !== 'bigint') return '—'; n = Number(n); const u = ['B', 'KB', 'MB', 'GB', 'TB']; let i = 0; while (n >= 1000 && i < u.length - 1) { n /= 1000; i++; } return (i ? n.toFixed(2) : String(n)) + ' ' + u[i]; };
+const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const short = (nym) => typeof nym === 'string' && nym.startsWith('ed25519:') ? nym.slice(8, 20) + '…' : String(nym);
+function nymCell(nym) {
+  const td = el('td', 'id'); const c = el('code', null, short(nym)); c.title = String(nym); td.appendChild(c); return td;
+}
+function backendLine() {
+  const b = bsp.ed25519Backend();
+  return b === 'noble' ? 'Ed25519 via noble-ed25519 2.3.0 from jsDelivr, because this browser\'s WebCrypto has no Ed25519; SHA-256 via WebCrypto.'
+    : 'SHA-256 and Ed25519 via this browser\'s WebCrypto.';
+}
+function row(dt, dd, cls) {
+  cdl.appendChild(el('dt', null, dt));
+  const d = el('dd', cls);
+  if (typeof dd === 'string') d.textContent = dd; else d.appendChild(dd);
+  cdl.appendChild(d);
+}
+function mark(ok, yes, no) { const s = el('span', ok ? 'y' : 'n', ok ? yes : no); return s; }
+
+function showCommitment(c, extra) {
+  cdl.textContent = '';
+  ccard.className = 'card ' + (c.ok ? 'ok' : 'bad');
+  if (c.window != null && Number.isInteger(c.window)) row('Hour', when(c.window) + ' ' + tz() + ' · Unix ' + c.window);
+  else row('Hour', String(c.window));
+  const m = el('span'); m.textContent = String(c.mint == null ? '—' : c.mint);
+  if (c.expected) {
+    const e = el('small', null, c.expected.matches ? ' · the Mint you expected' : ' · not the Mint you expected (' + c.expected.nym + ')');
+    m.appendChild(e);
+  }
+  row('Mint', m);
+  row('Root', String(c.root == null ? '—' : c.root));
+  row('Settlements', c.count == null ? '—' : plural(c.count, 'settlement') + (extra && extra.shown != null && extra.shown !== c.count ? ' · ' + extra.shown + ' shown in this document' : ''));
+  const sig = el('span');
+  sig.appendChild(mark(c.ok, 'VALID', 'INVALID'));
+  sig.appendChild(document.createTextNode(c.ok ? ' · the Mint\'s Ed25519 signature over [mint, window, root, count]' : ' · ' + (c.reason || 'the signature does not verify')));
+  row('Signature', sig);
+  if (extra && extra.made) row('Made', hms(extra.made) + ', ' + day(extra.made));
+}
+
+function showSettlements(list, root) {
+  tbody.textContent = '';
+  twrap.hidden = !list.length;
+  for (const r of list) {
+    const tr = el('tr'), s = r.settlement || {};
+    tr.appendChild(el('td', 'num', r.index == null ? '—' : String(r.index)));
+    const w = el('td');
+    if (Number.isInteger(s.t_first) && Number.isInteger(s.t_last)) { w.textContent = hms(s.t_first) + ' → ' + hms(s.t_last); w.appendChild(el('span', 'day', day(s.t_last))); }
+    else w.textContent = '—';
+    tr.appendChild(w);
+    tr.appendChild(nymCell(s.payer));
+    tr.appendChild(nymCell(s.hop));
+    tr.appendChild(el('td', 'num', bytes(s.payer_bytes)));
+    tr.appendChild(el('td', 'num', bytes(s.hop_bytes)));
+    tr.appendChild(el('td', 'num', bytes(s.settled_bytes)));
+    tr.appendChild(el('td', 'st ' + (s.status === 'settled' || s.status === 'disputed' ? s.status : ''), s.status == null ? '—' : String(s.status)));
+    tr.appendChild(el('td', 'num', typeof s.amount_usd === 'number' ? '$' + s.amount_usd : '—'));
+    const i = el('td', 'in');
+    i.appendChild(mark(r.ok, '✓ yes', '✗ no'));
+    if (!r.ok) i.appendChild(el('span', 'why', r.reason || ''));
+    else if (r.leafMatches === false) i.appendChild(el('span', 'why', 'in the root, but the document\'s stated leaf differs from the one computed here'));
+    tr.appendChild(i);
+    tbody.appendChild(tr);
+  }
+}
+
+function fail(reason) {
+  out.hidden = false;
+  verdict.className = 'verdict bad';
+  verdict.textContent = 'This cannot be checked.';
+  ccard.className = 'card bad'; cdl.textContent = ''; row('Reason', reason);
+  twrap.hidden = true; onote.textContent = '';
+}
+
+async function checkText(text) {
+  const expect = $('mint').value.trim() || null;
+  let parsed;
+  try { parsed = bsp.parse(text); } catch (e) { return fail(e.message); }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return fail('the document is not a JSON object');
+  // A status report pasted whole: check its commitment, and its proof when it carries one.
+  if (parsed.kind === undefined && parsed.commitment && typeof parsed.commitment === 'object') {
+    const mint = parsed.mint || parsed.commitment.mint || expect || LAB_MINT;
+    if (parsed.proof && typeof parsed.proof === 'object') return showProof(await bsp.verifyProof(parsed.proof, expect ? { mint: expect } : {}), parsed.commitment.t);
+    const c = Object.assign({}, parsed.commitment, { mint });
+    bsp.markFloats(c, []);
+    const r = await bsp.verifyCommitment(c, expect ? { mint: expect } : {});
+    out.hidden = false; verdict.className = 'verdict ' + (r.ok ? 'ok' : 'bad');
+    verdict.textContent = r.ok ? 'The commitment in this report is signed by its Mint.' : 'The commitment in this report does not check out.';
+    showCommitment(r, { made: parsed.commitment.t }); twrap.hidden = true;
+    onote.textContent = 'A status report carries the commitment and no proofs, so only the signature can be checked. ' + (parsed.mint || parsed.commitment.mint ? 'The NYM came from the report.' : 'The report names no Mint; the NYM is the one on this page.') + ' ' + backendLine();
+    return;
+  }
+  if (parsed.kind === 'commitment') {
+    const r = await bsp.verifyCommitment(parsed, expect ? { mint: expect } : {});
+    out.hidden = false; verdict.className = 'verdict ' + (r.ok ? 'ok' : 'bad');
+    verdict.textContent = r.ok ? 'This commitment is signed by its Mint.' : 'This commitment does not check out.';
+    showCommitment(r, { made: parsed.t }); twrap.hidden = true;
+    onote.textContent = 'A commitment alone has no settlements to check; paste the proof from bwkit prove to check its leaves. ' + backendLine();
+    return;
+  }
+  showProof(await bsp.verifyProof(text, expect ? { mint: expect } : {}));
+}
+
+function showProof(r, made) {
+  out.hidden = false;
+  if (!r.commitment) return fail(r.reason || 'malformed proof');
+  verdict.className = 'verdict ' + (r.ok ? 'ok' : 'bad');
+  const n = r.settlements.length, bad = r.settlements.filter((s) => !s.ok).length;
+  if (r.ok) verdict.textContent = 'This proof checks out: the commitment is signed by the Mint and ' + (n === 1 ? 'its one settlement is' : 'all ' + n + ' settlements are') + ' in its root.';
+  else if (!r.commitment.ok) verdict.textContent = 'This proof fails: the commitment\'s signature is not valid.';
+  else verdict.textContent = 'This proof fails: ' + plural(bad, 'settlement') + ' of ' + n + ' ' + (bad === 1 ? 'is' : 'are') + ' not in the root.';
+  showCommitment(r.commitment, { shown: r.shown, made });
+  showSettlements(r.settlements, r.commitment.root);
+  const notes = [];
+  if (r.shown !== r.count) notes.push('the document shows ' + r.shown + ' of the ' + plural(r.count, 'settlement') + ' the commitment counts');
+  if (r.settlements.some((s) => s.leafMatches === false)) notes.push('a stated leaf differs from the computed one; the verdict uses the computed leaf, as the kit does');
+  notes.push(backendLine());
+  onote.textContent = notes.join(' · ');
+}
+
+$('form').addEventListener('submit', () => { const t = doc.value.trim(); if (t) checkText(t); else fail('paste a proof document first, or load the example'); });
+$('clear').addEventListener('click', () => { doc.value = ''; out.hidden = true; doc.focus(); });
+$('example').addEventListener('click', () => { doc.value = $('example-doc').textContent.trim(); checkText(doc.value); });
+$('file').addEventListener('change', (ev) => {
+  const f = ev.target.files && ev.target.files[0]; if (!f) return;
+  f.text().then((t) => { doc.value = t; checkText(t); });
+  ev.target.value = '';
+});
+
+/* The live feed's commitment, checked against the Mint's NYM: the feed's own when it carries one, else this page's. */
+$('live').addEventListener('click', async () => {
+  const btn = $('live'), box = $('liveout'), note = $('livenote');
+  btn.disabled = true; box.textContent = '';
+  const card = el('div', 'card'); const dl = el('dl'); card.appendChild(dl); box.appendChild(card);
+  const put = (k, v) => { dl.appendChild(el('dt', null, k)); const d = el('dd'); if (typeof v === 'string') d.textContent = v; else d.appendChild(v); dl.appendChild(d); };
+  try {
+    const res = await fetch(FEED, { cache: 'no-store' });
+    if (!res.ok) throw new Error('the feed answered HTTP ' + res.status);
+    const text = await res.text();
+    const rep = bsp.parse(text);
+    const C = rep.commitment;
+    if (!C || typeof C !== 'object') throw new Error('the feed carries no commitment yet');
+    const fromFeed = rep.mint || C.mint || null;
+    const mint = fromFeed || LAB_MINT;
+    const c = Object.assign({}, C, { mint });
+    bsp.markFloats(c, []);
+    const r = await bsp.verifyCommitment(c, { mint: LAB_MINT });
+    card.className = 'card ' + (r.ok ? 'ok' : 'bad');
+    put('Hour', when(C.window) + ' ' + tz() + ' · Unix ' + C.window);
+    put('Mint', mint + (fromFeed ? ' · named by the feed' : ' · from this page; the feed names no Mint yet'));
+    put('Root', String(C.root));
+    put('Settlements', plural(C.count, 'settlement') + (C.t ? ', committed ' + hms(C.t) + ', ' + day(C.t) : ''));
+    const sig = el('span'); sig.appendChild(mark(r.ok, 'VALID', 'INVALID'));
+    sig.appendChild(document.createTextNode(r.ok ? ' · the lab Mint\'s signature over this hour, root and count' : ' · ' + r.reason));
+    put('Signature', sig);
+    put('Report', 'generated ' + hms(rep.generated_at) + ', ' + day(rep.generated_at) + ' · bwkit ' + rep.bwkit);
+    if (rep.proof && typeof rep.proof === 'object') {
+      const p = await bsp.verifyProof(rep.proof, { mint: LAB_MINT });
+      put('Proofs', (p.ok ? 'every one of the ' : 'FAIL: ') + plural(p.settlements.length, 'settlement') + (p.ok ? ' is in the root' : ' · ' + p.reason));
+      note.textContent = 'The feed carries the Mint\'s NYM and the hour\'s proofs; both were checked here. ' + backendLine();
+    } else {
+      note.textContent = (fromFeed ? 'The feed names its Mint; the signature was checked against that NYM. ' : 'The feed does not yet carry the Mint\'s NYM or the hour\'s proofs, so the signature was checked against the NYM on this page, read from bw-mint on October 18, 2026. ') + backendLine();
+    }
+  } catch (e) {
+    card.className = 'card bad';
+    put('Could not check', e.message + (e.message.includes('fetch') || e.name === 'TypeError' ? ' · the feed allows this page only at bandwidthswap.com, so a local copy cannot read it' : ''));
+  }
+  btn.disabled = false;
+});
+
+if (location.hash === '#example') $('example').click();
+</script>
+</body>
+</html>

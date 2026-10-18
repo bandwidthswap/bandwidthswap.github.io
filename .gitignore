@@ -2,3 +2,4 @@ tools/card/stock-backup/
 tools/card/*.log
 worker/.wrangler/
 worker/node_modules/
+.claude/

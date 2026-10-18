@@ -298,6 +298,7 @@ signed by payer</code></pre>
   <p class="note" id="lab-note" aria-live="polite">Loading the status feed…</p>
   <noscript><p class="note">The map and the ledger need JavaScript. The feed itself is plain JSON at <a href="https://status.bandwidthswap.com/status">status.bandwidthswap.com/status</a>.</p></noscript>
   <p>A node is <strong>up</strong> when the Mint has a receipt from it within the last 90 minutes (receipts are hourly); the Mint is up when its report is under five minutes old and its ledger service answers. A hop is <strong>idle</strong> when it is not the one the house pays and has had no receipt in that time. A <strong>disputed</strong> window is one where the two signed counts differed by more than one percent; it settles at the smaller count, like every other window. Under the Mint is its latest <strong>commitment</strong>, a signed root over the hour's settlements that anyone holding the receipts can rebuild with the kit and check. The feed carries names, roles, times and byte counts, and nothing about the networks the boards sit on.</p>
+  <p><a href="docs/verify.html">Check a proof in your browser</a>: paste a proof from the Mint's <code>bwkit prove</code> and a second implementation of the rules, sharing no code with the kit, checks the Mint's signature on the hour's root and each settlement's place in it, sending nothing anywhere.</p>
 </section>
 
 <section id="roadmap">
