@@ -10,6 +10,6 @@ Source for the Bandwidth Swap project site and whitepaper. Served by GitHub Page
 - **The kit (receipt daemon, Mint, node provisioning):** https://github.com/bandwidthswap/kit
 - **Open questions:** [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md)
 
-Edit `paper/BANDWIDTH-whitepaper-v0.6.md` (or its two readings, still `-v0.5-plain.md` and `-v0.5-operators.md` until their v0.6 edits are approved) or `OPEN-QUESTIONS.md`, run `tools/build.sh`, push. A field note is one HTML file in `notes/` plus a line in `notes/index.html` and in the Field notes section of `index.html`. Needs pandoc and python3.
+Edit `paper/BANDWIDTH-whitepaper-v0.6.md` (or its two readings, `-v0.6-plain.md` and `-v0.6-operators.md`) or `OPEN-QUESTIONS.md`, run `tools/build.sh`, push. A field note is one HTML file in `notes/` plus a line in `notes/index.html` and in the Field notes section of `index.html`. Needs pandoc and python3.
 
 For the full handoff (layout, conventions, decisions, next step) read [CLAUDE.md](CLAUDE.md). To flash the cards and bring up the three Pis, read [PHASE0-SETUP.md](PHASE0-SETUP.md). The parts, by phase and with a budget, are in [SHOPPING-LIST.md](SHOPPING-LIST.md).

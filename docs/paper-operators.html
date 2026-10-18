@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bandwidth Swap for operators</title>
 <meta name="description" content="Bandwidth Swap for
-operators. Version 0.5 (draft), for operators.">
+operators. Version 0.6 (draft), for operators.">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/latex.css@1.10.0/style.min.css">
 <style>
 body{max-width:80ch;padding-top:1.5rem}
@@ -40,8 +40,8 @@ sup{font-size:.7em}
 <body>
 <nav class="toolbar" aria-label="Paper tools">
   <span class="lead">Rendered from Markdown</span>
-  <a href="BANDWIDTH-whitepaper-v0.5-operators.md" download>Download .md</a>
-  <a href="BANDWIDTH-whitepaper-v0.5-operators.txt" download>Download .txt</a>
+  <a href="BANDWIDTH-whitepaper-v0.6-operators.md" download>Download .md</a>
+  <a href="BANDWIDTH-whitepaper-v0.6-operators.txt" download>Download .txt</a>
   <a href="BANDWIDTH-whitepaper-v0.1-original.pdf">Original 2021 PDF</a>
   <a href="../">bandwidthswap.com</a>
 </nav>
@@ -50,7 +50,7 @@ sup{font-size:.7em}
   <h1>Bandwidth Swap for operators</h1>
   <p class="authors">Robert Douglas and Chris Odom</p>
   <p class="affil"><a href="mailto:bandwidthswap@pm.me">bandwidthswap@pm.me</a></p>
-  <p class="date">October 17, 2026 · Version 0.5 (draft), for
+  <p class="date">October 18, 2026 · Version 0.6 (draft), for
 operators</p>
 </header>
 <p><em>This is the whitepaper read from the side of someone who would
@@ -63,8 +63,9 @@ machinery.</em></p>
 <h2 id="who-this-is-for">Who this is for</h2>
 <p>Anyone who would carry someone else’s bytes for payment: a neighbor
 with a radio on a ridge, a company with a relay in lunar orbit, or the
-person running the three boards on the bench today. The protocol has
-three roles, and you may run any of them.</p>
+person running four boards today, three on a bench and one at a
+neighbor’s house. The protocol has three roles, and you may run any of
+them.</p>
 <ul>
 <li>A <strong>payer</strong> opens payment windows and signs receipts
 for the bytes it paid for.</li>
@@ -151,12 +152,25 @@ notary whose own signature on what it processed is what convicts it
 (Section 4).</p>
 <h2 id="how-you-are-paid">How you are paid</h2>
 <p>A window settles at the smaller of the two signed counts, yours and
-the payer’s, times your posted price. If the counts are within one
-percent the window is settled; if they differ by more it is recorded as
-disputed and settles by the same rule, at the smaller count. You cannot
-be paid for more than the payer signed for. In the lab, a hop that
-signed for twenty-two megabytes against a payer’s 272 bytes was paid for
-272 bytes (Section 9).</p>
+the payer’s, times your posted price. If the counts are within your
+link’s agreement margin the window is settled; if they differ by more it
+is recorded as disputed and settles by the same rule, at the smaller
+count. The margin is yours to publish (Appendix A.1): set it from the
+loss your path normally has, one percent on a wire and more on a relayed
+path, so that a disputed mark means something. It changes what is
+written, never what is paid. You cannot be paid for more than the payer
+signed for. In the lab, a hop that signed for twenty-two megabytes
+against a payer’s 272 bytes was paid for 272 bytes (Section 9).</p>
+<p>You are paid for what arrived at the payer’s meter, not for what you
+sent. The tunnel’s headers and every retransmission are yours, and
+belong in your price, as freight belongs in the price of goods. On the
+first link off the bench the path lost a tenth of what the hop sent,
+every hour; a hop on such a path mends it or charges for it. The rule
+also lets a payer sign for a little less than it received, and you
+cannot tell that from the path’s loss. Publish how many windows beyond
+your margin you will serve a payer before you decline the next (Appendix
+A.1), and then do it. That is the whole remedy, and it is yours, not a
+Mint’s.</p>
 <p>Five percent of every fee goes to the Network Steward before anyone
 is paid. That is not a Mint’s cut and not a treasury: the Steward is a
 rule that can spend only by posting bounties, and it can match a bounty
@@ -215,24 +229,34 @@ gate your eligibility; the heartbeats earn nothing (Section 5).</p>
 <h2 id="disputes">Disputes</h2>
 <p>You will have them, and they resolve without you. Both signed counts
 go to the Mint; the Mint pays the smaller and marks the window disputed
-if the gap was over one percent. Anyone can reproduce the settlement
-from the two receipts; on the bench, each of the three forced disputes
-was reproduced offline from the signed copies alone. If you believe a
-Mint settled a window wrongly, your signed copy and the Mint’s published
-commitment are your case, and the Mint’s own signature is what convicts
-it. In the pilot the Mint’s bond is its standing with its members and
-your remedy is to leave with the proof; the paper says so (Section
-4).</p>
+if the gap was over your link’s margin. Anyone can reproduce the
+settlement from the two receipts; on the bench, each of the three forced
+disputes was reproduced offline from the signed copies alone. If you
+believe a Mint settled a window wrongly, your signed copy and the Mint’s
+published commitment are your case, and the Mint’s own signature is what
+convicts it. In the pilot the Mint’s bond is its standing with its
+members and your remedy is to leave with the proof; the paper says so
+(Section 4).</p>
+<h2 id="your-address">Your address</h2>
+<p>When you sell endpoint service, a payer’s traffic reaches the public
+internet under your address, and you cannot see what it is. The receipt
+chain records which payer bought the window; what you may refuse by
+destination or policy, and how to say so in your announcement, the paper
+has not written (Section 10). On the first link off the bench a public
+service refused the house’s download because it arrived through the
+neighbor’s connection. Know this before you sell to anyone you would not
+lend your connection to.</p>
 <h2 id="clocks">Clocks</h2>
 <p>The payer’s clock is authoritative, because the payer is the one
 paying. You decline a payer whose clock differs from yours by more than
 the tolerance. Five seconds is generous for a node that keeps a time
 source and fails safe for one that does not: on the bench, synchronized
-nodes agree within a millisecond, and a free-running Pi 3 gains 0.76
-seconds a day and crosses five seconds in about a week (Section 3.5). On
-a link with a light time, your tolerance is the base tolerance plus the
-light time both ways plus the drift you expect since the last contact,
-and it is yours to publish (Appendix A.3).</p>
+nodes agree within a millisecond, a free-running Pi 3 gains 0.76 seconds
+a day and crosses five seconds in about a week, and the first two sites
+on separate time sources were about a millisecond apart on their first
+night (Section 3.5). On a link with a light time, your tolerance is the
+base tolerance plus the light time both ways plus the drift you expect
+since the last contact, and it is yours to publish (Appendix A.3).</p>
 <h2 id="on-a-link-with-a-delay">On a link with a delay</h2>
 <p>The window is the contact: it opens when the link does and closes
 when it does, and the receipt is per contact. Windows are prepaid and

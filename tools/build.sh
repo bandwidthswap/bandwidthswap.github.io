@@ -7,8 +7,8 @@
 #   paper/v0.3.md vs v0.4.md            ->  docs/whitepaper-diff-v0.4.html (side-by-side, historical)
 #   paper/v0.4.md vs v0.5.md            ->  docs/whitepaper-diff-v0.5.html (side-by-side, historical)
 #   paper/v0.5.md vs v0.6.md            ->  docs/whitepaper-diff-v0.6.html (side-by-side)
-#   paper/BANDWIDTH-whitepaper-v0.5-plain.md      ->  docs/paper-plain.html (+ .md/.txt downloads; the v0.5 readings until v0.6's are approved)
-#   paper/BANDWIDTH-whitepaper-v0.5-operators.md  ->  docs/paper-operators.html (+ .md/.txt downloads)
+#   paper/BANDWIDTH-whitepaper-v0.6-plain.md      ->  docs/paper-plain.html (+ .md/.txt downloads)
+#   paper/BANDWIDTH-whitepaper-v0.6-operators.md  ->  docs/paper-operators.html (+ .md/.txt downloads)
 #   OPEN-QUESTIONS.md                   ->  docs/OPEN-QUESTIONS.md
 # Needs: pandoc, python3. Run from anywhere; then commit and push to deploy.
 set -e
@@ -64,14 +64,14 @@ render_reading() {  # <source.md> <docs basename> <title> <version>
     -M title="$title" \
     -M authors="Robert Douglas and Chris Odom" \
     -M email="bandwidthswap@pm.me" \
-    -M date="October 17, 2026" \
+    -M date="October 18, 2026" \
     -M version="$ver" \
     -M slug="$(basename "$md" .md)" \
     -o "$docs/$base.html"
   rm "$docs/.reading-body.md"
 }
-render_reading "$root/paper/BANDWIDTH-whitepaper-v0.5-plain.md" paper-plain "Bandwidth Swap, in plain words" "0.5 (draft), plain reading"
-render_reading "$root/paper/BANDWIDTH-whitepaper-v0.5-operators.md" paper-operators "Bandwidth Swap for operators" "0.5 (draft), for operators"
+render_reading "$root/paper/BANDWIDTH-whitepaper-v0.6-plain.md" paper-plain "Bandwidth Swap, in plain words" "0.6 (draft), plain reading"
+render_reading "$root/paper/BANDWIDTH-whitepaper-v0.6-operators.md" paper-operators "Bandwidth Swap for operators" "0.6 (draft), for operators"
 
 python3 -I "$root/tools/mkdiff.py" "$root/paper/BANDWIDTH-whitepaper-v0.1.md" "$v02" "$docs/whitepaper-diff.html" \
   '$BANDWIDTH whitepaper: version 0.1 to version 0.2' 'Before: v0.1, Aug 23 2021' 'After: v0.2 draft, Oct 8 2026' >/dev/null
