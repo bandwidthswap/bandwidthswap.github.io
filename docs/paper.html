@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bandwidth Swap: A Peer-to-Peer Bandwidth Exchange</title>
 <meta name="description" content="Bandwidth Swap: A Peer-to-Peer
-Bandwidth Exchange. Version 0.5 (draft).">
+Bandwidth Exchange. Version 0.6 (draft).">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/latex.css@1.10.0/style.min.css">
 <style>
 body{max-width:80ch;padding-top:1.5rem}
@@ -40,8 +40,8 @@ sup{font-size:.7em}
 <body>
 <nav class="toolbar" aria-label="Paper tools">
   <span class="lead">Rendered from Markdown</span>
-  <a href="BANDWIDTH-whitepaper-v0.5.md" download>Download .md</a>
-  <a href="BANDWIDTH-whitepaper-v0.5.txt" download>Download .txt</a>
+  <a href="BANDWIDTH-whitepaper-v0.6.md" download>Download .md</a>
+  <a href="BANDWIDTH-whitepaper-v0.6.txt" download>Download .txt</a>
   <a href="BANDWIDTH-whitepaper-v0.1-original.pdf">Original 2021 PDF</a>
   <a href="../">bandwidthswap.com</a>
 </nav>
@@ -50,7 +50,7 @@ sup{font-size:.7em}
   <h1>Bandwidth Swap: A Peer-to-Peer Bandwidth Exchange</h1>
   <p class="authors">Robert Douglas and Chris Odom</p>
   <p class="affil"><a href="mailto:bandwidthswap@pm.me">bandwidthswap@pm.me</a></p>
-  <p class="date">October 17, 2026 · Version 0.5 (draft)</p>
+  <p class="date">October 18, 2026 · Version 0.6 (draft)</p>
 </header>
 <div class="abstract">
 <p>A marketplace measured in available bandwidth has the possibility of
@@ -77,12 +77,16 @@ yet. The Steward can match a payer’s own purchases only below the
 fraction it took, so generating traffic to oneself costs more than it
 earns. It hands out no bonuses for the appearance of a network; it buys
 bandwidth on the links it wants to exist, and only against receipts.</p>
-<p>A lab of three nodes has run the receipt mechanism since October
-2026. It settles hourly windows at the smaller of two signed counts,
-resolves a forced disagreement from the receipt data alone, and declines
-a payer whose clock has drifted. What it has not yet shown is a second
-party, a subsidy that moves anyone, or a settlement layer other than an
-invoice. Those are stated as open.</p>
+<p>A lab of four nodes has run the receipt mechanism since October 2026,
+the fourth at a neighbor’s house on its own connection. It settles
+hourly windows at the smaller of two signed counts, resolves a forced
+disagreement from the receipt data alone, declines a payer whose clock
+has drifted, rebuilds the Mint’s ledger from the two parties’ signed
+copies, and has settled its first window across a relayed path, which
+taught it that the margin between two honest counts belongs to the link.
+What it has not yet shown is a second party, a subsidy that moves
+anyone, or a settlement layer other than an invoice. Those are stated as
+open.</p>
 </div>
 <h2 id="introduction">1. Introduction</h2>
 <p>Communications infrastructure growth has been historically slowed by
@@ -306,13 +310,15 @@ synchronized on one network agree within a millisecond. Left
 free-running, the fastest of their oscillators gains 0.76 seconds a day
 and crosses the tolerance in about a week; the slowest takes three
 weeks. A node that has been alone that long is declined, its window is
-lost, and nothing is paid. Drift between sites has not been measured. On
-a link with a light time, the tolerance widens by the light time both
-ways and the drift expected since the last contact; it is a parameter of
-the link (Appendix A). The payer’s timestamp is a claim, checked by the
-hop against that tolerance. The time a Mint’s commitment gives a receipt
-is a record. A receipt’s acceptance rests on the claim; its durability
-rests on the record (Appendix A.5).</p>
+lost, and nothing is paid. Between sites, the first night of the
+neighbor’s link (Section 9) put the two clocks, each on its own time
+source, about a millisecond apart; a week of samples is being taken
+(Section 10). On a link with a light time, the tolerance widens by the
+light time both ways and the drift expected since the last contact; it
+is a parameter of the link (Appendix A). The payer’s timestamp is a
+claim, checked by the hop against that tolerance. The time a Mint’s
+commitment gives a receipt is a record. A receipt’s acceptance rests on
+the claim; its durability rests on the record (Appendix A.5).</p>
 <h3 id="payment-windows">3.6 Payment windows</h3>
 <p>A payment window is one hour on the pilot’s links; on a link that
 exists only during contacts, it is the contact (Appendix A). Before the
@@ -335,17 +341,37 @@ contact that never comes into the carry on the windows that do settle,
 as maritime lenders priced the ship that did not come home into the rate
 on the ones that did (Appendix A.2).</p>
 <p>A window settles at the smaller of the two signed byte counts, the
-payer’s and the hop’s. When the two counts are within one percent of
-each other the window is recorded as settled; when they differ by more
-it is recorded as disputed and settles by the same rule. Nothing else is
-needed to resolve a dispute: no probe, no testimony, no judgement. The
-rule was chosen because each party can only lower the number the other
-party is paid or paid for, and neither gains by doing so. A hop that
-declines a receipt loses the window: its next acknowledgement covers
-both windows, and the payer’s count governs. A hop also declines a
-receipt whose timestamps disagree with what it observed by more than the
-tolerance of Section 3.5, since a payer that shortened its own window
-could otherwise claim a rate it did not get.</p>
+payer’s and the hop’s. When the two counts are within the link’s
+agreement margin the window is recorded as settled; when they differ by
+more it is recorded as disputed and settles by the same rule. The margin
+is a parameter of the link (Appendix A.1), set from the loss the path
+normally has, so that the mark means something: one percent on the
+pilot’s wire, where the counts agreed to a few hundred bytes in twenty
+megabytes, and more on a relayed path, where the first window off the
+bench disagreed by a tenth (Section 9). The margin decides what is
+written, never what is paid. Nothing else is needed to resolve a
+dispute: no probe, no testimony, no judgement. The rule was chosen
+because each party can only lower the number the other party is paid or
+paid for. The hop gains nothing by it. The payer does: a count below
+what it received is a discount, and the rule allows it. What bounds the
+discount is the hop, which declines to open another window with a payer
+whose counts fall short of its own beyond the margin more often than it
+will bear (Appendix A.1), and what hides it is the path, whose own loss
+the hop cannot tell from a lie. The protocol does not try to tell them
+apart. It lets the hop price the one and walk away from the other. A hop
+that declines a receipt loses the window: its next acknowledgement
+covers both windows, and the payer’s count governs. A hop also declines
+a receipt whose timestamps disagree with what it observed by more than
+the tolerance of Section 3.5, since a payer that shortened its own
+window could otherwise claim a rate it did not get.</p>
+<p>What is counted is what crosses the metered interface at each end:
+the bytes as the hop’s side sent them and as the payer’s side received
+them. Everything the path adds to get them there, the tunnel’s own
+headers and every retransmission, is the hop’s cost and is in its price,
+as freight is in the price of goods. A relay whose path loses a tenth of
+what it sends is paid for nine tenths, and either mends the path or
+charges for the tenth. The payer pays for what arrived and nothing else,
+which is Section 3.2 again.</p>
 <p>Streaming payments per chunk, which interactive traffic would need,
 are not in the pilot, which carries bulk traffic settled by the
 hour.</p>
@@ -373,6 +399,13 @@ the payer bond age in Section 5.</li>
 payer’s count. Measured in the lab: a hop that signed for twenty-two
 megabytes against a payer who signed for 272 bytes was paid for 272
 bytes.</li>
+<li><strong>A hop that pads.</strong> Bytes the payer never asked for,
+delivered to its meter and counted as received, which over-claiming is
+not. The bound is the lock of Section 3.6: a padding hop is paid at most
+one window’s value before the payer signs for what it wanted, which its
+signature allows, and opens no further window with that hop. The pilot’s
+payer signs whatever its meter counted, so on the bench the lock is the
+only bound.</li>
 </ul>
 <h3 id="alternatives-considered">3.8 Alternatives considered</h3>
 <ul>
@@ -788,13 +821,38 @@ one hop. Any subsidy, since there is no Steward. Any adversary, since
 one person operates all three nodes. It showed that the receipt
 mechanism works between machines that are not trusted to agree, which is
 the part a whitepaper cannot show on paper.</p>
-<p><strong>What Phase 0 does next.</strong> Two tests that Section 4
-depends on, and that Phase 2 needs before a second operator signs
-anything, have not run: rebuild the Mint’s ledger from the payer’s and
-the hop’s signed copies alone, and publish each hour’s Merkle commitment
-in the status the Mint already posts. The installations beyond the
-bench, from a neighbor across a valley to a link between stars, can be
-emulated on the same three boards with a delay on the tunnel and a
+<p><strong>Phase 0, continued (October 17 and 18).</strong> The two
+tests that Section 4 depends on, and that Phase 2 needs before a second
+operator signs anything, ran on the bench and passed: the Mint publishes
+a signed Merkle commitment for each hour in the status it already posts
+and answers with a proof for any receipt in it, and its ledger was
+rebuilt from the payer’s and the hop’s signed copies alone, 37
+settlements including the two forced disputes, and matched the Mint’s
+own ledger and commitment. Then a fourth board left the bench: a relay
+at a neighbor’s house, on the neighbor’s own connection and its own time
+source, reached from the house over a tunnel that a third party’s server
+relays, since neither end can accept a connection, with a round trip of
+about 87 milliseconds. The house buys a hundred megabytes an hour
+through it. The first window settled as a dispute: the payer signed
+21.99 megabytes, the hop 24.12, and the window settled at the payer’s
+count. The gap is the path’s. A ten-megabyte purchase measured at both
+ends crossed the tunnel as 10.65 megabytes received and 11.73 sent, the
+retransmissions of a relayed path, so under the bench’s one-percent
+margin every window on this link is marked disputed, which is why
+Section 3.6 now makes the margin a parameter of the link. The first full
+purchase moved 104,857,600 bytes in 230 seconds, about 3.6 megabits a
+second, through a 2.4 GHz Wi-Fi, a satellite uplink and the relay. The
+two clocks were about a millisecond apart. One thing the paper had not
+anticipated appeared on the first purchase: a public service that had
+served the same download to the house refused it when it came through
+the neighbor’s connection, which is Section 10’s attribution item. And
+the server relaying the tunnel is a carrier the protocol does not see
+and does not pay; in the protocol it would hold receipts of its own, and
+part of the loss measured here is its.</p>
+<p><strong>What this is not.</strong> The neighbor hosts the board and
+one person still operates all four, so it is not the second party. The
+installations beyond the bench, from a valley to a link between stars,
+can be emulated on the same boards with a delay on the tunnel and a
 schedule for the link; what each would show is set down in the project’s
 notes on example installations, and none of it has run.</p>
 <p><strong>Phase 1</strong> replaces the bench cable between the gateway
@@ -805,7 +863,7 @@ connection returns, which is the claim in Section 1. <strong>Phase
 2</strong> puts the relay outdoors on its own power and, with it, a
 second operator who is not the authors, which is the success criterion
 above.</p>
-<h2 id="what-version-0.4-leaves-open">10. What version 0.4 leaves
+<h2 id="what-version-0.6-leaves-open">10. What version 0.6 leaves
 open</h2>
 <ul>
 <li><strong>Whether a bounded match moves anyone.</strong> With
@@ -850,6 +908,16 @@ replacement by bond age and diversity.</li>
 <li><strong>Open relays.</strong> Relay service is between members.
 Carrying third-party traffic for the public internet raises liability
 the paper does not address, and is not in the pilot.</li>
+<li><strong>Attribution.</strong> Endpoint service (Section 5) puts a
+payer’s traffic on the public internet under the relay’s address, and
+the relay cannot see what it carries. The receipt chain records which
+payer bought the window, so the record exists. What a relay may refuse
+by destination or by policy, how it says so in its announcement (Section
+6), and what the record is worth to anyone outside the membership are
+not written. The first purchase across the neighbor’s link met this on
+its first try: a public service that had served the same download to the
+house all evening refused it when it arrived through the neighbor’s
+connection, and the link itself was never at fault (Section 9).</li>
 <li><strong>The token</strong>, its status, and the Steward’s legal
 form, deferred until there is traffic to denominate, and all to be
 reviewed with counsel against the rules in force then. The unit question
@@ -858,8 +926,10 @@ Appendix A.5 names the three answers; which one a given bridge uses is
 the bridge’s to announce. The token question is separate from the fee:
 version 0.5 creates and destroys nothing, which lets the books close in
 dollars, and that is not a peg (Section 2).</li>
-<li><strong>Clock drift between sites</strong>, measured once the relay
-leaves the bench.</li>
+<li><strong>Clock drift between sites.</strong> The relay has left the
+bench (Section 9), and the two sites’ clocks, each on its own time
+source, are sampled every ten minutes. The first night’s reading is
+about a millisecond; the number that belongs here is a week’s.</li>
 <li><strong>The levels.</strong> Version 0.4 says what the carry is for,
 what custody costs and what a bridge relay’s two bonds do; it does not
 know the numbers. How large the bonds must be relative to what a bridge
@@ -905,17 +975,20 @@ which is when the link exists, for how long, the bytes it expects to
 carry in each contact, and how long it holds a bundle between contacts;
 its posted price per byte and the unit it is posted in; its carry, the
 price per unit of time that a window’s value stays locked (Section 3.6);
-its clock tolerance; the kind of window it accepts, an hour, a contact,
-or a transmission; its medium and range class, a wire, a point-to-point
-radio, LoRa, or a short-range hotspot; the signature scheme its receipts
-use and how long a receipt stays presentable to a Mint; and the
-settlement domain it settles in, which is the Mint that holds its bond.
-A payer that opens a window accepts those parameters for that window.
-Nothing in them is trusted for payment. The receipt graph records what
-each announced contact actually settled, and a relay whose contacts
-persistently settle less than it announced ranks below one whose
-contacts match, exactly as Section 6 ranks announcements on a continuous
-link.</p>
+its clock tolerance; its agreement margin, the disagreement between the
+two signed counts that it treats as the path’s own loss rather than a
+dispute (Section 3.6), and how many windows disputed beyond that margin
+it will serve a payer before declining the next; the kind of window it
+accepts, an hour, a contact, or a transmission; its medium and range
+class, a wire, a point-to-point radio, LoRa, or a short-range hotspot;
+the signature scheme its receipts use and how long a receipt stays
+presentable to a Mint; and the settlement domain it settles in, which is
+the Mint that holds its bond. A payer that opens a window accepts those
+parameters for that window. Nothing in them is trusted for payment. The
+receipt graph records what each announced contact actually settled, and
+a relay whose contacts persistently settle less than it announced ranks
+below one whose contacts match, exactly as Section 6 ranks announcements
+on a continuous link.</p>
 <p><strong>A.2 Windows and custody.</strong> On a link with a contact
 plan the window is the contact: it opens when the link does, closes when
 it does, and the receipt is per contact. The window is prepaid (Section
