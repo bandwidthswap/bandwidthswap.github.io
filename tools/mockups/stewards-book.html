@@ -1,0 +1,194 @@
+<title>The Steward's Book</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the site's own look (bandwidthswap.com tokens), one column: the rule, the balances as a ledger strip, the open offers as cards, then the tables. Display face for headings, serif for prose, mono for money. */
+:root{
+  --bg:#f2f4f0; --panel:#fbfcfa; --fg:#182019; --muted:#5d685f; --line:#d5dbd4;
+  --accent:#1d6a58; --accent-ink:#ffffff; --signal:#b9561c; --code-bg:#e9ede7;
+  --paying:#1d6a58; --open:#2b5f9e; --standing:#7a7f7a;
+  --display:"IBM Plex Sans Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --body:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#121715; --panel:#181f1c; --fg:#e6ebe6; --muted:#9aa89e; --line:#2a3430;
+  --accent:#5fc3a6; --accent-ink:#0f1a16; --signal:#e8955a; --code-bg:#1f2824;
+  --paying:#5fc3a6; --open:#7fb0ea; --standing:#8a938c; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#121715; --panel:#181f1c; --fg:#e6ebe6; --muted:#9aa89e; --line:#2a3430;
+  --accent:#5fc3a6; --accent-ink:#0f1a16; --signal:#e8955a; --code-bg:#1f2824;
+  --paying:#5fc3a6; --open:#7fb0ea; --standing:#8a938c; color-scheme:dark }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.55}
+.wrap{max-width:980px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.mock{background:var(--signal);color:#fff;border-radius:6px;padding:8px 14px;font-family:var(--display);font-weight:600;letter-spacing:.02em;margin:0 0 22px}
+.mock b{font-weight:700}
+.brand{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+h1{font-family:var(--display);font-weight:700;font-size:44px;line-height:1.05;margin:0 0 10px;letter-spacing:-.01em;text-wrap:balance}
+h2{font-family:var(--display);font-weight:700;font-size:26px;margin:40px 0 12px;letter-spacing:-.005em;text-wrap:balance}
+.eyebrow{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:0 0 4px}
+p{margin:0 0 12px;max-width:68ch}
+.rule{font-size:19px;max-width:70ch}
+.params{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0;padding:0;list-style:none}
+.params li{font-family:var(--mono);font-size:13px;background:var(--code-bg);border-radius:4px;padding:4px 9px}
+.params li b{font-weight:500;color:var(--muted)}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:16px 0 8px}
+.strip div{background:var(--panel);padding:12px 14px;min-width:0}
+.strip .k{font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block}
+.strip .v{font-family:var(--mono);font-size:24px;font-variant-numeric:tabular-nums;display:block;margin-top:2px}
+.strip .s{font-size:13px;color:var(--muted);display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:12px 0 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px 14px;min-width:0;display:flex;flex-direction:column;gap:8px}
+.card h3{font-family:var(--display);font-weight:700;font-size:21px;margin:0;line-height:1.15;text-wrap:balance}
+.badge{align-self:flex-start;font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:3px 10px;color:#fff}
+.badge.paying{background:var(--paying);color:var(--accent-ink)} .badge.open{background:var(--open)} .badge.standing{background:var(--standing)}
+.card dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:4px 0;font-size:15px}
+.card dt{color:var(--muted);font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;align-self:baseline}
+.card dd{margin:0;font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums;min-width:0;overflow-wrap:anywhere}
+.card .how{font-size:15px;margin:0;border-top:1px solid var(--line);padding-top:8px}
+.card .how b{font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:block}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel);margin:12px 0 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;white-space:nowrap}
+th{font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+tbody tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+td.t{white-space:normal;min-width:16ch}
+tr.sum td{font-weight:600;border-top:2px solid var(--line)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+pre{background:var(--code-bg);border-radius:8px;padding:14px 16px;font-family:var(--mono);font-size:13px;line-height:1.5;overflow-x:auto;margin:10px 0 0;min-width:0}
+.note{font-size:15px;color:var(--muted);max-width:72ch}
+.foot{border-top:1px solid var(--line);margin-top:44px;padding-top:16px}
+</style>
+
+<div class="wrap">
+  <p class="mock"><b>Mockup.</b> The balances are the lab's real fees to date; the offers and payouts are what the rule would post on them, worked by hand. The built page draws the live feed.</p>
+  <p class="brand">Bandwidth<span>Swap</span> · Lab</p>
+  <h1>The Steward's book</h1>
+  <p class="rule">The Network Steward is a rule, not a party. Five percent of every fee comes here, and it leaves only one way: as prepaid offers to buy bandwidth on links the network wants, paid out against settled receipts and refunded on shortfall. Nobody holds it, nobody votes on it, and no payer can get back more of it than it paid in.</p>
+  <ul class="params">
+    <li><b>f</b> 5% of every fee</li><li><b>m</b> match up to 4%</li><li><b>cap</b> f − 1% per payer</li><li><b>program window</b> 168 windows</li><li><b>first link</b> $1.00 standing</li><li><b>domain</b> earth · USD · bw-mint</li>
+  </ul>
+
+  <h2>Balances</h2>
+  <p class="note">Amounts in cents. The pilot settles in dollars by monthly invoice; the Steward's escrow is a line on that invoice, not money in an account. Since Oct 16, 2026, 41 windows, 4.19¢ paid for carriage.</p>
+  <div class="strip">
+    <div><span class="k">Income</span><span class="v">0.210¢</span><span class="s">f of 4.19¢ in fees</span></div>
+    <div><span class="k">In open offers</span><span class="v">0.202¢</span><span class="s">two postings</span></div>
+    <div><span class="k">Match reserve</span><span class="v">0.000¢</span><span class="s">m of income, all matched</span></div>
+    <div><span class="k">Paid out</span><span class="v">0.008¢</span><span class="s">against receipts</span></div>
+    <div><span class="k">Returned</span><span class="v">0.000¢</span><span class="s">to the Steward's escrow</span></div>
+    <div><span class="k">Held by the cap</span><span class="v">0.000¢</span><span class="s">payouts the cap stopped</span></div>
+  </div>
+
+  <h2>Open offers</h2>
+  <p class="note">An offer pays whoever carries the route, against receipts, at the premium above the relay's posted price. Each card says who can collect it, and whether anyone on the lab can.</p>
+  <div class="cards">
+    <article class="card">
+      <span class="badge paying">Paying</span>
+      <h3>Keep next-door in use</h3>
+      <dl>
+        <dt>Posted by</dt><dd>bw-house (payer) · matched by the Steward</dd>
+        <dt>Route</dt><dd>house → next-door</dd>
+        <dt>Terms</dt><dd>≥ 50 MB a window · 2.0¢/GB premium · 168 windows · until Oct 25</dd>
+        <dt>Escrow</dt><dd>100.000¢ from bw-house + 0.008¢ match</dd>
+        <dt>So far</dt><dd>2 windows paid · 1 short, 0.025¢ returned</dd>
+      </dl>
+      <p class="how"><b>Who collects</b> bw-neighbor, on every window it carries for bw-house at or above the minimum. The match is small because the rule caps it at m of the Steward's whole income, which is 0.21¢.</p>
+    </article>
+    <article class="card">
+      <span class="badge open">Open</span>
+      <h3>First link to the cabin</h3>
+      <dl>
+        <dt>Posted by</dt><dd>the Steward · program 3, first link</dd>
+        <dt>Route</dt><dd>any → the cabin (mapped, no link yet)</dd>
+        <dt>Terms</dt><dd>5.0¢/GB premium · renewed weekly until a receipt settles</dd>
+        <dt>Escrow</dt><dd>0.012¢ now, growing with income toward $1.00</dd>
+      </dl>
+      <p class="how"><b>Who collects</b> the first relay to settle a receipt on a link to the cabin. On the lab that is bw-forest moved out to the cabin's place on a radio, which is Phase 1. Nobody has to ask; the offer is standing.</p>
+    </article>
+    <article class="card">
+      <span class="badge standing">Standing · not collectible yet</span>
+      <h3>A second path around house ⇄ next-door</h3>
+      <dl>
+        <dt>Posted by</dt><dd>the Steward · program 2, second bridge</dd>
+        <dt>Route</dt><dd>house → next-door, not via house or next-door</dd>
+        <dt>Terms</dt><dd>0.5¢/GB premium · 168 windows · until Oct 25</dd>
+        <dt>Escrow</dt><dd>0.190¢, f of the 3.75¢ the sole link carried this week</dd>
+      </dl>
+      <p class="how"><b>Who collects</b> a relay carrying between the two houses through a third mapped place. The lab has no third place, so this offer waits; its money came from the sole link's own fees, and the only way to get it back is to build the second path.</p>
+    </article>
+  </div>
+
+  <h2>Payouts</h2>
+  <p class="note">Each row is one settled window that an offer applied to. The premium is paid in proportion to delivery over the minimum; the rest of that window's premium goes back to the poster.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Window</th><th>Payer → hop</th><th class="n">Settled</th><th class="n">Rate</th><th>Offer</th><th class="n">Premium</th><th class="n">From poster</th><th class="n">From Steward</th><th class="n">Returned to poster</th></tr></thead>
+    <tbody>
+      <tr><td>Oct 18 00:00</td><td>bw-house → bw-neighbor</td><td class="n">21.99 MB</td><td class="n">44% of min</td><td class="t">Keep next-door in use</td><td class="n">0.019¢</td><td class="n">0.019¢</td><td class="n">0.000¢</td><td class="n">0.025¢</td></tr>
+      <tr><td>Oct 18 01:00</td><td>bw-house → bw-neighbor</td><td class="n">117.43 MB</td><td class="n">above min</td><td class="t">Keep next-door in use</td><td class="n">0.235¢</td><td class="n">0.235¢</td><td class="n">0.000¢</td><td class="n">0.000¢</td></tr>
+      <tr><td>Oct 18 02:00</td><td>bw-house → bw-neighbor</td><td class="n">104.86 MB</td><td class="n">above min</td><td class="t">Keep next-door in use</td><td class="n">0.210¢</td><td class="n">0.202¢</td><td class="n">0.008¢</td><td class="n">0.000¢</td></tr>
+      <tr class="sum"><td colspan="5">Three windows</td><td class="n">0.464¢</td><td class="n">0.456¢</td><td class="n">0.008¢</td><td class="n">0.025¢</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="two">
+    <section>
+      <h2>Where the income came from</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>Link</th><th class="n">Windows</th><th class="n">Carried</th><th class="n">Paid</th><th class="n">Fee (f)</th></tr></thead>
+        <tbody>
+          <tr><td class="t">house → house, the bench wire (one place)</td><td class="n">38</td><td class="n">44.33 MB</td><td class="n">0.442¢</td><td class="n">0.022¢</td></tr>
+          <tr><td class="t">house → next-door, the neighbor's link</td><td class="n">3</td><td class="n">375.19 MB</td><td class="n">3.752¢</td><td class="n">0.188¢</td></tr>
+          <tr class="sum"><td>Since Oct 16</td><td class="n">41</td><td class="n">419.52 MB</td><td class="n">4.194¢</td><td class="n">0.210¢</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section>
+      <h2>The map</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>Place</th><th>Medium</th><th>Range</th><th>Linked</th></tr></thead>
+        <tbody>
+          <tr><td>house</td><td>wire, Wi-Fi</td><td>building</td><td>yes · bench, next-door</td></tr>
+          <tr><td>next-door</td><td>2.4 GHz Wi-Fi</td><td>building</td><td>yes · house</td></tr>
+          <tr><td>the cabin</td><td>915 MHz</td><td>hill</td><td>no · first-link offer open</td></tr>
+        </tbody>
+      </table></div>
+      <p class="note" style="margin-top:10px">Domain earth, unit USD, Mint bw-mint. Places are accepted into the map by the membership (one Mint, one file). A link inside one place, like the bench wire, has no second bridge to post for.</p>
+    </section>
+  </div>
+
+  <h2>What the operator sees</h2>
+  <div class="two">
+    <section>
+      <p class="note">On bw-mint, after each hour's commitment:</p>
+<pre>$ sudo -u bwkit bwkit steward book
+Steward ed25519:…K4oQ  domain earth (USD)  f 5%  m 4%
+income     0.00210  escrow 0.00000  reserve 0.00000
+posted     0.00202  paid   0.00008  returned 0.00000  held 0.00000
+open
+  pur-7f3a  payer   bw-house → bw-neighbor  ≥50MB  2.0¢/GB  165 left  1.00000 + 0.00008
+  pur-9c01  first   * → the cabin          5.0¢/GB  standing  0.00012
+  pur-b2d4  bridge  house → next-door !via house,next-door  0.5¢/GB  168 left  0.00190
+last run  2026-10-18 03:00  posted nothing new: income since 02:00 was 0.00011</pre>
+    </section>
+    <section>
+      <p class="note">The record a payer signs to post an offer (`bwkit purchase post`):</p>
+<pre>{"kind": "purchase", "proto": 1,
+ "id": "pur-7f3a", "program": "payer",
+ "poster": "ed25519:…eY42wSx0",
+ "route": {"from": "ed25519:…eY42wSx0",
+           "to": "ed25519:…Z-tE7IoY", "not_via": []},
+ "min_bytes": 50000000, "premium_per_gb": 0.02,
+ "windows": 168, "deadline": 1792900800,
+ "proving": null, "escrow": 1.00, "unit": "USD",
+ "posted_at": 1792296000, "sig": "…"}</pre>
+    </section>
+  </div>
+
+  <div class="foot">
+    <p class="note">What is real here: the 41 windows, the bytes, the 4.19¢ paid and the 0.21¢ that would be the Steward's at five percent. What is worked by hand: the three offers, their sizes, the match and the payouts, computed by the paper's rule over those numbers. What the lab cannot do yet: collect the second-bridge offer, since it has no third place; that is the program working as written, not a fault.</p>
+    <p class="note">At a street's scale the same page reads differently: a hundred homes buying a gigabyte a day at ten cents pay $10 a day for carriage, the Steward's share is fifty cents a day, and a sole bridge carrying it all would see a $3.50 bounty for its competitor posted every week.</p>
+  </div>
+</div>

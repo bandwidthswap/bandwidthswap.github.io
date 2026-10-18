@@ -89,7 +89,9 @@ async function runDir(dir) {
   for (const env of ['receipt.json', 'ack.json']) {
     if (!names.includes(env)) continue;
     const e = bsp.parse(readFileSync(join(dir, env), 'utf8'));
-    check(env + ' is signed by its sender', await bsp.verifyReceipt(e.from, e.receipt, e.sig));
+    // The signer is the NYM inside the tuple (the payer for a receipt, the hop for an ack); `from` is only a name.
+    const signer = env === 'ack.json' ? e.receipt.hop : e.receipt.payer;
+    check(env + ' is signed by its sender', await bsp.verifyReceipt(signer, e.receipt, e.sig));
   }
   const mustFail = (f) => /tampered|\.bad\b|bad\./.test(f);
   const isProof = (f) => f === 'proof.json' || f.endsWith('.proof.json') || /^proof-.*\.json$/.test(f);
