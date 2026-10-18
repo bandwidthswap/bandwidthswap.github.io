@@ -76,31 +76,35 @@ figcaption{font-size:14px;color:var(--muted);margin-top:6px;max-width:65ch}
 .phases li{display:grid;grid-template-columns:90px minmax(0,1fr);gap:12px;padding:10px 0;border-top:1px dashed var(--line)}
 .phases .ph{font:600 13px/1.4 var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
 .phases .ph small{display:block;color:var(--muted);font:400 12px/1.3 var(--mono);text-transform:none;letter-spacing:0}
-/* Lab status: a map of the bench over its ledger. Cards, lines and bars are plain elements, so the tokens apply in both themes. */
+/* Lab status: a map of the bench over its ledger, drawn from the nodes the feed lists. Cards, lines and bars are plain elements, so the tokens apply in both themes. */
 .lab-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px 24px;flex-wrap:wrap}
 .lab-head>div{min-width:0;flex:1 1 420px}
 .lab-sum{margin:6px 0 0;text-align:right;font:500 12px/1.6 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);white-space:nowrap;max-width:none}
 .lab-sum .m{color:var(--muted)}.lab-sum.off{color:var(--signal)}
-.lab-map{position:relative;height:300px;margin:4px 0 18px}
+.lab-map{position:relative;height:var(--map-h,320px);margin:4px 0 18px}
 .lab .node{position:absolute;width:200px;min-height:92px;box-sizing:border-box;padding:10px 14px;display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font:400 14px/1.35 var(--body)}
 .lab .node b{font:700 18px/1.2 var(--display)}
-.lab .node .st{font:500 11px/1.4 var(--mono);letter-spacing:.04em;color:var(--muted)}
+.lab .node .st{font:500 11px/1.4 var(--mono);letter-spacing:.02em;color:var(--muted)}
 .lab .node .dot{width:14px;height:14px;border-radius:50%;flex:none;box-sizing:border-box;border:2px solid var(--muted)}
 .lab .node.up .dot{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 18%,transparent)}
 .lab .node.up .st{color:var(--accent)}
 .lab .node.stale .dot,.lab .node.down .dot{background:var(--signal);border-color:var(--signal)}
 .lab .node.stale .st,.lab .node.down .st{color:var(--signal)}
-.lab .node.house{left:0;top:20px}.lab .node.forest{right:0;top:20px}.lab .node.mint{left:50%;top:196px;width:260px;margin-left:-130px;border-color:var(--accent)}
+.lab .node.payer{left:0}.lab .node.hop{right:0}.lab .node.mint{left:50%;width:260px;margin-left:-130px;border-color:var(--accent)}
+.lab .node.quiet{width:170px;min-height:0;padding:8px 10px;gap:10px;border-style:dashed;color:var(--muted)}
+.lab .node.quiet b{font-size:15px}.lab .node.quiet .role{font-size:12px}.lab .node.quiet .st{letter-spacing:0}.lab .node.quiet .dot{width:12px;height:12px}
+.lab .node.idle .dot{border-color:var(--line)}
 .lab .ln{position:absolute;background:var(--muted)}
 .lab .ln.tunnel{left:200px;right:200px;top:62px;height:6px;border-radius:3px;background:var(--accent)}
-.lab .ln.drop{top:112px;width:2px;height:130px}.lab .ln.drop.l{left:99px}.lab .ln.drop.r{right:99px}
-.lab .ln.arrow{top:241px;height:2px}.lab .ln.arrow.l{left:99px;right:calc(50% + 134px)}.lab .ln.arrow.r{right:99px;left:calc(50% + 134px)}
+.lab .ln.drop{top:112px;width:2px;height:130px}.lab .ln.drop.l{left:186px}.lab .ln.drop.r{right:186px}
+.lab .ln.arrow{top:241px;height:2px}.lab .ln.arrow.l{left:186px;right:calc(50% + 134px)}.lab .ln.arrow.r{right:186px;left:calc(50% + 134px)}
 .lab .head{position:absolute;top:237px;width:10px;height:10px;color:var(--muted)}.lab .head.l{right:calc(50% + 130px)}.lab .head.r{left:calc(50% + 130px);transform:scaleX(-1)}
 .lab .lbl{position:absolute;font:400 13px/16px var(--mono);color:var(--muted);text-align:center;white-space:nowrap}
 .lab .lbl.ta{left:200px;right:200px;top:38px;font-weight:500;color:var(--accent)}
 .lab .lbl.tb{left:200px;right:200px;top:78px}
-.lab .lbl.la{left:112px;top:169px;text-align:left}.lab .lbl.lb{right:112px;top:169px;text-align:right}
-.lab .pulse{position:absolute;left:95px;top:107px;width:10px;height:10px;border-radius:50%;background:var(--accent);opacity:0;pointer-events:none}
+.lab .lbl.la{left:196px;top:169px;text-align:left}.lab .lbl.lb{right:196px;top:169px;text-align:right}
+.lab .lbl.cm{left:0;right:0;top:296px}
+.lab .pulse{position:absolute;left:181px;top:107px;width:10px;height:10px;border-radius:50%;background:var(--accent);opacity:0;pointer-events:none}
 .lab-ledger{display:grid;grid-template-columns:140px repeat(12,minmax(0,1fr));gap:6px;align-items:end;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px 12px;min-width:640px}
 .lab-ledger:empty{display:none}
 .lab-ledger .rl{height:64px;display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:0}
@@ -114,10 +118,10 @@ figcaption{font-size:14px;color:var(--muted);margin-top:6px;max-width:65ch}
 .lab-ledger .hl{font:400 11px/1.4 var(--mono);color:var(--muted);text-align:center}.lab-ledger .hl.now{color:var(--accent)}.lab-ledger .hl.first{text-align:left;white-space:nowrap}
 .lab-legend{display:flex;justify-content:space-between;gap:6px 24px;flex-wrap:wrap;font:400 12px/1.5 var(--mono);color:var(--muted);max-width:none;margin:0 0 14px}
 .lab-legend .sw{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:middle;background:repeating-linear-gradient(45deg,var(--signal) 0 2px,var(--panel) 2px 4px);border:1px solid var(--signal)}
-.lab-legend .up{color:var(--accent)}.lab-legend .stale{color:var(--signal)}
+.lab-legend .up{color:var(--accent)}.lab-legend .stale{color:var(--signal)}.lab-legend .idle{color:var(--muted)}
 .lab .note{font:400 13px/1.5 var(--mono);color:var(--muted);margin:10px 0 8px;max-width:none}
-@media (max-width:1000px){.lab-map{height:auto;display:flex;flex-direction:column;gap:10px}.lab .node,.lab .node.mint{position:static;width:100%;min-height:0;margin:0}.lab .node.house{order:1}.lab .lbl.ta{order:2}.lab .lbl.tb{order:3;margin-top:-6px}.lab .node.forest{order:4}.lab .node.mint{order:5}
-.lab .ln,.lab .head,.lab .pulse,.lab .lbl.la,.lab .lbl.lb{display:none}.lab .lbl.ta,.lab .lbl.tb{position:static;text-align:left;white-space:normal}.lab-sum{text-align:left}}
+@media (max-width:1000px){.lab-map{height:auto;display:flex;flex-direction:column;gap:10px}.lab .node,.lab .node.mint,.lab .node.quiet{position:static;width:100%;min-height:0;margin:0}
+.lab .ln,.lab .head,.lab .pulse,.lab .lbl.la,.lab .lbl.lb{display:none}.lab .lbl.ta,.lab .lbl.tb,.lab .lbl.cm{position:static;text-align:left;white-space:normal}.lab .lbl.tb,.lab .lbl.cm{margin-top:-6px}.lab-sum{text-align:left}}
 .callout{border-left:3px solid var(--signal);padding:4px 0 4px 14px;margin:0 0 16px;max-width:65ch}
 .callout p{margin-bottom:8px}
 .contact{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 14px}
@@ -282,30 +286,18 @@ signed by payer</code></pre>
 <section id="lab" class="lab">
   <div class="lab-head">
     <div>
-      <p class="eyebrow">Phase 0, on the bench</p>
+      <p class="eyebrow">Phase 0, on the bench and next door</p>
       <h2>Lab status</h2>
-      <p>Three Raspberry Pi 3 B boards on a bench, on one home network, running <a href="https://github.com/bandwidthswap/kit">the kit</a>. At the top of every hour <code>bw-house</code> signs a receipt for the bytes that crossed the tunnel, <code>bw-forest</code> answers with its own count, and <code>bw-mint</code> settles the window at the smaller of the two. Every two minutes the Mint posts a summary of its ledger; the map and the ledger below are that summary. Nothing on the bench accepts a connection from the internet.</p>
+      <p>Four Raspberry Pi 3 B boards running <a href="https://github.com/bandwidthswap/kit">the kit</a>. Three sit on a bench at the house, on one home network. The fourth, <code>bw-neighbor</code>, is at a neighbor's house, reached over a tailnet, and since October 18 it is the hop the house pays: <code>bw-house</code> buys 100 MB an hour through it, signs a receipt for the bytes that crossed, <code>bw-neighbor</code> answers with its own count, and <code>bw-mint</code> settles the window at the smaller of the two. Those windows settle as disputes, at the payer's count: a relayed path counts retransmissions, so the hop's count runs about ten percent above the payer's, past the one percent margin that was set on a wired bench and is recorded in <a href="docs/OPEN-QUESTIONS.md">the backlog</a> as B11. <code>bw-forest</code>, the bench hop, stays installed and idle. Every two minutes the Mint posts a summary of its ledger; the map and the ledger below are that summary. No node accepts a connection from the internet.</p>
     </div>
     <p class="lab-sum" id="lab-sum" aria-live="polite"><span class="k">loading</span><br><span class="m">status feed</span></p>
   </div>
-  <div class="lab-map" id="lab-map" role="img" aria-label="bw-house and bw-forest joined by the WireGuard tunnel, both sending hourly receipts down to bw-mint, which settles each window at the smaller count">
-    <div class="node house" data-node="bw-house"><span class="dot"></span><span class="txt"><b>bw-house</b><br><span class="role">gateway, payer</span><br><span class="st">NO DATA</span></span></div>
-    <div class="node forest" data-node="bw-forest"><span class="dot"></span><span class="txt"><b>bw-forest</b><br><span class="role">relay, hop</span><br><span class="st">NO DATA</span></span></div>
-    <div class="node mint" data-node="bw-mint"><span class="dot"></span><span class="txt"><b>bw-mint</b><br><span class="role">settles at the smaller count</span><br><span class="st">NO DATA</span></span></div>
-    <div class="ln tunnel"></div>
-    <div class="lbl ta" id="lab-tunnel">WireGuard tunnel · — this window</div>
-    <div class="lbl tb" id="lab-total">— since the bench came up</div>
-    <div class="ln drop l"></div><div class="ln arrow l"></div><svg class="head l" viewBox="0 0 10 10" aria-hidden="true"><path d="M0 0L10 5L0 10z" fill="currentColor"/></svg>
-    <div class="ln drop r"></div><div class="ln arrow r"></div><svg class="head r" viewBox="0 0 10 10" aria-hidden="true"><path d="M0 0L10 5L0 10z" fill="currentColor"/></svg>
-    <div class="lbl la">signed receipt, hourly</div>
-    <div class="lbl lb">own count, hourly</div>
-    <span class="pulse" aria-hidden="true"></span>
-  </div>
-  <div class="tablewrap"><div class="lab-ledger" id="lab-ledger" role="table" aria-label="The ledger: one row per node, one column per hourly window of the last twelve hours"></div></div>
-  <p class="lab-legend"><span><span class="up">●</span> up: receipt within 90 min &nbsp; <span class="stale">●</span> stale &nbsp; <span class="sw"></span> disputed, settled at the smaller count</span><span>empty: no receipt · bars are log scale</span></p>
+  <div class="lab-map" id="lab-map" role="img" aria-label="The nodes the Mint reports: the payer, the hop it pays over the tunnel, any idle hop, and the Mint below, which settles each window at the smaller count"></div>
+  <div class="tablewrap"><div class="lab-ledger" id="lab-ledger" role="table" aria-label="The ledger: one row per node with windows in the last twelve hours, one column per hour"></div></div>
+  <p class="lab-legend"><span><span class="up">●</span> up: receipt within 90 min &nbsp; <span class="stale">●</span> stale &nbsp; <span class="idle">○</span> idle: a hop not in use &nbsp; <span class="sw"></span> disputed: the two counts differed by more than one percent; settled at the smaller</span><span>empty: no receipt · bars are log scale</span></p>
   <p class="note" id="lab-note" aria-live="polite">Loading the status feed…</p>
   <noscript><p class="note">The map and the ledger need JavaScript. The feed itself is plain JSON at <a href="https://status.bandwidthswap.com/status">status.bandwidthswap.com/status</a>.</p></noscript>
-  <p>A node is <strong>up</strong> when the Mint has a receipt from it within the last 90 minutes (receipts are hourly); the Mint is up when its report is under five minutes old and its ledger service answers. A <strong>disputed</strong> window is one where the two signed counts differed by more than 1%; it settles at the smaller count, like every other window. The feed carries names, roles, times and byte counts, and nothing about the network the boards sit on.</p>
+  <p>A node is <strong>up</strong> when the Mint has a receipt from it within the last 90 minutes (receipts are hourly); the Mint is up when its report is under five minutes old and its ledger service answers. A hop is <strong>idle</strong> when it is not the one the house pays and has had no receipt in that time. A <strong>disputed</strong> window is one where the two signed counts differed by more than one percent; it settles at the smaller count, like every other window. Under the Mint is its latest <strong>commitment</strong>, a signed root over the hour's settlements that anyone holding the receipts can rebuild with the kit and check. The feed carries names, roles, times and byte counts, and nothing about the networks the boards sit on.</p>
 </section>
 
 <section id="roadmap">
@@ -404,14 +396,16 @@ signed by payer</code></pre>
   });
 })();
 (function(){
-  /* Lab status: the map and the ledger from the Mint's report. The last good report is kept in this browser for when the feed is away. */
+  /* Lab status: the map and the ledger from the Mint's report, drawn from the nodes the feed lists. The last good report is kept in this browser for when the feed is away. */
   var sec=document.getElementById('lab'); if(!sec||!window.fetch) return;
   var SRC=sec.getAttribute('data-src')||'https://status.bandwidthswap.com/status', UP_S=90*60, MINT_S=5*60, KEY='bw.lab.status', COLS=12, H=3600;
   var ROLE={payer:'gateway, payer',hop:'relay, hop',mint:'settles at the smaller count',peer:'peer'};
   var SUB={payer:'bytes signed',hop:'bytes counted',mint:'windows settled',peer:'no receipts yet'};
-  var FALLBACK=[{name:'bw-house',role:'payer'},{name:'bw-forest',role:'hop'},{name:'bw-mint',role:'mint'}];
-  var sum=document.getElementById('lab-sum'), note=document.getElementById('lab-note'), ledger=document.getElementById('lab-ledger');
-  var tunnel=document.getElementById('lab-tunnel'), total=document.getElementById('lab-total'), map=document.getElementById('lab-map');
+  var FALLBACK=[{name:'bw-house',role:'payer'},{name:'bw-neighbor',role:'hop'},{name:'bw-forest',role:'hop'},{name:'bw-mint',role:'mint'}];
+  /* The map's geometry (desktop): the payer and the hop in use on the top row, quiet cards under the hop, the Mint below, its commitment under it. */
+  var TOP=20, QTOP=124, QSTEP=78, MINT_TOP=196, DROP_X=186, MAP_H=320;
+  var WORDS=['no','one','two','three','four','five','six','seven','eight','nine'];
+  var sum=document.getElementById('lab-sum'), note=document.getElementById('lab-note'), ledger=document.getElementById('lab-ledger'), map=document.getElementById('lab-map');
   var seen=null;
   function pad2(n){return (n<10?'0':'')+n;}
   function hm(t){var d=new Date(t*1000);return pad2(d.getHours())+':'+pad2(d.getMinutes());}
@@ -421,25 +415,95 @@ signed by payer</code></pre>
   function ago(t,now){var s=Math.max(0,now-t);if(s<60)return 'just now';var m=Math.round(s/60);if(m<90)return m+' min ago';var h=Math.round(s/3600);if(h<48)return h+' h ago';return Math.round(s/86400)+' d ago';}
   function bytes(n){if(n==null)return '—';var u=['B','KB','MB','GB','TB'],i=0;while(n>=1000&&i<u.length-1){n/=1000;i++;}return (i?n.toFixed(2):String(n))+' '+u[i];}
   function plural(n,w){return n+' '+w+(n===1?'':'s');}
+  function count(n){return WORDS[n]||String(n);}
   function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
-  function stateOf(n,rep,now){
+  function arrange(rep){
+    /* The nodes in drawing order: the payer, the hop it pays (the hop with the newest receipt), other hops and peers as quiet cards, the Mint. */
+    var nodes=(rep&&rep.nodes&&rep.nodes.length?rep.nodes:FALLBACK).filter(function(n){return n&&n.name;});
+    var of=function(role){return nodes.filter(function(n){return n.role===role;});};
+    var payers=of('payer'), hops=of('hop'), mints=of('mint'), peers=nodes.filter(function(n){return n.role!=='payer'&&n.role!=='hop'&&n.role!=='mint';});
+    var hop=null; hops.forEach(function(h){if(!hop||(h.last_receipt||0)>(hop.last_receipt||0))hop=h;});
+    var items=[];
+    payers.forEach(function(n,i){items.push({n:n,side:'payer',quiet:i>0});});
+    if(hop)items.push({n:hop,side:'hop',quiet:false});
+    hops.forEach(function(n){if(n!==hop)items.push({n:n,side:'hop',quiet:true});});
+    peers.forEach(function(n){items.push({n:n,side:'hop',quiet:true});});
+    mints.forEach(function(n,i){items.push({n:n,side:i?'hop':'mint',quiet:i>0});});
+    return {items:items,payer:payers[0]||null,hop:hop,mint:mints[0]||null};
+  }
+  function stateOf(n,rep,now,quiet){
     if(!n||!rep)return 'nodata';
     if(n.role==='mint')return (now-rep.generated_at)>MINT_S?'stale':rep.service===false?'down':'up';
-    if(!n.last_receipt)return 'nodata';
-    return (now-n.last_receipt)<=UP_S?'up':'stale';
+    if(!n.last_receipt)return quiet?'idle':'nodata';
+    if((now-n.last_receipt)<=UP_S)return 'up';
+    return quiet?'idle':'stale';
   }
-  function card(name,n,rep,now){
-    var c=sec.querySelector('.node[data-node="'+name+'"]');
-    if(!c){c=el('div','node');c.setAttribute('data-node',name);c.innerHTML='<span class="dot"></span><span class="txt"><b></b><br><span class="role"></span><br><span class="st"></span></span>';c.querySelector('b').textContent=name;map.appendChild(c);}
-    var st=stateOf(n,rep,now), word={up:'UP',stale:'STALE',down:'LEDGER DOWN',nodata:'NO DATA'}[st];
-    c.classList.remove('up','stale','down','nodata');c.classList.add(st);
-    if(n&&ROLE[n.role])c.querySelector('.role').textContent=ROLE[n.role];
-    var s=c.querySelector('.st');
+  function card(it,rep,now){
+    var n=it.n, st=stateOf(rep?n:null,rep,now,it.quiet), c=el('div','node '+it.side+(it.quiet?' quiet':'')+' '+st);
+    c.setAttribute('data-node',n.name);
+    c.innerHTML='<span class="dot"></span><span class="txt"><b></b><br><span class="role"></span><br><span class="st"></span></span>';
+    c.querySelector('b').textContent=n.name;
+    c.querySelector('.role').textContent=ROLE[n.role]||n.role||'';
+    var s=c.querySelector('.st'), word={up:'UP',stale:'STALE',down:'LEDGER DOWN'}[st];
     if(st==='nodata')s.textContent='NO DATA';
+    else if(st==='idle')s.textContent=n.last_receipt?'IDLE SINCE '+hm(n.last_receipt):'NO RECEIPTS YET';
     else if(n.role==='mint')s.textContent=word+' · REPORT '+hm(rep.generated_at);
     else s.textContent=word+' · RECEIPT '+hm(n.last_receipt);
-    if(n&&n.last_receipt)c.title=(n.role==='mint'?'last ledger entry ':'last receipt reached the Mint ')+when(n.last_receipt);else c.removeAttribute('title');
-    return st;
+    var t=[];
+    if(it.quiet&&n.role==='hop')t.push('not the hop the house pays now');
+    if(n.last_receipt)t.push((n.role==='mint'?'last ledger entry ':'last receipt reached the Mint ')+when(n.last_receipt));
+    if(t.length)c.title=t.join('; ');
+    return {el:c,state:st};
+  }
+  function latestWindow(n){
+    var h=n&&n.history||[], w=null;
+    h.forEach(function(x){if(x&&x.t_last===n.window_t_last)w=x;});
+    return w;
+  }
+  function drawMap(rep,now,A){
+    var payer=A.payer, hop=A.hop, mint=A.mint, states={}, cols={payer:0,hop:0}, height=MAP_H;
+    map.textContent='';
+    function put(it,top){var k=card(it,rep,now);k.el.style.top=top+'px';states[n(it)]=k.state;map.appendChild(k.el);}
+    function n(it){return it.n.name;}
+    if(payer)put({n:payer,side:'payer',quiet:false},TOP);
+    if(payer&&hop){
+      map.appendChild(el('div','ln tunnel'));
+      var ta=el('div','lbl ta','to '+hop.name+' · '+bytes(hop.window_bytes)+' this window'), tb=el('div','lbl tb','tunnel · '+bytes(hop.total_bytes)+' counted so far'), w=latestWindow(hop);
+      if(hop.window_t_first)ta.title='counted by '+hop.name+', window '+when(hop.window_t_first)+' to '+when(hop.window_t_last)+(w&&w.settled_bytes!=null?'; settled at '+bytes(w.settled_bytes)+(w.disputed?', disputed':''):'; not settled yet');
+      tb.title='bytes counted by '+hop.name+' over every window on the ledger'+(rep&&rep.since?'; first ledger entry '+when(rep.since):'');
+      map.appendChild(ta);map.appendChild(tb);
+    }
+    if(hop)put({n:hop,side:'hop',quiet:false},TOP);
+    A.items.forEach(function(it){
+      if(!it.quiet)return;
+      var i=cols[it.side]++;
+      put(it,QTOP+i*QSTEP);height=Math.max(height,QTOP+(i+1)*QSTEP+8);
+    });
+    if(mint)put({n:mint,side:'mint',quiet:false},MINT_TOP);
+    var C=rep&&rep.commitment, cm=el('div','lbl cm');
+    if(!rep)cm.textContent='commitment · no data';
+    else if(C&&C.root){
+      cm.textContent='commitment for the '+hm(C.window)+' hour · '+String(C.root).slice(0,16);
+      cm.title='the Mint\'s signed root over the settlements of the hour starting '+when(C.window)+': '+plural(C.count||0,'settlement')+(C.t?', made '+hms(C.t):'')+'; root '+C.root;
+    }else cm.textContent='commitment · none yet';
+    map.appendChild(cm);
+    function arrow(side){
+      var s=side==='payer'?'l':'r', head=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      map.appendChild(el('div','ln drop '+s));map.appendChild(el('div','ln arrow '+s));
+      head.setAttribute('class','head '+s);head.setAttribute('viewBox','0 0 10 10');head.setAttribute('aria-hidden','true');
+      head.innerHTML='<path d="M0 0L10 5L0 10z" fill="currentColor"/>';map.appendChild(head);
+      map.appendChild(el('div','lbl '+(s==='l'?'la':'lb'),s==='l'?'signed receipt, hourly':'own count, hourly'));
+    }
+    if(payer&&mint)arrow('payer');
+    if(hop&&mint)arrow('hop');
+    var pulse=el('span','pulse');pulse.setAttribute('aria-hidden','true');map.appendChild(pulse);
+    map.style.setProperty('--map-h',height+'px');
+    var idle=A.items.filter(function(it){return states[n(it)]==='idle';}).map(n), parts=[];
+    if(payer&&hop)parts.push(payer.name+' pays '+hop.name+' over the tunnel');
+    if(mint)parts.push((payer&&hop?'both send':'each node sends')+' hourly receipts down to '+mint.name+', which settles each window at the smaller count');
+    if(idle.length)parts.push(idle.join(', ')+' idle');
+    map.setAttribute('aria-label',parts.join('; ')||'no nodes reported');
+    return states;
   }
   function buckets(n){
     var b={};(n&&n.history||[]).forEach(function(w){
@@ -450,11 +514,13 @@ signed by payer</code></pre>
       if(w.disputed===true)o.disputed=true;
     });return b;
   }
-  function drawLedger(rep,now){
-    var nodes=rep&&rep.nodes&&rep.nodes.length?rep.nodes:FALLBACK, last=Math.floor(now/H), first=last-(COLS-1);
+  function drawLedger(now,A){
+    /* One row per node with windows in the last twelve hours, in the map's order. */
+    var nodes=A.items.map(function(it){return it.n;}).filter(function(n){return n.history&&n.history.length;}), last=Math.floor(now/H), first=last-(COLS-1);
     var per=nodes.map(buckets), max=0;
     nodes.forEach(function(n,i){if(n.role!=='mint')for(var k in per[i])if(per[i][k].bytes>max)max=per[i][k].bytes;});
     ledger.textContent='';
+    if(!nodes.length)return;
     nodes.forEach(function(n,i){
       var isMint=n.role==='mint', rl=el('div','rl'+(isMint?' m':''));
       rl.appendChild(el('b',null,n.name));rl.appendChild(el('span',null,SUB[n.role]||n.role));
@@ -479,24 +545,18 @@ signed by payer</code></pre>
   }
   function pulse(){
     var dot=sec.querySelector('.pulse'), mint=sec.querySelector('.node.mint');
-    if(!dot||!dot.animate||getComputedStyle(dot).display==='none')return;
+    if(!dot||!mint||!dot.animate||getComputedStyle(dot).display==='none')return;
     if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-    var dx=mint.getBoundingClientRect().left-map.getBoundingClientRect().left-100;
+    var dx=mint.getBoundingClientRect().left-map.getBoundingClientRect().left-DROP_X;
     dot.animate([{transform:'translate(0,0)',opacity:0},{transform:'translate(0,20px)',opacity:1,offset:.15},{transform:'translate(0,130px)',opacity:1,offset:.5},{transform:'translate('+(dx-6)+'px,130px)',opacity:1,offset:.95},{transform:'translate('+dx+'px,130px)',opacity:0}],{duration:1800,easing:'ease-in-out'});
   }
   function draw(rep,now,fetched){
-    var states={}, names={};
-    (rep&&rep.nodes&&rep.nodes.length?rep.nodes:FALLBACK).forEach(function(n){names[n.name]=n;states[n.name]=card(n.name,rep?n:null,rep,now);});
-    var all=Object.keys(states), up=all.filter(function(k){return states[k]==='up';}).length;
-    sum.classList.toggle('off',!rep||up<all.length);
-    sum.querySelector('.k').textContent=!rep?'status unavailable':up===all.length?(all.length===3?'all three up':'all '+all.length+' up'):up+' of '+all.length+' up';
+    var A=arrange(rep), states=drawMap(rep,now,A), all=Object.keys(states);
+    var idle=all.filter(function(k){return states[k]==='idle';}).length, up=all.filter(function(k){return states[k]==='up';}).length, counted=all.length-idle;
+    sum.classList.toggle('off',!rep||up<counted);
+    sum.querySelector('.k').textContent=!rep?'status unavailable':(up===counted?'all '+count(counted)+' up':count(up)+' of '+count(counted)+' up')+(idle?', '+count(idle)+' idle':'');
     sum.querySelector('.m').textContent=rep?'Mint report '+hms(rep.generated_at)+' '+tz():'no report';
-    var mint=names['bw-mint'], house=names['bw-house'], src=rep&&(mint&&mint.window_bytes!=null?mint:house);
-    tunnel.textContent='WireGuard tunnel · '+(src?bytes(src.window_bytes):'—')+' this window';
-    if(src&&src.window_t_first)tunnel.title='window '+when(src.window_t_first)+' to '+when(src.window_t_last)+(src===mint?', settled':', signed by bw-house');
-    total.textContent=(src&&src.total_bytes!=null?bytes(src.total_bytes):'—')+' since the bench came up';
-    if(rep&&rep.since)total.title='first ledger entry '+when(rep.since);
-    drawLedger(rep,now);
+    drawLedger(now,A);
     var L=rep&&rep.ledger||{}, parts=[];
     if(!rep)parts.push('Status unavailable: the feed at status.bandwidthswap.com did not answer, and this browser has no earlier report to show.');
     else{
@@ -506,7 +566,8 @@ signed by payer</code></pre>
       if(fetched)parts.push('status feed unavailable right now; this is the last good report, fetched '+when(fetched));
     }
     note.textContent=parts.join(' · ');
-    if(rep&&house&&house.last_receipt){if(seen!==null&&house.last_receipt>seen)pulse();seen=house.last_receipt;}
+    var payer=A.payer;
+    if(rep&&payer&&payer.last_receipt){if(seen!==null&&payer.last_receipt>seen)pulse();seen=payer.last_receipt;}
   }
   function load(){
     fetch(SRC,{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(rep){
