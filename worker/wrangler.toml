@@ -17,17 +17,8 @@ binding = "DB"
 database_name = "bandwidthswap-status"
 database_id = "ae297e69-fcf1-4644-a87c-8be0fd8da50b"
 
-# One key ("status") holds the latest report of the bearer-token path, until P2 removes that path. Made once with
-#   npx -y wrangler@3 kv namespace create STATUS
-[[kv_namespaces]]
-binding = "STATUS"
-id = "53d62fede0824ac3b0d4828352e6c82f"
-
 # NYMs are public keys. DEFAULT_MINT is what GET /status serves; ADMIN_MINTS (comma-separated) may post the map.
 # ALLOW_TEST_KEYS is deliberately absent: the three vector NYMs of the kit's spec/vectors/keys.json are refused here.
 [vars]
 DEFAULT_MINT = "ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM"
 ADMIN_MINTS = "ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM"
-
-# Secret (never committed): STATUS_TOKEN, the bearer token the lab's Mint still posts with until P2.
-#   printf '%s' "$tok" | npx -y wrangler@3 secret put STATUS_TOKEN

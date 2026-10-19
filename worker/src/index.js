@@ -2,9 +2,8 @@
 // back. The Worker keeps the bytes the Mint signed and serves them with the signature, so it can delay or drop a
 // report and cannot make one up or alter one; a reader checks the signature with docs/bsp.js (worker/PLAN.md).
 //
-//   POST /report                      a signed status record (below); 200 {stored, received_at}
+//   POST /report                      a signed status record (below); 200 {stored, received_at, rows_written}
 //   POST /map                         the map, a signed record from a Mint in ADMIN_MINTS; it decides who /mints lists
-//   POST /status                      the Phase 0 lab's Mint with the bearer token, until the kit signs its reports (P2 removes it)
 //   GET  /status                      the default Mint's latest report, with `received_at` (Unix seconds) added
 //   GET  /mints                       the Mints the map lists, and how many are not
 //   GET  /mints/<nym>/status          that Mint's latest report, listed or not
@@ -18,7 +17,8 @@
 // node's windows of the last twelve hours, the Mint's NYM, the committed hour's proof, the Steward's book), with
 // `kind: "status"`, `proto: 1`, the Mint's NYM in `mint`, and `sig`: Ed25519 by the Mint over the domain string
 // "bandwidthswap/status/v1", a newline, and the canonical JSON of the record without `sig` (the kit's
-// spec/PROTOCOL.md, Section 3). The key is the identity: nothing is registered, no token is issued.
+// spec/PROTOCOL.md, Section 3). The key is the identity: nothing is registered, no token is issued. The bearer-token
+// path of the Phase 0 lab (POST /status, one KV key) served from Oct 16 to Oct 19, 2026, and answers 410 now.
 //
 // NYMs are public keys and may appear. The Worker refuses a body that carries an IPv4 or a MAC address, so a LAN
 // detail cannot leak through a careless reporter.
@@ -34,7 +34,6 @@ bsp.useEd25519('webcrypto');
 const STATUS_DOMAIN = 'bandwidthswap/status/v1';
 const MAP_DOMAIN = 'bandwidthswap/map/v1';
 const MAX_MAP_MINTS = 64;
-const KEY = 'status';
 const MAX_BODY = 64 * 1024;
 const MAX_HISTORY = 48;
 const FRESH_S = 300;            // generated_at within this of the Worker's clock
@@ -63,18 +62,6 @@ function headers(extra) {
 
 function json(obj, status, extra) {
   return new Response(JSON.stringify(obj), { status, headers: headers(extra) });
-}
-
-// Compare two strings without leaking where they differ: hash both, compare the digests.
-async function sameToken(a, b) {
-  const [x, y] = await Promise.all([
-    crypto.subtle.digest('SHA-256', enc.encode(a)),
-    crypto.subtle.digest('SHA-256', enc.encode(b)),
-  ]);
-  const u = new Uint8Array(x), v = new Uint8Array(y);
-  let diff = 0;
-  for (let i = 0; i < u.length; i++) diff |= u[i] ^ v[i];
-  return diff === 0;
 }
 
 const count = (v) => v === null || v === undefined || (Number.isInteger(v) && v >= 0);   // a byte count or a time, or none
@@ -395,23 +382,19 @@ async function postReport(request, env) {
 }
 
 // A stored report, served as the bytes the Mint signed with `received_at` spliced in before the last brace (and
-// `"sig":null` for a report that came through the token path). Re-serialising would drop the floats the Mint
-// wrote, and a reader could no longer check the signature: a reader removes `received_at` and `sig` and verifies.
+// `"sig":null` for a row the token path stored before Oct 19, 2026, should one remain). Re-serialising would drop the
+// floats the Mint wrote, and a reader could no longer check the signature: a reader removes `received_at` and `sig`
+// and verifies.
 function serveReport(row, maxAge) {
   const end = row.body.lastIndexOf('}');
   const tail = ',"received_at":' + row.received_at + (row.sig === null ? ',"sig":null' : '') + '}';
   return new Response(row.body.slice(0, end) + tail, { status: 200, headers: headers({ 'Cache-Control': 'public, max-age=' + maxAge }) });
 }
 
-// GET /status and GET /mints/<nym>/status: the Mint's latest report. The default Mint falls back to the KV key of the
-// token path while D1 holds nothing for it, so the page keeps drawing through the change.
-async function getLatest(env, mint, fallback) {
+// GET /status and GET /mints/<nym>/status: the Mint's latest report.
+async function getLatest(env, mint) {
   const row = await env.DB.prepare(SQL.latest).bind(mint).first();
   if (row) return serveReport(row, 30);
-  if (fallback && env.STATUS) {
-    const raw = await env.STATUS.get(KEY);
-    if (raw) return new Response(raw, { status: 200, headers: headers({ 'Cache-Control': 'public, max-age=30' }) });
-  }
   return json({ error: 'no report yet' }, 404);
 }
 
@@ -520,11 +503,11 @@ export default {
 
     if (request.method === 'GET') {
       if (url.pathname === '/') return getAbout(env);
-      if (url.pathname === '/status') return getLatest(env, env.DEFAULT_MINT, true);
+      if (url.pathname === '/status') return getLatest(env, env.DEFAULT_MINT);
       if (url.pathname === '/mints') return getMints(env);
       if (url.pathname === '/map') return getMap(env);
       const m = MINT_PATH.exec(url.pathname);
-      if (m) return m[2] === 'status' ? getLatest(env, m[1], false) : getHistory(env, m[1], url.searchParams.get('hours'));
+      if (m) return m[2] === 'status' ? getLatest(env, m[1]) : getHistory(env, m[1], url.searchParams.get('hours'));
       if (url.pathname === '/report') return json({ error: 'method not allowed' }, 405, { Allow: 'POST, OPTIONS' });
       return json({ error: 'no such path' }, 404);
     }
@@ -534,46 +517,13 @@ export default {
       return json({ error: 'method not allowed' }, 405, { Allow: 'GET, POST, OPTIONS' });
     }
 
-    if (url.pathname !== '/status') return json({ error: 'no such path' }, 404);
-
-    if (request.method === 'POST') {
-      // The bearer-token path of the Phase 0 lab (bwkit 0.4.0 posts here every two minutes), kept through the
-      // transition and removed in P2 (PLAN.md 3): the token is the credential, the report is unsigned, and it is
-      // stored into D1 with sig NULL under the Mint the body names (else DEFAULT_MINT) as well as into the KV key,
-      // so a rollback to the Oct 16 build loses nothing. Its faults stay 400, which the kit expects; it keeps no
-      // per-Mint rate (the lab's timer is two minutes) and no freshness rule, and only the day's meter guards it.
-      if (!env.STATUS_TOKEN) return json({ error: 'no token configured' }, 503);
-      const auth = request.headers.get('Authorization') || '';
-      const given = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
-      if (!given || !(await sameToken(given, env.STATUS_TOKEN))) {
-        return json({ error: 'bad token' }, 401, { 'WWW-Authenticate': 'Bearer' });
-      }
-      const text = (await request.text()).trim();
-      if (byteLength(text) > MAX_BODY) return json({ error: 'too large' }, 413);
-      let report;
-      try {
-        report = JSON.parse(text);
-      } catch (e) {
-        return json({ error: 'bad JSON' }, 400);
-      }
-      const why = checkReport(report, text) || (report.sig !== undefined || report.received_at !== undefined ? 'sig and received_at are not posted here' : null);
-      if (why) return json({ error: why }, 400);
-      const mint = (typeof report.mint === 'string' && report.mint)
-        || (isObj(report.commitment) && typeof report.commitment.mint === 'string' && report.commitment.mint)
-        || env.DEFAULT_MINT || null;
-      const received_at = Math.floor(Date.now() / 1000);
-      if (mint && env.DB) {
-        const [mintRow, meter] = await Promise.all([
-          env.DB.prepare(SQL.mintRow).bind(mint).first(),
-          env.DB.prepare(SQL.meter).bind(day(received_at)).first(),
-        ]);
-        if (meter && meter.writes >= METER_MAX) return json({ error: 'the day\'s write meter is full; try after midnight UTC' }, 429);
-        await store(env, { mint, report, text, sig: null, received_at, pruned_at: mintRow ? mintRow.pruned_at : null });
-      }
-      if (env.STATUS) await env.STATUS.put(KEY, JSON.stringify({ ...report, received_at }));   // absent on a self-hosted copy
-      return json({ stored: true, received_at }, 200);
+    if (url.pathname === '/status' && request.method === 'POST') {
+      // The Phase 0 lab's bearer-token path, Oct 16 to Oct 19, 2026. A reporter older than bwkit 0.5.0 still posting
+      // here is told where to go; nothing is stored.
+      return json({ error: 'the token path is gone: a Mint posts a signed status record to /report (bwkit 0.5.0 and later)' }, 410);
     }
 
-    return json({ error: 'method not allowed' }, 405, { Allow: 'GET, POST, OPTIONS' });
+    if (url.pathname !== '/status') return json({ error: 'no such path' }, 404);
+    return json({ error: 'method not allowed' }, 405, { Allow: 'GET, OPTIONS' });
   },
 };

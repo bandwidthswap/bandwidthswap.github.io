@@ -1,5 +1,6 @@
-// Runs the Worker in Node (20 or newer) against a KV and a D1 in memory: `node test.mjs`.
+// Runs the Worker in Node (20 or newer) against a D1 in memory: `node test.mjs`.
 // The D1 is fake-d1.mjs, which implements each statement of src/sql.js by name; the real SQL runs in smoke.mjs.
+// Every post is signed by one of the kit's vector keys (sign.mjs), so the Worker takes them with ALLOW_TEST_KEYS.
 import worker from './src/index.js';
 import { readFileSync } from 'node:fs';
 import { fakeD1 } from './fake-d1.mjs';
@@ -8,17 +9,12 @@ import { keyFromSeed, signObject, signText, SEEDS, STATUS_DOMAIN, MAP_DOMAIN } f
 process.removeAllListeners('warning');
 process.on('warning', (w) => { if (w.name !== 'ExperimentalWarning') console.warn(w); });
 
-const kv = new Map();
-const db = fakeD1();
-const LAB = 'ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM';
-const env = {
-  STATUS: { get: async (k) => kv.get(k) ?? null, put: async (k, v) => { kv.set(k, v); } },
-  STATUS_TOKEN: 'test-token-0123456789abcdef',
-  DB: db,
-  DEFAULT_MINT: LAB,
-  ADMIN_MINTS: LAB + ', ' + SEEDS.mint.nym,
-  ALLOW_TEST_KEYS: '1',
-};
+const LAB = 'ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM';   // the lab Mint's NYM, as the fixtures carry it: a key no test holds
+const { key: mintKey, nym: MINT } = await keyFromSeed(SEEDS.mint.seed);
+const { key: hopKey, nym: HOP } = await keyFromSeed(SEEDS.hop.seed);
+const envFor = (database) => ({ DB: database, DEFAULT_MINT: MINT, ADMIN_MINTS: LAB + ', ' + MINT, ALLOW_TEST_KEYS: '1' });
+const db1 = fakeD1(), db = fakeD1();
+let env = envFor(db1);                    // the shape checks run on db1; everything after on db, fresh
 const BASE = 'https://status.bandwidthswap.com';
 const SITE = 'https://bandwidthswap.com';
 let failures = 0;
@@ -28,12 +24,32 @@ function check(name, ok, detail) {
   if (!ok) failures++;
 }
 
+// The clock is the test's: Date.now is skewed forward by tick() so the per-Mint rate (60 s) and freshness (300 s)
+// rules can be exercised without waiting.
+const realNow = Date.now;
+let skew = 0;
+Date.now = () => realNow() + skew;
+const tick = (s = 61) => { skew += s * 1000; };
+const now = () => Math.floor(Date.now() / 1000);
+const today = () => new Date(Date.now()).toISOString().slice(0, 10);
+const meterNow = () => db.tables.meter.get(today()) || 0;
+
 const call = (path, init) => worker.fetch(new Request(BASE + path, init), env);
-const post = (body, token = env.STATUS_TOKEN, origin) => call('/status', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}), ...(origin ? { Origin: origin } : {}) },
-  body: typeof body === 'string' ? body : JSON.stringify(body),
-});
+const postReport = (text, e = env) => worker.fetch(new Request(BASE + '/report', { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: 'https://example.com' }, body: text }), e);
+const isObj = (v) => v && typeof v === 'object' && !Array.isArray(v);
+const without = (o, ...keys) => { const c = { ...o }; for (const k of keys) delete c[k]; return c; };
+// A report as a status record of the vector Mint's: kind, proto, a fresh generated_at, and the signer's NYM wherever
+// the record names its own Mint (the lab's NYM in the fixtures); any other mint is left as the test wrote it.
+const asMint = (body, nym = MINT) => {
+  const r = { ...body, kind: 'status', proto: 1, generated_at: now() };
+  if (r.mint === undefined || r.mint === LAB) r.mint = nym;
+  if (isObj(r.proof) && r.proof.mint === LAB) r.proof = { ...r.proof, mint: nym };
+  if (isObj(r.commitment) && r.commitment.mint === LAB) r.commitment = { ...r.commitment, mint: nym };
+  return r;
+};
+const signed = (body, key = mintKey, nym = MINT) => signObject(key, STATUS_DOMAIN, asMint(body, nym));
+// post: a fresh minute and a fresh generated_at for every post, so the rate and freshness rules stay out of a shape check
+const post = async (body, key = mintKey, nym = MINT) => { tick(); return postReport(await signed(body, key, nym)); };
 
 const win = (t_first, t_last, bytes, settled_bytes, disputed) => ({ t_first, t_last, bytes, settled_bytes, disputed });
 const report = {
@@ -50,144 +66,135 @@ const report = {
 };
 const noHistory = { ...report, nodes: report.nodes.map(({ history, total_bytes, ...n }) => n) };
 delete noHistory.since;
+const fixture = (name) => JSON.parse(readFileSync(new URL('../tools/fixtures/' + name, import.meta.url), 'utf8'));
+const withProof = fixture('report-with-proof.json'), withSteward = fixture('report-with-steward.json'), live = fixture('report-bwkit-0.4.0.json');
+const clone = (o) => JSON.parse(JSON.stringify(o));
 
+// ---------------------------------------------------------------- the shape of a report (checkReport), on db1
 let r = await call('/status', { headers: { Origin: SITE } });
 check('GET before any report is 404', r.status === 404, r.status);
 check('…with CORS for any origin', r.headers.get('Access-Control-Allow-Origin') === '*');
 
-r = await post(report, null);
-check('POST without a token is 401', r.status === 401, r.status);
-r = await post(report, 'wrong');
-check('POST with the wrong token is 401', r.status === 401, r.status);
-r = await post('{not json');
+r = await postReport('{not json');
 check('POST with bad JSON is 400', r.status === 400, r.status);
 r = await post({ ...report, nodes: [] });
-check('POST with no nodes is 400', r.status === 400, r.status);
+check('POST with no nodes is 422', r.status === 422, r.status);
 r = await post({ ...report, nodes: [{ name: 'bw-house', role: 'router' }] });
-check('POST with an unknown role is 400', r.status === 400, r.status);
+check('POST with an unknown role is 422', r.status === 422, r.status);
 r = await post({ ...report, nodes: [{ name: 'BW House', role: 'payer' }] });
-check('POST with a bad name is 400', r.status === 400, r.status);
+check('POST with a bad name is 422', r.status === 422, r.status);
 r = await post({ ...report, note: 'bw-mint is 192.168.0.61' });
-check('POST carrying an IPv4 address is 400', r.status === 400, r.status);
+check('POST carrying an IPv4 address is 422', r.status === 422, r.status);
 r = await post({ ...report, note: 'b8:27:eb:6b:1b:09' });
-check('POST carrying a MAC address is 400', r.status === 400, r.status);
+check('POST carrying a MAC address is 422', r.status === 422, r.status);
 r = await post({ ...report, pad: 'x'.repeat(65 * 1024) });
 check('POST over 64 KB is 413', r.status === 413, r.status);
 r = await post({ ...report, nodes: [{ ...report.nodes[0], history: Array.from({ length: 49 }, (_, i) => win(i, i + 1, 1, 1, false)) }] });
-check('POST with a history of 49 windows is 400', r.status === 400, r.status);
+check('POST with a history of 49 windows is 422', r.status === 422, r.status);
 r = await post({ ...report, nodes: [{ ...report.nodes[0], history: [win(5, 4, 1, 1, false)] }] });
-check('POST with a window ending before it starts is 400', r.status === 400, r.status);
+check('POST with a window ending before it starts is 422', r.status === 422, r.status);
 r = await post({ ...report, nodes: [{ ...report.nodes[0], history: [{ t_first: 1, t_last: 2, bytes: '9', settled_bytes: null, disputed: null }] }] });
-check('POST with a string byte count is 400', r.status === 400, r.status);
+check('POST with a string byte count is 422', r.status === 422, r.status);
 r = await post({ ...report, nodes: [{ ...report.nodes[0], total_bytes: -1 }] });
-check('POST with a negative total is 400', r.status === 400, r.status);
+check('POST with a negative total is 422', r.status === 422, r.status);
 r = await post({ ...report, since: 'yesterday' });
-check('POST with a bad since is 400', r.status === 400, r.status);
+check('POST with a bad since is 422', r.status === 422, r.status);
 r = await call('/status', { headers: { Origin: SITE } });
 check('nothing was stored by the refused posts', r.status === 404, r.status);
 
 r = await post(noHistory);
-check('a POST from an older reporter, without history, is 200', r.status === 200, r.status);
+check('a POST from an older reporter, without history, is 200', r.status === 200, r.status + ' ' + (await r.text()));
 r = await post(report);
 check('a good POST with history is 200', r.status === 200, r.status);
 const posted = await r.json();
-check('…and answers with received_at', Number.isInteger(posted.received_at) && posted.stored === true);
-check('…is in D1 under the default Mint with no signature', db.tables.reports.get(LAB)?.sig === null && db.tables.reports.get(LAB).received_at === posted.received_at && db.tables.mints.get(LAB).name === 'bw-mint');
-check('…and in the KV key still, for a rollback', JSON.parse(kv.get('status')).received_at === posted.received_at);
-check('…with its windows in the table', [...db.tables.windows.values()].filter((w) => w.mint === LAB).length === 5);
-r = await post({ ...report, received_at: 1 });
-check('a token report carrying received_at is 400', r.status === 400, r.status);
-r = await post({ ...report, sig: null });
-check('a token report carrying sig is 400', r.status === 400, r.status);
-r = await post(report);
-check('the token path keeps no per-Mint rate: the next post right away is 200', r.status === 200, r.status);
+check('…and answers with received_at and the rows written', Number.isInteger(posted.received_at) && posted.stored === true && Number.isInteger(posted.rows_written));
 
 r = await call('/status', { headers: { Origin: SITE } });
 check('GET after the post is 200', r.status === 200, r.status);
 const got = await r.json();
-check('…returns the report with received_at added, now from D1, with sig null', got.generated_at === report.generated_at && got.received_at === db.tables.reports.get(LAB).received_at && got.nodes.length === 3 && got.sig === null);
+check('…returns the report with received_at added and the signature kept', got.generated_at === now() && got.received_at === posted.received_at && got.nodes.length === 3 && /^[A-Za-z0-9_-]{86}$/.test(got.sig));
 check('…history and totals intact', got.nodes[0].history.length === 3 && got.nodes[0].history[2].settled_bytes === null && got.nodes[0].total_bytes === 65846000 && got.since === report.since);
 check('…with CORS for any origin', r.headers.get('Access-Control-Allow-Origin') === '*');
 check('…and a short cache', r.headers.get('Cache-Control') === 'public, max-age=30');
 r = await call('/status', { headers: { Origin: 'https://example.com' } });
 check('GET from another origin gets * too: the feed is public', r.status === 200 && r.headers.get('Access-Control-Allow-Origin') === '*');
-// bwkit 0.3.0 adds the Mint's NYM, the committed hour's proof and, once the Steward runs, its book (PLAN.md 2.5).
-// The two fixtures are a real report with a real proof from bw-mint, and the same with a hand-made Steward object.
-const fixture = (name) => JSON.parse(readFileSync(new URL('../tools/fixtures/' + name, import.meta.url), 'utf8'));
-const withProof = fixture('report-with-proof.json'), withSteward = fixture('report-with-steward.json');
-const clone = (o) => JSON.parse(JSON.stringify(o));
-const NYM = 'ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM';
 
+// bwkit 0.3.0 added the Mint's NYM, the committed hour's proof and, once the Steward runs, its book (PLAN.md 2.5); 0.4.0
+// posts the shape in report-bwkit-0.4.0.json. The fixtures name the lab Mint; asMint re-signs them as the vector Mint's.
 r = await post(withProof);
 check('a report with the Mint on its commitment and a real proof is 200', r.status === 200, r.status + ' ' + (await r.text()));
-r = await post({ ...withProof, mint: NYM });
+r = await post({ ...withProof, mint: LAB });
 check('…and with mint at the top level too', r.status === 200, r.status);
 r = await post({ ...withProof, mint: 'lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM' });
-check('a mint without its ed25519: prefix is 400', r.status === 400, r.status);
+check('a mint without its ed25519: prefix is 422', r.status === 422, r.status);
 r = await post({ ...withProof, commitment: { ...withProof.commitment, mint: 'ed25519:short' } });
-check('a commitment.mint of the wrong length is 400', r.status === 400, r.status);
+check('a commitment.mint of the wrong length is 422', r.status === 422, r.status);
+r = await post({ ...withProof, commitment: { ...withProof.commitment, mint: HOP } });
+check('a commitment that is another Mint\'s is 422', r.status === 422, r.status);
 let bad = clone(withProof); bad.proof.kind = 'commitment';
 r = await post(bad);
-check('a proof that is not kind "proof" is 400', r.status === 400, r.status);
+check('a proof that is not kind "proof" is 422', r.status === 422, r.status);
 bad = clone(withProof); bad.proof.root = bad.proof.root.slice(0, 63);
 r = await post(bad);
-check('a proof with a short root is 400', r.status === 400, r.status);
+check('a proof with a short root is 422', r.status === 422, r.status);
 bad = clone(withProof); bad.proof.count = 49;
 r = await post(bad);
-check('a proof claiming 49 settlements is 400', r.status === 400, r.status);
+check('a proof claiming 49 settlements is 422', r.status === 422, r.status);
 bad = clone(withProof); bad.proof.settlements.push(bad.proof.settlements[0]);
 r = await post(bad);
-check('a proof with more entries than its count is 400', r.status === 400, r.status);
+check('a proof with more entries than its count is 422', r.status === 422, r.status);
 bad = clone(withProof); bad.proof.settlements[0].index = 1;
 r = await post(bad);
-check('a proof entry indexed past the count is 400', r.status === 400, r.status);
+check('a proof entry indexed past the count is 422', r.status === 422, r.status);
 bad = clone(withProof); bad.proof.settlements[0].path = [['M', bad.proof.root]];
 r = await post(bad);
-check('a path step that is not L or R is 400', r.status === 400, r.status);
+check('a path step that is not L or R is 422', r.status === 422, r.status);
 bad = clone(withProof); bad.proof.settlements[0].settlement.status = 'paid';
 r = await post(bad);
-check('a settlement with an unknown status is 400', r.status === 400, r.status);
+check('a settlement with an unknown status is 422', r.status === 422, r.status);
 bad = clone(withProof); bad.proof.settlements[0].settlement.hop = 'bw-neighbor';
 r = await post(bad);
-check('a settlement whose hop is a name, not a NYM, is 400', r.status === 400, r.status);
+check('a settlement whose hop is a name, not a NYM, is 422', r.status === 422, r.status);
 bad = clone(withProof); bad.proof.signature = bad.proof.signature + '=';
 r = await post(bad);
-check('a proof signature with padding is 400', r.status === 400, r.status);
+check('a proof signature with padding is 422', r.status === 422, r.status);
 r = await post({ ...withProof, proof: null });
 check('proof: null is 200 (no commitment yet)', r.status === 200, r.status);
+r = await post({ ...withProof, commitment: null, proof: null });
+check('commitment: null is 200 too (the kit before its first commitment)', r.status === 200, r.status);
 
 r = await post(withSteward);
-check('a report with the Steward\'s book is 200', r.status === 200, r.status + ' ' + (await r.text()));
+check('a report with the Steward\'s book (the Oct 17 shape) is 200', r.status === 200, r.status + ' ' + (await r.text()));
 bad = clone(withSteward); bad.steward.purchases[0].route.to = 'bw_neighbor';
 r = await post(bad);
-check('a route to a name with an underscore is 400', r.status === 400, r.status);
+check('a route to a name with an underscore is 422', r.status === 422, r.status);
 bad = clone(withSteward); bad.steward.purchases[2].route.from = '*';
 r = await post(bad);
-check('a route from "*" is 400 (any relay is null)', r.status === 400, r.status);
+check('a route from "*" is 422 (any relay is null)', r.status === 422, r.status);
 bad = clone(withSteward); bad.steward.purchases[3].route.not_via = ['house', 'Next Door'];
 r = await post(bad);
-check('a not_via with a bad name is 400', r.status === 400, r.status);
+check('a not_via with a bad name is 422', r.status === 422, r.status);
 bad = clone(withSteward); bad.steward.payouts[0].hop = 'ed25519:Y_rtP6d0teob8J1qJttIOoZ17FLi5PG29HaZ-tE7IoY';
 r = await post(bad);
-check('a payout naming its hop by NYM, not name, is 400', r.status === 400, r.status);
+check('a payout naming its hop by NYM, not name, is 422', r.status === 422, r.status);
 bad = clone(withSteward); bad.steward.purchases[0].program = 'bounty';
 r = await post(bad);
-check('an unknown program is 400', r.status === 400, r.status);
+check('an unknown program is 422', r.status === 422, r.status);
 bad = clone(withSteward); bad.steward.f = 1.5;
 r = await post(bad);
-check('f above 1 is 400', r.status === 400, r.status);
+check('f above 1 is 422', r.status === 422, r.status);
 bad = clone(withSteward); bad.steward.paid_usd = -0.00008;
 r = await post(bad);
-check('a negative balance is 400', r.status === 400, r.status);
+check('a negative balance is 422', r.status === 422, r.status);
 bad = clone(withSteward); bad.steward.purchases = Array.from({ length: 33 }, () => clone(withSteward.steward.purchases[0]));
 r = await post(bad);
-check('33 purchases is 400', r.status === 400, r.status);
+check('33 purchases is 422', r.status === 422, r.status);
 bad = clone(withSteward); bad.steward.map.places[0].medium = 'Wi-Fi at 192.168.0.1';
 r = await post(bad);
-check('a Steward object smuggling an IPv4 address in a label is 400', r.status === 400, r.status);
+check('a Steward object smuggling an IPv4 address in a label is 422', r.status === 422, r.status);
 bad = clone(withSteward); bad.steward.purchases[0].note = 'posted from b8:27:eb:6b:1b:09';
 r = await post(bad);
-check('a Steward object smuggling a MAC address in an extra field is 400', r.status === 400, r.status);
+check('a Steward object smuggling a MAC address in an extra field is 422', r.status === 422, r.status);
 bad = clone(withSteward); delete bad.steward.links; delete bad.steward.map; delete bad.steward.cap_margin;
 for (const p of bad.steward.purchases) { delete p.poster; delete p.refunded_usd; delete p.target_usd; delete p.matches; }
 for (const y of bad.steward.payouts) { delete y.settled_bytes; delete y.purchase; delete y.refund_usd; }
@@ -198,40 +205,29 @@ check('steward: null is 200 (the Steward has not run)', r.status === 200, r.stat
 r = await call('/status', { headers: { Origin: SITE } });
 const last = await r.json();
 check('the stored report is the last good one, with the Steward absent', r.status === 200 && last.steward === null && last.proof.count === 1);
+r = await post(live);
+check('what bwkit 0.4.0 posts today (the Steward\'s book in the kit\'s shape), signed, is 200', r.status === 200, r.status + ' ' + (await r.text()));
+bad = clone(live); bad.steward.payouts[0].window = { t_first: 5, t_last: 4 };
+r = await post(bad);
+check('a payout window ending before it starts is 422', r.status === 422, r.status);
 
 r = await call('/status', { method: 'OPTIONS', headers: { Origin: SITE, 'Access-Control-Request-Method': 'GET' } });
-check('OPTIONS is 204 and allows GET only', r.status === 204 && r.headers.get('Access-Control-Allow-Methods') === 'GET, OPTIONS');
+check('OPTIONS /status is 204 and allows GET only', r.status === 204 && r.headers.get('Access-Control-Allow-Methods') === 'GET, OPTIONS');
 r = await call('/status', { method: 'DELETE' });
-check('DELETE is 405', r.status === 405, r.status);
+check('DELETE /status is 405', r.status === 405 && r.headers.get('Allow') === 'GET, OPTIONS', r.status);
+r = await call('/status', { method: 'POST', headers: { Authorization: 'Bearer x' }, body: '{}' });
+check('the bearer-token path of Oct 16 to 19 is 410 Gone, and says where to post', r.status === 410 && /\/report/.test((await r.json()).error), r.status);
 r = await call('/elsewhere');
 check('another path is 404', r.status === 404, r.status);
 r = await call('/');
 const about = await r.json();
-check('/ says what this is, the routes, the default Mint, and that Ed25519 works here', r.status === 200 && about.ed25519 === 'ok' && about.default_mint === LAB && Object.keys(about.routes).length === 6, JSON.stringify(about).slice(0, 200));
-r = await worker.fetch(new Request(BASE + '/status', { method: 'POST', headers: { Authorization: 'Bearer x' }, body: '{}' }), { STATUS: env.STATUS });
-check('POST with no token configured is 503', r.status === 503, r.status);
+check('/ says what this is, the routes, the default Mint, and that Ed25519 works here', r.status === 200 && about.ed25519 === 'ok' && about.default_mint === MINT && Object.keys(about.routes).length === 6, JSON.stringify(about).slice(0, 200));
 
-// ---------------------------------------------------------------- POST /report: signed records (PLAN.md 2.1)
-// The clock is the test's: Date.now is skewed forward by tick() so the per-Mint rate (60 s) and freshness (300 s)
-// rules can be exercised without waiting.
-const realNow = Date.now;
-let skew = 0;
-Date.now = () => realNow() + skew;
-const tick = (s = 61) => { skew += s * 1000; };
-const now = () => Math.floor(Date.now() / 1000);
-const today = () => new Date(Date.now()).toISOString().slice(0, 10);
-const meterNow = () => db.tables.meter.get(today()) || 0;
-
-const { key: mintKey, nym: MINT } = await keyFromSeed(SEEDS.mint.seed);
-const { key: hopKey, nym: HOP } = await keyFromSeed(SEEDS.hop.seed);
-check('the vector seeds rebuild their NYMs', MINT === SEEDS.mint.nym && HOP === SEEDS.hop.nym);
-const without = (o, ...keys) => { const c = { ...o }; for (const k of keys) delete c[k]; return c; };
-const record = (base, extra = {}, nym = MINT) => ({ ...base, kind: 'status', proto: 1, mint: nym, generated_at: now(), ...extra });
-const signedReport = (extra = {}, key = mintKey, nym = MINT, base = report) => signObject(key, STATUS_DOMAIN, record(base, extra, nym));
-const postReport = (text, e = env) => worker.fetch(new Request(BASE + '/report', { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: 'https://example.com' }, body: text }), e);
-
+// ---------------------------------------------------------------- POST /report: the signed record (PLAN.md 2.1), on a fresh db
+env = envFor(db);
 const m0 = meterNow();
-let text = await signedReport();
+tick();
+let text = await signed(report);
 r = await postReport(text);
 let body = await r.json();
 check('a signed report from the vector Mint is 200', r.status === 200, r.status + ' ' + JSON.stringify(body));
@@ -251,46 +247,38 @@ check('…and pruned_at is stamped', mintRow.pruned_at === now());
 const at = text.lastIndexOf('"sig":"') + 7;   // the first character, not the last: that one carries four padding bits
 r = await postReport(text.slice(0, at) + (text[at] === 'A' ? 'B' : 'A') + text.slice(at + 1));
 check('a signature with one character changed is 401', r.status === 401, r.status);
-r = await postReport(await signedReport({}, hopKey, MINT));
+r = await postReport(await signed(report, hopKey, MINT));
 check('a record signed by another key, claiming the Mint\'s NYM, is 401', r.status === 401, r.status);
-r = await postReport('{not json');
-check('a body that is not JSON is 400', r.status === 400, r.status);
-r = await postReport(await signedReport({ kind: 'report' }));
+r = await postReport(await signObject(mintKey, STATUS_DOMAIN, { ...asMint(report), kind: 'report' }));
 check('kind other than "status" is 422', r.status === 422, r.status);
-r = await postReport(await signedReport({ proto: 2 }));
+r = await postReport(await signObject(mintKey, STATUS_DOMAIN, { ...asMint(report), proto: 2 }));
 check('proto other than 1 is 422', r.status === 422, r.status);
-r = await postReport(await signObject(mintKey, STATUS_DOMAIN, without(record(report), 'mint')));
+r = await postReport(await signObject(mintKey, STATUS_DOMAIN, without(asMint(report), 'mint')));
 check('a record without mint is 422', r.status === 422, r.status);
 r = await postReport(text.replace(/"sig":"[^"]+"/, '"sig":"abc"'));
 check('a sig that is not 86 base64url characters is 422', r.status === 422, r.status);
-r = await postReport(await signedReport({ note: 'bw-mint is 192.168.0.61' }));
-check('an address in the signed body is 422', r.status === 422, r.status);
-r = await postReport(await signedReport({ received_at: 1 }));
+r = await postReport(await signed({ ...report, received_at: 1 }));
 check('a posted received_at is 422', r.status === 422, r.status);
-r = await postReport(await signedReport({ nodes: [{ name: 'bw-house', role: 'router' }] }));
-check('a shape fault of the report is 422 here (400 on the token path)', r.status === 422, r.status);
-r = await postReport(await signedReport({ pad: 'x'.repeat(65 * 1024) }));
-check('over 64 KB is 413', r.status === 413, r.status);
-r = await postReport(await signedReport(), { ...env, ALLOW_TEST_KEYS: undefined });
+r = await postReport(await signed(report), { ...env, ALLOW_TEST_KEYS: undefined });
 check('a vector key is 403 unless ALLOW_TEST_KEYS is set', r.status === 403, r.status);
-r = await postReport(await signedReport({ generated_at: now() - 301 }));
+r = await postReport(await signObject(mintKey, STATUS_DOMAIN, { ...asMint(report), generated_at: now() - 301 }));
 check('generated_at 301 s in the past is 409', r.status === 409, r.status);
-r = await postReport(await signedReport({ generated_at: now() + 301 }));
+r = await postReport(await signObject(mintKey, STATUS_DOMAIN, { ...asMint(report), generated_at: now() + 301 }));
 check('generated_at 301 s in the future is 409', r.status === 409, r.status);
 r = await postReport(text);
 check('the same record again is 409 (generated_at not newer)', r.status === 409, r.status);
-r = await postReport(await signedReport({ generated_at: now() + 1 }));
+r = await postReport(await signObject(mintKey, STATUS_DOMAIN, { ...asMint(report), generated_at: now() + 1 }));
 check('a newer record within 60 s of the last is 429, with Retry-After', r.status === 429 && r.headers.get('Retry-After') === '60', r.status + ' ' + r.headers.get('Retry-After'));
 check('…and nothing of the refused posts was stored', db.tables.reports.get(MINT).body === text && meterNow() - m0 === 9);
 
 tick();
 const before = meterNow();
-r = await postReport(await signedReport());
+r = await postReport(await signed(report));
 check('61 s later the next report is 200', r.status === 200, r.status);
 check('…and with no window changed, the batch wrote the report and the Mint only: 3 rows with the meter', meterNow() - before === 3, meterNow() - before);
 tick();
 const settled = { ...report, nodes: report.nodes.map((n, i) => i ? n : { ...n, history: n.history.map((w, j) => j === 2 ? { ...w, settled_bytes: 8416, disputed: false } : w) }) };
-r = await postReport(await signedReport({}, mintKey, MINT, settled));
+r = await postReport(await signed(settled));
 check('a report that settles one window writes that one row more', r.status === 200 && meterNow() - before === 7, (meterNow() - before) + ' ' + r.status);
 check('…and the window is updated in place', [...db.tables.windows.values()].find((w) => w.mint === MINT && w.t_first === 1792186147).settled_bytes === 8416 && [...db.tables.windows.values()].filter((w) => w.mint === MINT).length === 5);
 
@@ -298,7 +286,7 @@ check('…and the window is updated in place', [...db.tables.windows.values()].f
 // so). The signer signs the text it wrote, bsp.parse keeps the float, and the signature verifies; the same record
 // through JSON.stringify loses it, and the same signature no longer does.
 tick();
-const proofRecord = record(withProof, { proof: { ...withProof.proof, mint: MINT }, commitment: { ...withProof.commitment, mint: MINT } });
+const proofRecord = asMint(withProof);
 proofRecord.proof.settlements[0].settlement.fee_usd = 0;
 text = await signText(mintKey, STATUS_DOMAIN, JSON.stringify(proofRecord).replace('"fee_usd":0', '"fee_usd":0.0'));
 check('the signed text carries the whole-valued float as 0.0', /"fee_usd":0\.0[,}]/.test(text));
@@ -309,40 +297,29 @@ r = await postReport(JSON.stringify(JSON.parse(text)));
 check('the same record through JSON.stringify (0.0 becomes 0) no longer verifies: 401', r.status === 401, r.status);
 
 // A Mint describes itself: the name, the domain and the places come out of the report.
-tick();
-r = await postReport(await signedReport({ proof: { ...withSteward.proof, mint: MINT }, commitment: { ...withSteward.commitment, mint: MINT } }, mintKey, MINT, withSteward));
+r = await post(withSteward);
 mintRow = db.tables.mints.get(MINT);
 check('the Oct 17 Steward shape gives the Mint its domain and places', r.status === 200 && mintRow.domain === 'earth' && mintRow.places === '["house","next-door","cabin"]', r.status + ' ' + JSON.stringify(mintRow));
-const live = fixture('report-bwkit-0.4.0.json');
-tick();
-r = await postReport(await signedReport({ proof: { ...live.proof, mint: MINT }, commitment: { ...live.commitment, mint: MINT } }, mintKey, MINT, live));
+r = await post(live);
 mintRow = db.tables.mints.get(MINT);
 check('what bwkit 0.4.0 posts today, signed, is 200', r.status === 200, r.status + ' ' + (await r.text()));
 check('…and gives the Mint its domain and places from the kit\'s map shape', mintRow.domain === 'earth' && mintRow.places === '["house","next-door","the-cabin"]', JSON.stringify(mintRow));
 check('…and every window of its four nodes is in the table', live.nodes.every((n) => (n.history || []).every((w) => db.tables.windows.has(MINT + '|' + n.name + '|' + w.t_first))));
-tick();
-r = await postReport(await signedReport({ name: 'lab', domain: 'texas' }));
+r = await post({ ...report, name: 'lab', domain: 'texas' });
 check('a Mint may say its own name and domain', r.status === 200 && db.tables.mints.get(MINT).name === 'lab' && db.tables.mints.get(MINT).domain === 'texas');
-r = await postReport(await signedReport({ name: 'The Lab' }));
+r = await post({ ...report, name: 'The Lab' });
 check('…as names', r.status === 422, r.status);
-r = await postReport(await signedReport({ proof: { ...withProof.proof, mint: LAB } }));
+r = await post({ ...report, proof: { ...withProof.proof, mint: HOP } });
 check('a proof that is another Mint\'s is 422', r.status === 422, r.status);
 
-tick();
-r = await postReport(await signedReport({}, hopKey, HOP));
+r = await post(report, hopKey, HOP);
 check('a second Mint (the vector hop posting as a Mint) is 200', r.status === 200, r.status);
-check('…and the tables hold both, beside the lab Mint from the token path', db.tables.reports.size === 3 && db.tables.mints.size === 3);
-
-r = await post(live);
-check('the token path takes what bwkit 0.4.0 posts today, unchanged: 200', r.status === 200, r.status + ' ' + (await r.text()));
-check('…and stores it under the Mint the body names, with its windows and commitment', db.tables.reports.get(LAB).generated_at === live.generated_at && live.nodes.every((n) => (n.history || []).every((w) => db.tables.windows.has(LAB + '|' + n.name + '|' + w.t_first))) && db.tables.commitments.get(LAB + '|' + live.commitment.window)?.root === live.commitment.root);
+check('…and the tables hold both', db.tables.reports.size === 2 && db.tables.mints.size === 2);
 tick();
 const meterSaved = meterNow();
 db.tables.meter.set(today(), 80000);
-r = await postReport(await signedReport());
+r = await postReport(await signed(report));
 check('with the day\'s meter full, a signed report is 429 and the body says the meter', r.status === 429 && /meter/.test((await r.json()).error), r.status);
-r = await post(report);
-check('…and so is the token path', r.status === 429, r.status);
 db.tables.meter.set(today(), meterSaved);
 r = await call('/report', { method: 'OPTIONS', headers: { Origin: 'https://example.com', 'Access-Control-Request-Method': 'POST' } });
 check('OPTIONS /report allows POST from any origin', r.status === 204 && r.headers.get('Access-Control-Allow-Methods') === 'GET, POST, OPTIONS' && r.headers.get('Access-Control-Allow-Origin') === '*');
@@ -350,16 +327,15 @@ r = await call('/report');
 check('GET /report is 405', r.status === 405, r.status);
 
 // ---------------------------------------------------------------- the GETs (PLAN.md 2.3)
-r = await worker.fetch(new Request(BASE + '/status'), { ...env, DB: fakeD1() });
-let got2 = await r.json();
-check('/status falls back to the KV key while D1 has nothing for the default Mint', r.status === 200 && got2.generated_at === live.generated_at && got2.sig === undefined, r.status);
-check('…with any origin allowed and the short cache', r.headers.get('Access-Control-Allow-Origin') === '*' && r.headers.get('Cache-Control') === 'public, max-age=30');
 r = await call('/status');
-got2 = await r.json();
-check('/status is served from D1 once the token path has stored there: the same report, sig null, received_at', got2.generated_at === live.generated_at && got2.sig === null && got2.received_at === db.tables.reports.get(LAB).received_at, JSON.stringify(got2).slice(-80));
+let got2 = await r.json();
+stored = db.tables.reports.get(MINT);
+check('/status serves the default Mint\'s latest report from D1, with its signature and received_at', r.status === 200 && got2.generated_at === stored.generated_at && got2.sig === stored.sig && got2.received_at === stored.received_at, JSON.stringify(got2).slice(-120));
+check('…with any origin allowed and the short cache', r.headers.get('Access-Control-Allow-Origin') === '*' && r.headers.get('Cache-Control') === 'public, max-age=30');
+r = await worker.fetch(new Request(BASE + '/status'), envFor(fakeD1()));
+check('/status on an empty D1 is 404', r.status === 404, r.status);
 r = await call('/mints/' + MINT + '/status');
 const rawMint = await r.text();
-stored = db.tables.reports.get(MINT);
 check('/mints/<nym>/status serves the Mint\'s latest report', r.status === 200 && rawMint.startsWith(stored.body.slice(0, -1)), r.status);
 got2 = JSON.parse(rawMint);
 check('…as the bytes it signed with received_at added', got2.sig === stored.sig && got2.received_at === stored.received_at && got2.name === 'lab' && rawMint.endsWith('"received_at":' + stored.received_at + '}'));
@@ -373,7 +349,7 @@ r = await call('/mints/not-a-nym/status');
 check('a path with something that is not a NYM is 404', r.status === 404, r.status);
 r = await call('/mints');
 got2 = await r.json();
-check('/mints before any map lists nobody and counts the three unlisted', r.status === 200 && got2.mints.length === 0 && got2.unlisted === 3, JSON.stringify(got2));
+check('/mints before any map lists nobody and counts the two unlisted', r.status === 200 && got2.mints.length === 0 && got2.unlisted === 2, JSON.stringify(got2));
 r = await call('/mints/' + MINT + '/history');
 got2 = await r.json();
 check('/history defaults to a week and names the span', r.status === 200 && got2.hours === 168 && got2.since === now() - 168 * 3600 && got2.mint === MINT, JSON.stringify(got2).slice(0, 120));
@@ -413,7 +389,7 @@ r = await call('/mints');
 got2 = await r.json();
 check('/mints lists the named Mint that has posted, not the one that has not', got2.mints.length === 1 && got2.mints[0].mint === MINT, JSON.stringify(got2));
 check('…with its own name and domain (the Mint\'s report wins over the map), its places, last seen and windows settled', got2.mints[0].name === 'lab' && got2.mints[0].domain === 'texas' && got2.mints[0].last_seen === db.tables.reports.get(MINT).received_at && got2.mints[0].windows_settled === [...db.tables.windows.values()].filter((w) => w.mint === MINT && w.settled_bytes !== null).length, JSON.stringify(got2.mints[0]));
-check('…and the hop Mint and the lab\'s are the unlisted', got2.unlisted === 2 && db.tables.mints.get(THIRD).name === 'third' && db.tables.mints.get(THIRD).listed === 1, JSON.stringify(got2));
+check('…and the hop Mint is the one unlisted', got2.unlisted === 1 && db.tables.mints.get(THIRD).name === 'third' && db.tables.mints.get(THIRD).listed === 1, JSON.stringify(got2));
 r = await postMap(await signObject(hopKey, MAP_DOMAIN, mapRecord([{ nym: HOP }], {}, HOP)));
 check('a map from a Mint that is not in ADMIN_MINTS is 403', r.status === 403, r.status);
 r = await postMap(await signObject(hopKey, MAP_DOMAIN, mapRecord([{ nym: HOP }])));
@@ -434,22 +410,12 @@ r = await postMap(await signObject(mintKey, MAP_DOMAIN, mapRecord([{ nym: HOP, n
 check('a new map listing the hop Mint only is 200', r.status === 200, r.status);
 r = await call('/mints');
 got2 = await r.json();
-check('…so /mints now lists the hop Mint, and two are unlisted', got2.mints.length === 1 && got2.mints[0].mint === HOP && got2.mints[0].name === 'bw-mint' && got2.unlisted === 2, JSON.stringify(got2));
-tick();
-r = await postReport(await signedReport({}, hopKey, HOP));
+check('…so /mints now lists the hop Mint, and the vector Mint is the one unlisted', got2.mints.length === 1 && got2.mints[0].mint === HOP && got2.mints[0].name === 'bw-mint' && got2.unlisted === 1, JSON.stringify(got2));
+r = await post(report, hopKey, HOP);
 r = await call('/mints');
 check('a later report from a listed Mint leaves it listed', r.status === 200 && (await r.json()).mints[0].mint === HOP);
 r = await call('/map', { method: 'DELETE' });
 check('DELETE /map is 405', r.status === 405, r.status);
-
-// A self-hosted copy has no KV binding (README, "Running your own"): nothing throws without it.
-const own = { ...env, STATUS: undefined, DB: fakeD1() };
-r = await worker.fetch(new Request(BASE + '/status'), own);
-check('without a KV binding and an empty D1, GET /status is 404, not an error', r.status === 404, r.status);
-r = await worker.fetch(new Request(BASE + '/status', { method: 'POST', headers: { Authorization: 'Bearer ' + env.STATUS_TOKEN }, body: JSON.stringify(report) }), own);
-check('…and the token path stores into D1 alone', r.status === 200 && own.DB.tables.reports.get(LAB)?.sig === null, r.status);
-r = await worker.fetch(new Request(BASE + '/status'), own);
-check('…from where GET /status then serves it', r.status === 200 && (await r.json()).sig === null, r.status);
 Date.now = realNow;
 
 console.log(failures ? failures + ' failed' : 'all passed');
