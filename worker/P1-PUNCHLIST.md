@@ -1,6 +1,6 @@
 # Phase 1 of the multi-tenant Worker: the punch list
 
-Written Oct 18, 2026, and paused by the owner before any code was written. Nothing below is built: `src/index.js` is still the single-tenant Worker (one KV key, the bearer token, 60 checks in `test.mjs`), and the live Worker is still the Oct 16 build. `PLAN.md` is the design; this is the work of its phase P1 (Section 3) in order, with what each item is done when, and what was found while reading. Tick the boxes as you go and commit each item with its tests, so main never carries half a step.
+Written Oct 18, 2026, and paused by the owner before any code was written. **Built later the same day**, on the branch `worker/p1-multi-tenant`, one commit per item with its tests (160 checks in `test.mjs`, and `smoke.mjs` against workerd); the live Worker is still the Oct 16 build until the owner's section at the end is run. `PLAN.md` is the design; this is the work of its phase P1 (Section 3) in order, with what each item is done when, what was found while reading, and what was found while building.
 
 ## Before you start
 
@@ -14,9 +14,9 @@ Written Oct 18, 2026, and paused by the owner before any code was written. Nothi
 
 ## The work
 
-- [ ] **1. The schema.** `worker/migrations/0001.sql` with the six tables of PLAN.md 2.2: `reports`, `windows`, `commitments`, `mints`, `map`, `meter`. In `wrangler.toml`, a `[[d1_databases]]` binding `DB` with `database_name = "bandwidthswap-status"`, a placeholder `database_id`, and a comment saying to fill it from `npx -y wrangler@3 d1 create bandwidthswap-status`. Keep the KV binding `STATUS`: the token path and the fallback use it until P2. Put `DEFAULT_MINT` and `ADMIN_MINTS` (comma-separated) in `[vars]` with the lab Mint's NYM, `ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM`; NYMs are public keys. Consider `WITHOUT ROWID` for `windows` and `commitments` (see the note on rows written). Done when `npx -y wrangler@3 d1 execute bandwidthswap-status --local --file=migrations/0001.sql` runs clean.
+- [x] **1. The schema.** `worker/migrations/0001.sql` with the six tables of PLAN.md 2.2: `reports`, `windows`, `commitments`, `mints`, `map`, `meter`. In `wrangler.toml`, a `[[d1_databases]]` binding `DB` with `database_name = "bandwidthswap-status"`, a placeholder `database_id`, and a comment saying to fill it from `npx -y wrangler@3 d1 create bandwidthswap-status`. Keep the KV binding `STATUS`: the token path and the fallback use it until P2. Put `DEFAULT_MINT` and `ADMIN_MINTS` (comma-separated) in `[vars]` with the lab Mint's NYM, `ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM`; NYMs are public keys. Consider `WITHOUT ROWID` for `windows` and `commitments` (see the note on rows written). Done when `npx -y wrangler@3 d1 execute bandwidthswap-status --local --file=migrations/0001.sql` runs clean.
 
-- [ ] **2. `POST /report`.** The signed record of PLAN.md 2.1: `kind: "status"`, `proto: 1`, `mint`, `generated_at`, the report's fields, `sig`. The signed bytes are `bandwidthswap/status/v1`, a newline, and the canonical JSON of the record without `sig`, verified with `pubOfNym` and `verifySignature` from `docs/bsp.js` against the `mint` inside the record. Answers:
+- [x] **2. `POST /report`.** The signed record of PLAN.md 2.1: `kind: "status"`, `proto: 1`, `mint`, `generated_at`, the report's fields, `sig`. The signed bytes are `bandwidthswap/status/v1`, a newline, and the canonical JSON of the record without `sig`, verified with `pubOfNym` and `verifySignature` from `docs/bsp.js` against the `mint` inside the record. Answers:
   - 413 over 64 KB, measured in bytes before parsing.
   - 400 for text that is not JSON.
   - 422 for a shape fault (the existing `checkReport`, plus `kind`, `proto`, `mint` as a NYM and `sig` as 86 base64url characters) or an IPv4 or MAC address anywhere in the text.
@@ -26,7 +26,7 @@ Written Oct 18, 2026, and paused by the owner before any code was written. Nothi
   - 429 for a second accepted write from the same Mint within 60 s, or when the day's meter has reached 80,000; the body says which.
   - 200 `{stored: true, received_at}` after one `DB.batch`: upsert `reports`, upsert `mints` (`listed` when the map names it), write the report's `history` windows into `windows` and its `commitment` into `commitments`, bump `meter`.
 
-- [ ] **3. The GETs of PLAN.md 2.3.**
+- [x] **3. The GETs of PLAN.md 2.3.**
   - `/status`: the `DEFAULT_MINT`'s latest report from D1, falling back to the KV key while D1 has none; the shape unchanged plus `sig` and `received_at`.
   - `/mints`: the listed Mints with name, domain, places, last seen and windows settled, and `unlisted: n`.
   - `/mints/<nym>/status`: that Mint's latest report, listed or not.
@@ -35,11 +35,11 @@ Written Oct 18, 2026, and paused by the owner before any code was written. Nothi
   - `/`: what this is, the routes, and the Ed25519 self-test below.
   - CORS: `Access-Control-Allow-Origin: *` on every GET, and the preflight allows `POST` with `Content-Type` for `/report` and `/map`.
 
-- [ ] **4. The map.** `POST /map` with a signed record `{kind: "map", proto: 1, by: <NYM>, at, map: {...}, sig}`, accepted only when `by` is in `ADMIN_MINTS` (403 otherwise, 401 on a bad signature, 409 when `at` is not newer than the stored map's). It replaces the one stored map and sets `listed` on the Mints it names, clearing it on those it no longer names.
+- [x] **4. The map.** `POST /map` with a signed record `{kind: "map", proto: 1, by: <NYM>, at, map: {...}, sig}`, accepted only when `by` is in `ADMIN_MINTS` (403 otherwise, 401 on a bad signature, 409 when `at` is not newer than the stored map's). It replaces the one stored map and sets `listed` on the Mints it names, clearing it on those it no longer names.
 
-- [ ] **5. The token path.** `POST /status` with the bearer token keeps working exactly as today (its shape faults stay 400, which the 60 existing checks assert) and now also stores into D1: an unsigned report with `sig: null`, the Mint taken from the body's `mint`, or `DEFAULT_MINT` when absent. Keep writing the KV key too, so a rollback to the Oct 16 build loses nothing. Mark the whole path in the code as what P2 removes.
+- [x] **5. The token path.** `POST /status` with the bearer token keeps working exactly as today (its shape faults stay 400, which the 60 existing checks assert) and now also stores into D1: an unsigned report with `sig: null`, the Mint taken from the body's `mint`, or `DEFAULT_MINT` when absent. Keep writing the KV key too, so a rollback to the Oct 16 build loses nothing. Mark the whole path in the code as what P2 removes.
 
-- [ ] **6. Tests and the local smoke.** Extend `test.mjs` with a fake D1 binding (`prepare`, `bind`, `first`, `all`, `run`, `batch` over in-memory tables, enough for the statements the Worker uses) and cover:
+- [x] **6. Tests and the local smoke.** Extend `test.mjs` with a fake D1 binding (`prepare`, `bind`, `first`, `all`, `run`, `batch` over in-memory tables, enough for the statements the Worker uses) and cover:
   - a good signed report stored and served;
   - a bad signature, 401;
   - a stale `generated_at`, 409;
@@ -53,7 +53,7 @@ Written Oct 18, 2026, and paused by the owner before any code was written. Nothi
 
   Then the smoke, recorded in the README as how to run the Worker locally: the migration with `d1 execute --local`, `wrangler dev --local` with `--var ALLOW_TEST_KEYS:1`, and a script (`smoke.mjs`, sharing the signing helper with `test.mjs`) that posts a signed record and reads every GET. Note the rows written per report it measures.
 
-- [ ] **7. The README.** Rewrite `worker/README.md` for the multi-tenant Worker: the routes, the signed record and its bytes, the local run, the deploy (the login steps, exactly), and how another operator self-hosts it (PLAN.md 2.7).
+- [x] **7. The README.** Rewrite `worker/README.md` for the multi-tenant Worker: the routes, the signed record and its bytes, the local run, the deploy (the login steps, exactly), and how another operator self-hosts it (PLAN.md 2.7).
 
 ## Found while reading: read before writing code
 
@@ -78,9 +78,18 @@ Written Oct 18, 2026, and paused by the owner before any code was written. Nothi
   - How the map names Mints. The Steward's map in the feed names places and one Mint by name; listing needs NYMs. Suggested: `map.mints: [{nym, name, domain}]`, with `/mints` showing those that have posted.
   - Whether the token path should also obey the 60-second rate. It posts every 120 s, so either way is safe.
 
+## Found while building: Oct 18, 2026
+
+- **The stricter shape check that main carried would have refused the live feed.** It was written against the Oct 17 fixture, and bwkit 0.4.0 posts a different Steward's book: a payout's `window` is `{t_first, t_last}`, links carry `payer`, `hop`, `fees_usd` and `take_usd`, the map has `domains` keyed by name and places with an `id` and a free-text `name`. Deploying main's `worker/` as it was would have turned the lab's two-minute post into a 400 and frozen the Lab status. `checkSteward` now admits both shapes, and `tools/fixtures/report-bwkit-0.4.0.json` (the live report of Oct 18, 21:00 UTC) is posted on both paths by `test.mjs` so it cannot happen again. (The site's `docs/steward.html` still reads the Oct 17 shape; that is P3's.)
+- **What D1 counts, measured in workerd:** a first report with 36 windows and a commitment writes 42 rows (the windows, the commitment, the report and its primary-key index, the Mint's row, the prune stamp, the meter); the same report with nothing changed writes 3. `reports` keeps its rowid, so its first insert costs two rows and an update one. The `meter` row is written after the batch with the sum of the batch's `rows_written`, plus one for itself: it cannot be in the same batch, since the count is only known afterwards.
+- **Two orderings that bit the tests.** A second record in the same second is "not newer" (409) before it is "too soon" (429), so a rate test needs `generated_at` one second ahead. And the last character of an 86-character base64url signature carries four padding bits: changing it changes nothing, so a tamper test must change another character.
+- **Wrangler 3.114 runs the local Worker on a runtime whose latest compatibility date is 2025-07-18** and falls back to it from the 2025-09-01 in `wrangler.toml`; Ed25519 verifies there all the same (`GET /` says `ok`). `d1 execute --local` and `dev --local` take the placeholder `database_id`; the local database lives under `worker/.wrangler/` (ignored).
+- **The vendored `bsp.js` bundles clean.** Its import of noble from jsDelivr stays in the bundle unused; `useEd25519('webcrypto')` at module start keeps the probe from ever running.
+- **`mints` gained two columns** beyond PLAN.md 2.2, `places` (a JSON list of place ids from the Mint's last report) and `pruned_at`; the map table's signer column is `signer`, since `BY` is a keyword.
+
 ## Left for the owner: needs the Cloudflare login
 
-From `worker/`, once items 1 to 7 are on main and `node test.mjs` passes:
+From `worker/`, once the branch is merged to main and `node test.mjs` passes (on Oct 18 the Mac in use, the `isiah` account on Roberts-MacBook-Pro-3, already has the login: `whoami` names the account):
 
 ```sh
 npx -y wrangler@3 login
