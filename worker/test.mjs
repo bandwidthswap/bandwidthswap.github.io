@@ -92,11 +92,20 @@ r = await post(report);
 check('a good POST with history is 200', r.status === 200, r.status);
 const posted = await r.json();
 check('…and answers with received_at', Number.isInteger(posted.received_at) && posted.stored === true);
+check('…is in D1 under the default Mint with no signature', db.tables.reports.get(LAB)?.sig === null && db.tables.reports.get(LAB).received_at === posted.received_at && db.tables.mints.get(LAB).name === 'bw-mint');
+check('…and in the KV key still, for a rollback', JSON.parse(kv.get('status')).received_at === posted.received_at);
+check('…with its windows in the table', [...db.tables.windows.values()].filter((w) => w.mint === LAB).length === 5);
+r = await post({ ...report, received_at: 1 });
+check('a token report carrying received_at is 400', r.status === 400, r.status);
+r = await post({ ...report, sig: null });
+check('a token report carrying sig is 400', r.status === 400, r.status);
+r = await post(report);
+check('the token path keeps no per-Mint rate: the next post right away is 200', r.status === 200, r.status);
 
 r = await call('/status', { headers: { Origin: SITE } });
 check('GET after the post is 200', r.status === 200, r.status);
 const got = await r.json();
-check('…returns the report with received_at added', got.generated_at === report.generated_at && got.received_at === posted.received_at && got.nodes.length === 3);
+check('…returns the report with received_at added, now from D1, with sig null', got.generated_at === report.generated_at && got.received_at === db.tables.reports.get(LAB).received_at && got.nodes.length === 3 && got.sig === null);
 check('…history and totals intact', got.nodes[0].history.length === 3 && got.nodes[0].history[2].settled_bytes === null && got.nodes[0].total_bytes === 65846000 && got.since === report.since);
 check('…with CORS for any origin', r.headers.get('Access-Control-Allow-Origin') === '*');
 check('…and a short cache', r.headers.get('Cache-Control') === 'public, max-age=30');
@@ -221,21 +230,22 @@ const record = (base, extra = {}, nym = MINT) => ({ ...base, kind: 'status', pro
 const signedReport = (extra = {}, key = mintKey, nym = MINT, base = report) => signObject(key, STATUS_DOMAIN, record(base, extra, nym));
 const postReport = (text, e = env) => worker.fetch(new Request(BASE + '/report', { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: 'https://example.com' }, body: text }), e);
 
+const m0 = meterNow();
 let text = await signedReport();
 r = await postReport(text);
 let body = await r.json();
 check('a signed report from the vector Mint is 200', r.status === 200, r.status + ' ' + JSON.stringify(body));
-check('…answers stored and received_at', body.stored === true && body.received_at === now());
+check('…answers stored, received_at and the rows written', body.stored === true && body.received_at === now() && body.rows_written === 9, JSON.stringify(body));
 check('…with CORS for any origin', r.headers.get('Access-Control-Allow-Origin') === '*');
 let stored = db.tables.reports.get(MINT);
 check('…the bytes as received are stored, with the signature', stored && stored.body === text && /^[A-Za-z0-9_-]{86}$/.test(stored.sig) && stored.generated_at === now());
 let mintRow = db.tables.mints.get(MINT);
 check('…the Mint has a row, named after its mint node, first and last seen now, unlisted', mintRow && mintRow.name === 'bw-mint' && mintRow.domain === null && mintRow.first_seen === now() && mintRow.last_seen === now() && mintRow.listed === 0);
-check('…its five windows are in the table', db.tables.windows.size === 5 && [...db.tables.windows.values()].every((w) => w.mint === MINT));
-check('…the unsettled window keeps null settled_bytes and disputed', [...db.tables.windows.values()].some((w) => w.t_first === 1792186147 && w.settled_bytes === null && w.disputed === null));
-check('…the disputed window is stored as 1', [...db.tables.windows.values()].some((w) => w.t_first === 1792185254 && w.disputed === 1 && w.settled_bytes === 1710));
-check('…no commitment, since the report had none', db.tables.commitments.size === 0);
-check('…the meter counts the rows: report, mint, five windows, the prune stamp, and itself', meterNow() === 9, meterNow());
+check('…its five windows are in the table', [...db.tables.windows.values()].filter((w) => w.mint === MINT).length === 5);
+check('…the unsettled window keeps null settled_bytes and disputed', [...db.tables.windows.values()].some((w) => w.mint === MINT && w.t_first === 1792186147 && w.settled_bytes === null && w.disputed === null));
+check('…the disputed window is stored as 1', [...db.tables.windows.values()].some((w) => w.mint === MINT && w.t_first === 1792185254 && w.disputed === 1 && w.settled_bytes === 1710));
+check('…no commitment, since the report had none', ![...db.tables.commitments.values()].some((c) => c.mint === MINT));
+check('…the meter counts the rows: report, mint, five windows, the prune stamp, and itself', meterNow() - m0 === 9, meterNow() - m0);
 check('…and pruned_at is stamped', mintRow.pruned_at === now());
 
 const at = text.lastIndexOf('"sig":"') + 7;   // the first character, not the last: that one carries four padding bits
@@ -271,7 +281,7 @@ r = await postReport(text);
 check('the same record again is 409 (generated_at not newer)', r.status === 409, r.status);
 r = await postReport(await signedReport({ generated_at: now() + 1 }));
 check('a newer record within 60 s of the last is 429, with Retry-After', r.status === 429 && r.headers.get('Retry-After') === '60', r.status + ' ' + r.headers.get('Retry-After'));
-check('…and nothing of the refused posts was stored', db.tables.reports.get(MINT).body === text && meterNow() === 9);
+check('…and nothing of the refused posts was stored', db.tables.reports.get(MINT).body === text && meterNow() - m0 === 9);
 
 tick();
 const before = meterNow();
@@ -282,7 +292,7 @@ tick();
 const settled = { ...report, nodes: report.nodes.map((n, i) => i ? n : { ...n, history: n.history.map((w, j) => j === 2 ? { ...w, settled_bytes: 8416, disputed: false } : w) }) };
 r = await postReport(await signedReport({}, mintKey, MINT, settled));
 check('a report that settles one window writes that one row more', r.status === 200 && meterNow() - before === 7, (meterNow() - before) + ' ' + r.status);
-check('…and the window is updated in place', [...db.tables.windows.values()].find((w) => w.t_first === 1792186147).settled_bytes === 8416 && db.tables.windows.size === 5);
+check('…and the window is updated in place', [...db.tables.windows.values()].find((w) => w.mint === MINT && w.t_first === 1792186147).settled_bytes === 8416 && [...db.tables.windows.values()].filter((w) => w.mint === MINT).length === 5);
 
 // The float trap: a settlement in the proof carries a fee the Mint wrote as 0.0 (Python writes a whole-valued float
 // so). The signer signs the text it wrote, bsp.parse keeps the float, and the signature verifies; the same record
@@ -321,20 +331,32 @@ check('a proof that is another Mint\'s is 422', r.status === 422, r.status);
 tick();
 r = await postReport(await signedReport({}, hopKey, HOP));
 check('a second Mint (the vector hop posting as a Mint) is 200', r.status === 200, r.status);
-check('…and the tables hold both', db.tables.reports.size === 2 && db.tables.mints.size === 2);
+check('…and the tables hold both, beside the lab Mint from the token path', db.tables.reports.size === 3 && db.tables.mints.size === 3);
 
 r = await post(live);
 check('the token path takes what bwkit 0.4.0 posts today, unchanged: 200', r.status === 200, r.status + ' ' + (await r.text()));
+check('…and stores it under the Mint the body names, with its windows and commitment', db.tables.reports.get(LAB).generated_at === live.generated_at && live.nodes.every((n) => (n.history || []).every((w) => db.tables.windows.has(LAB + '|' + n.name + '|' + w.t_first))) && db.tables.commitments.get(LAB + '|' + live.commitment.window)?.root === live.commitment.root);
+tick();
+const meterSaved = meterNow();
+db.tables.meter.set(today(), 80000);
+r = await postReport(await signedReport());
+check('with the day\'s meter full, a signed report is 429 and the body says the meter', r.status === 429 && /meter/.test((await r.json()).error), r.status);
+r = await post(report);
+check('…and so is the token path', r.status === 429, r.status);
+db.tables.meter.set(today(), meterSaved);
 r = await call('/report', { method: 'OPTIONS', headers: { Origin: 'https://example.com', 'Access-Control-Request-Method': 'POST' } });
 check('OPTIONS /report allows POST from any origin', r.status === 204 && r.headers.get('Access-Control-Allow-Methods') === 'GET, POST, OPTIONS' && r.headers.get('Access-Control-Allow-Origin') === '*');
 r = await call('/report');
 check('GET /report is 405', r.status === 405, r.status);
 
 // ---------------------------------------------------------------- the GETs (PLAN.md 2.3)
-r = await call('/status');
+r = await worker.fetch(new Request(BASE + '/status'), { ...env, DB: fakeD1() });
 let got2 = await r.json();
 check('/status falls back to the KV key while D1 has nothing for the default Mint', r.status === 200 && got2.generated_at === live.generated_at && got2.sig === undefined, r.status);
 check('…with any origin allowed and the short cache', r.headers.get('Access-Control-Allow-Origin') === '*' && r.headers.get('Cache-Control') === 'public, max-age=30');
+r = await call('/status');
+got2 = await r.json();
+check('/status is served from D1 once the token path has stored there: the same report, sig null, received_at', got2.generated_at === live.generated_at && got2.sig === null && got2.received_at === db.tables.reports.get(LAB).received_at, JSON.stringify(got2).slice(-80));
 r = await call('/mints/' + MINT + '/status');
 const rawMint = await r.text();
 stored = db.tables.reports.get(MINT);
@@ -344,13 +366,14 @@ check('…as the bytes it signed with received_at added', got2.sig === stored.si
 check('…so that removing received_at and sig gives back the signed text', JSON.stringify(JSON.parse(rawMint.replace(',"received_at":' + stored.received_at + '}', '}'))) === JSON.stringify(JSON.parse(stored.body)));
 r = await call('/mints/' + HOP + '/status');
 check('an unlisted Mint is reachable by its NYM', r.status === 200, r.status);
-r = await call('/mints/ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM/status');
+const NEVER = 'ed25519:77itfob3IonHBoK2O3OGcBIWsNoxkOzfYCCc5O53K_o';   // the lab Steward's NYM: a key, not a Mint
+r = await call('/mints/' + NEVER + '/status');
 check('a Mint that never posted is 404', r.status === 404, r.status);
 r = await call('/mints/not-a-nym/status');
 check('a path with something that is not a NYM is 404', r.status === 404, r.status);
 r = await call('/mints');
 got2 = await r.json();
-check('/mints before any map lists nobody and counts the two unlisted', r.status === 200 && got2.mints.length === 0 && got2.unlisted === 2, JSON.stringify(got2));
+check('/mints before any map lists nobody and counts the three unlisted', r.status === 200 && got2.mints.length === 0 && got2.unlisted === 3, JSON.stringify(got2));
 r = await call('/mints/' + MINT + '/history');
 got2 = await r.json();
 check('/history defaults to a week and names the span', r.status === 200 && got2.hours === 168 && got2.since === now() - 168 * 3600 && got2.mint === MINT, JSON.stringify(got2).slice(0, 120));
@@ -367,7 +390,7 @@ r = await call('/mints/' + MINT + '/history?hours=soon');
 check('?hours that is not a number is 400', r.status === 400, r.status);
 r = await call('/mints/' + HOP + '/history');
 check('an unlisted Mint\'s history is served too, only its own windows', r.status === 200 && (await r.json()).windows.length === 5, r.status);
-r = await call('/mints/ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM/history');
+r = await call('/mints/' + NEVER + '/history');
 check('a history of a Mint that never posted is 404', r.status === 404, r.status);
 r = await call('/map');
 check('/map before any map is 404', r.status === 404, r.status);
@@ -390,7 +413,7 @@ r = await call('/mints');
 got2 = await r.json();
 check('/mints lists the named Mint that has posted, not the one that has not', got2.mints.length === 1 && got2.mints[0].mint === MINT, JSON.stringify(got2));
 check('…with its own name and domain (the Mint\'s report wins over the map), its places, last seen and windows settled', got2.mints[0].name === 'lab' && got2.mints[0].domain === 'texas' && got2.mints[0].last_seen === db.tables.reports.get(MINT).received_at && got2.mints[0].windows_settled === [...db.tables.windows.values()].filter((w) => w.mint === MINT && w.settled_bytes !== null).length, JSON.stringify(got2.mints[0]));
-check('…and the hop Mint is the one unlisted', got2.unlisted === 1 && db.tables.mints.get(THIRD).name === 'third' && db.tables.mints.get(THIRD).listed === 1, JSON.stringify(got2));
+check('…and the hop Mint and the lab\'s are the unlisted', got2.unlisted === 2 && db.tables.mints.get(THIRD).name === 'third' && db.tables.mints.get(THIRD).listed === 1, JSON.stringify(got2));
 r = await postMap(await signObject(hopKey, MAP_DOMAIN, mapRecord([{ nym: HOP }], {}, HOP)));
 check('a map from a Mint that is not in ADMIN_MINTS is 403', r.status === 403, r.status);
 r = await postMap(await signObject(hopKey, MAP_DOMAIN, mapRecord([{ nym: HOP }])));
@@ -411,7 +434,7 @@ r = await postMap(await signObject(mintKey, MAP_DOMAIN, mapRecord([{ nym: HOP, n
 check('a new map listing the hop Mint only is 200', r.status === 200, r.status);
 r = await call('/mints');
 got2 = await r.json();
-check('…so /mints now lists the hop Mint, named by the map since its report named no Mint node', got2.mints.length === 1 && got2.mints[0].mint === HOP && got2.mints[0].name === 'bw-mint' && got2.unlisted === 1, JSON.stringify(got2));
+check('…so /mints now lists the hop Mint, and two are unlisted', got2.mints.length === 1 && got2.mints[0].mint === HOP && got2.mints[0].name === 'bw-mint' && got2.unlisted === 2, JSON.stringify(got2));
 tick();
 r = await postReport(await signedReport({}, hopKey, HOP));
 r = await call('/mints');

@@ -390,8 +390,8 @@ async function postReport(request, env) {
     return json({ error: 'one report a minute per Mint', retry_after: wait }, 429, { 'Retry-After': String(wait) });
   }
   if (meter && meter.writes >= METER_MAX) return json({ error: 'the day\'s write meter is full; try after midnight UTC' }, 429);
-  await store(env, { mint: rec.mint, report: rec, text, sig, received_at: now, pruned_at: mintRow ? mintRow.pruned_at : null });
-  return json({ stored: true, received_at: now }, 200);
+  const rows_written = await store(env, { mint: rec.mint, report: rec, text, sig, received_at: now, pruned_at: mintRow ? mintRow.pruned_at : null });
+  return json({ stored: true, received_at: now, rows_written }, 200);
 }
 
 // A stored report, served as the bytes the Mint signed with `received_at` spliced in before the last brace (and
@@ -537,13 +537,18 @@ export default {
     if (url.pathname !== '/status') return json({ error: 'no such path' }, 404);
 
     if (request.method === 'POST') {
+      // The bearer-token path of the Phase 0 lab (bwkit 0.4.0 posts here every two minutes), kept through the
+      // transition and removed in P2 (PLAN.md 3): the token is the credential, the report is unsigned, and it is
+      // stored into D1 with sig NULL under the Mint the body names (else DEFAULT_MINT) as well as into the KV key,
+      // so a rollback to the Oct 16 build loses nothing. Its faults stay 400, which the kit expects; it keeps no
+      // per-Mint rate (the lab's timer is two minutes) and no freshness rule, and only the day's meter guards it.
       if (!env.STATUS_TOKEN) return json({ error: 'no token configured' }, 503);
       const auth = request.headers.get('Authorization') || '';
       const given = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
       if (!given || !(await sameToken(given, env.STATUS_TOKEN))) {
         return json({ error: 'bad token' }, 401, { 'WWW-Authenticate': 'Bearer' });
       }
-      const text = await request.text();
+      const text = (await request.text()).trim();
       if (byteLength(text) > MAX_BODY) return json({ error: 'too large' }, 413);
       let report;
       try {
@@ -551,9 +556,20 @@ export default {
       } catch (e) {
         return json({ error: 'bad JSON' }, 400);
       }
-      const why = checkReport(report, text);
+      const why = checkReport(report, text) || (report.sig !== undefined || report.received_at !== undefined ? 'sig and received_at are not posted here' : null);
       if (why) return json({ error: why }, 400);
+      const mint = (typeof report.mint === 'string' && report.mint)
+        || (isObj(report.commitment) && typeof report.commitment.mint === 'string' && report.commitment.mint)
+        || env.DEFAULT_MINT || null;
       const received_at = Math.floor(Date.now() / 1000);
+      if (mint && env.DB) {
+        const [mintRow, meter] = await Promise.all([
+          env.DB.prepare(SQL.mintRow).bind(mint).first(),
+          env.DB.prepare(SQL.meter).bind(day(received_at)).first(),
+        ]);
+        if (meter && meter.writes >= METER_MAX) return json({ error: 'the day\'s write meter is full; try after midnight UTC' }, 429);
+        await store(env, { mint, report, text, sig: null, received_at, pruned_at: mintRow ? mintRow.pruned_at : null });
+      }
       await env.STATUS.put(KEY, JSON.stringify({ ...report, received_at }));
       return json({ stored: true, received_at }, 200);
     }
