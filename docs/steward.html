@@ -286,8 +286,9 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding-top:16px;font-si
     var byId={};st.purchases.forEach(function(p){byId[p.id]=p;});
     var matches={};st.purchases.forEach(function(p){if(p.program!=='match')return;var k=p.matches||st.purchases.filter(function(o){return o.program==='payer'&&o.route.from===p.route.from&&o.route.to===p.route.to;}).map(function(o){return o.id;})[0];if(k)matches[k]=p;});
     var places=st.map&&st.map.places||null;
-    var shown=st.purchases.filter(function(p){return p.program!=='match'||!Object.keys(matches).some(function(k){return matches[k]===p;});});
-    if(!shown.length){C.appendChild(el('p','empty','No offers are open. The Steward posts when it has income to post, and a payer posts with bwkit purchase post.'));return;}
+    var live=st.purchases.filter(function(p){return p.program!=='match'||!Object.keys(matches).some(function(k){return matches[k]===p;});});
+    var shown=live.filter(function(p){return p.status!=='closed'&&p.status!=='expired';}), closed=live.length-shown.length;   /* the Steward re-posts a standing offer each run and closes the last; the closed ones are history, counted below */
+    if(!shown.length){C.appendChild(el('p','empty','No offers are open. The Steward posts when it has income to post, and a payer posts with bwkit purchase post.'+(closed?' '+plural(closed,'closed offer')+' not shown.':'')));return;}
     shown.forEach(function(p){
       var m=matches[p.id], paid=p.paid_usd>0||(m&&m.paid_usd>0), standing=p.windows_left==null&&p.deadline==null;
       var mine=st.payouts.filter(function(y){return y.purchase===p.id;}), refunded=p.refunded_usd!=null?p.refunded_usd:mine.reduce(function(a,y){return a+(y.refund_usd||0);},0), short=mine.filter(function(y){return y.refund_usd>0;}).length;
@@ -333,6 +334,7 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding-top:16px;font-si
       how.appendChild(document.createTextNode(txt));a.appendChild(how);
       C.appendChild(a);
     });
+    if(closed){var cn=el('p','note',plural(closed,'closed offer')+' not shown: the Steward re-posts its standing offers each run and closes the last, and a payer\'s offer closes when it is withdrawn or runs out. Their escrow went back where it came from.');cn.style.gridColumn='1 / -1';C.appendChild(cn);}
   }
   function payouts(st){
     var P=$('payouts');P.textContent='';

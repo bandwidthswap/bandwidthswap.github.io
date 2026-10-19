@@ -20,6 +20,18 @@ The kit and the lab keep their own list, in the kit's `PUNCH-LIST.md`.
 
 **P3 is done** (Oct 19, 2026, later the same night): the Lab status checks the report's signature in the browser beside the proof and says so; the Mint is stale after fifteen minutes, not five; the ledger strip toggles between the last twelve hours and the last seven days (one column per local day, from `/history`); a Mint picker appears when `/mints` lists more than one, and `?mint=<NYM>` draws that Mint on the Lab status and the Steward's book; `docs/steward.html` reads the kit's 0.4.0 book beside the Oct 17 shape; `docs/network.html` lists the Mints the map names and the map itself, its signature checked. The pages were run headless under jsdom against the live feed before the push (32 checks); nothing in the kit changed.
 
-**What remains.**
-1. **P4, the words:** both repos' CLAUDE.md in full, one sentence for the paper's Section 9 on the proof sheet (the spec's Section 9 note is written), and the page's prose where it still describes the two-minute feed in passing.
-2. **The other three nodes still run 0.4.0.** The protocol is unchanged and only the Mint reports, so nothing is wrong; `SSH_SUFFIX=-ts phase0/provision.sh update` brings them to 0.5.0 when wanted (bw-forest through `FOREST_JUMP=bw-house-ts`).
+**P4, the words, is done** (Oct 19, 2026) except the paper: this repo's CLAUDE.md reads current throughout (the kit has no CLAUDE.md; its README and the spec's Section 9 note were brought current with 0.5.0), `docs/verify.html` says how the Mint posts, and the Steward's book no longer shows closed offers, counting them instead.
+
+**Left: one sentence for the paper's Section 9, for the proof sheet.** Paper edits are never applied on a chat go-ahead; each is a card on the proof sheet, an exact before/after pair, approved there. This card edits the second sentence of "Phase 0, continued (October 17 and 18)". The before text matches `paper/BANDWIDTH-whitepaper-v0.6.md` exactly once.
+
+*Before:*
+
+> The two tests that Section 4 depends on, and that Phase 2 needs before a second operator signs anything, ran on the bench and passed: the Mint publishes a signed Merkle commitment for each hour in the status it already posts and answers with a proof for any receipt in it, and its ledger was rebuilt from the payer's and the hop's signed copies alone, 37 settlements including the two forced disputes, and matched the Mint's own ledger and commitment.
+
+*After:*
+
+> The two tests that Section 4 depends on, and that Phase 2 needs before a second operator signs anything, ran on the bench and passed: the Mint publishes a signed Merkle commitment for each hour in the status it already posts and answers with a proof for any receipt in it, and its ledger was rebuilt from the payer's and the hop's signed copies alone, 37 settlements including the two forced disputes, and matched the Mint's own ledger and commitment. Since October 19 that status is itself a record the Mint signs, and the public page that shows it verifies the signature under the Mint's key, so the relay that carries it between them holds the Mint's bytes and can alter none of them.
+
+When it is approved, apply it to `paper/BANDWIDTH-whitepaper-v0.6.md`, run `tools/build.sh`, and add the same sentence to the operators' reading if its Section 9 paragraph repeats the tests.
+
+**The other three nodes still run 0.4.0.** The protocol is unchanged and only the Mint reports, so nothing is wrong; `SSH_SUFFIX=-ts phase0/provision.sh update` brings them to 0.5.0 when wanted (bw-forest through `FOREST_JUMP=bw-house-ts`).
