@@ -24,6 +24,7 @@ mkdir -p /etc/ssh/sshd_config.d; printf 'PasswordAuthentication no\n' > /etc/ssh
 systemctl enable ssh
 ln -sf /usr/share/zoneinfo/America/Chicago /etc/localtime; echo America/Chicago > /etc/timezone
 [ -f /etc/default/keyboard ] && sed -i 's/^XKBLAYOUT=.*/XKBLAYOUT="us"/' /etc/default/keyboard
+# __EXTRAS__
 cp /var/log/cloud-init.log /var/log/cloud-init-output.log "$BOOT/" 2>/dev/null
 rm -f "$BOOT/firstrun.sh"
 sed -i 's| systemd\.run=[^ ]*||; s| systemd\.run_success_action=[^ ]*||; s| systemd\.unit=kernel-command-line\.target||' "$BOOT/cmdline.txt"
