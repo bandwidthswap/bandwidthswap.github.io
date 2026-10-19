@@ -3,7 +3,7 @@
 import worker from './src/index.js';
 import { readFileSync } from 'node:fs';
 import { fakeD1 } from './fake-d1.mjs';
-import { keyFromSeed, signObject, signText, SEEDS, STATUS_DOMAIN } from './sign.mjs';
+import { keyFromSeed, signObject, signText, SEEDS, STATUS_DOMAIN, MAP_DOMAIN } from './sign.mjs';
 
 process.removeAllListeners('warning');
 process.on('warning', (w) => { if (w.name !== 'ExperimentalWarning') console.warn(w); });
@@ -16,7 +16,7 @@ const env = {
   STATUS_TOKEN: 'test-token-0123456789abcdef',
   DB: db,
   DEFAULT_MINT: LAB,
-  ADMIN_MINTS: LAB,
+  ADMIN_MINTS: LAB + ', ' + SEEDS.mint.nym,
   ALLOW_TEST_KEYS: '1',
 };
 const BASE = 'https://status.bandwidthswap.com';
@@ -373,6 +373,51 @@ r = await call('/map');
 check('/map before any map is 404', r.status === 404, r.status);
 r = await call('/map', { method: 'OPTIONS', headers: { Origin: SITE, 'Access-Control-Request-Method': 'POST' } });
 check('OPTIONS /map allows POST', r.status === 204 && r.headers.get('Access-Control-Allow-Methods') === 'GET, POST, OPTIONS');
+
+// ---------------------------------------------------------------- POST /map: who is listed (PLAN.md 2.4)
+const THIRD = 'ed25519:K4oQ7mJv2yF8hR1pL6tXa9cNdUeWbGzS0iHqVkMoPjE';   // a Mint the map names that has never posted
+const postMap = (text) => worker.fetch(new Request(BASE + '/map', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: text }), env);
+const mapRecord = (mints, extra = {}, by = MINT) => ({ kind: 'map', proto: 1, by, at: now(), map: { mints, places: [{ id: 'house', name: 'the house' }] }, ...extra });
+const meterBefore = meterNow();
+text = await signObject(mintKey, MAP_DOMAIN, mapRecord([{ nym: MINT, name: 'bench', domain: 'earth' }, { nym: THIRD, name: 'third', domain: 'mars' }]));
+r = await postMap(text);
+body = await r.json();
+check('a map signed by an admin Mint is 200', r.status === 200 && body.stored === true && body.listed === 2, r.status + ' ' + JSON.stringify(body));
+check('…and the meter counts the map, the two listings and itself (the unlisting found nobody listed: no row)', meterNow() - meterBefore === 4, meterNow() - meterBefore);
+r = await call('/map');
+check('/map serves the record as posted', r.status === 200 && (await r.text()) === text && r.headers.get('Cache-Control') === 'public, max-age=60', r.status);
+r = await call('/mints');
+got2 = await r.json();
+check('/mints lists the named Mint that has posted, not the one that has not', got2.mints.length === 1 && got2.mints[0].mint === MINT, JSON.stringify(got2));
+check('…with its own name and domain (the Mint\'s report wins over the map), its places, last seen and windows settled', got2.mints[0].name === 'lab' && got2.mints[0].domain === 'texas' && got2.mints[0].last_seen === db.tables.reports.get(MINT).received_at && got2.mints[0].windows_settled === [...db.tables.windows.values()].filter((w) => w.mint === MINT && w.settled_bytes !== null).length, JSON.stringify(got2.mints[0]));
+check('…and the hop Mint is the one unlisted', got2.unlisted === 1 && db.tables.mints.get(THIRD).name === 'third' && db.tables.mints.get(THIRD).listed === 1, JSON.stringify(got2));
+r = await postMap(await signObject(hopKey, MAP_DOMAIN, mapRecord([{ nym: HOP }], {}, HOP)));
+check('a map from a Mint that is not in ADMIN_MINTS is 403', r.status === 403, r.status);
+r = await postMap(await signObject(hopKey, MAP_DOMAIN, mapRecord([{ nym: HOP }])));
+check('a map claiming an admin NYM but signed by another key is 401', r.status === 401, r.status);
+r = await postMap(await signObject(mintKey, MAP_DOMAIN, mapRecord([{ nym: HOP }], { at: now() })));
+check('a map whose at is not newer than the stored one is 409', r.status === 409, r.status);
+r = await postMap(await signObject(mintKey, MAP_DOMAIN, mapRecord([{ nym: 'bw-mint' }], { at: now() + 1 })));
+check('a map naming a Mint by something other than a NYM is 422', r.status === 422, r.status);
+r = await postMap(await signObject(mintKey, MAP_DOMAIN, mapRecord([{ nym: HOP, name: 'Next Door' }], { at: now() + 1 })));
+check('a listed Mint\'s name must be a name', r.status === 422, r.status);
+r = await postMap(await signObject(mintKey, MAP_DOMAIN, mapRecord([{ nym: HOP }, { nym: HOP }], { at: now() + 1 })));
+check('a Mint listed twice is 422', r.status === 422, r.status);
+r = await postMap(await signObject(mintKey, MAP_DOMAIN, mapRecord([{ nym: HOP }], { at: now() + 1, map: { mints: [{ nym: HOP }], note: 'bw-mint is 192.168.0.61' } })));
+check('an address anywhere in the map is 422', r.status === 422, r.status);
+r = await postMap(await signObject(mintKey, MAP_DOMAIN, mapRecord([{ nym: HOP }], { kind: 'status', at: now() + 1 })));
+check('a status record posted to /map is 422', r.status === 422, r.status);
+r = await postMap(await signObject(mintKey, MAP_DOMAIN, mapRecord([{ nym: HOP, name: 'next-door' }], { at: now() + 1 })));
+check('a new map listing the hop Mint only is 200', r.status === 200, r.status);
+r = await call('/mints');
+got2 = await r.json();
+check('…so /mints now lists the hop Mint, named by the map since its report named no Mint node', got2.mints.length === 1 && got2.mints[0].mint === HOP && got2.mints[0].name === 'bw-mint' && got2.unlisted === 1, JSON.stringify(got2));
+tick();
+r = await postReport(await signedReport({}, hopKey, HOP));
+r = await call('/mints');
+check('a later report from a listed Mint leaves it listed', r.status === 200 && (await r.json()).mints[0].mint === HOP);
+r = await call('/map', { method: 'DELETE' });
+check('DELETE /map is 405', r.status === 405, r.status);
 Date.now = realNow;
 
 console.log(failures ? failures + ' failed' : 'all passed');

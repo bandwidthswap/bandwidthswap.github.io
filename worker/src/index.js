@@ -3,6 +3,7 @@
 // report and cannot make one up or alter one; a reader checks the signature with docs/bsp.js (worker/PLAN.md).
 //
 //   POST /report                      a signed status record (below); 200 {stored, received_at}
+//   POST /map                         the map, a signed record from a Mint in ADMIN_MINTS; it decides who /mints lists
 //   POST /status                      the Phase 0 lab's Mint with the bearer token, until the kit signs its reports (P2 removes it)
 //   GET  /status                      the default Mint's latest report, with `received_at` (Unix seconds) added
 //   GET  /mints                       the Mints the map lists, and how many are not
@@ -31,6 +32,8 @@ import { ed25519Ok } from './selftest.js';
 bsp.useEd25519('webcrypto');
 
 const STATUS_DOMAIN = 'bandwidthswap/status/v1';
+const MAP_DOMAIN = 'bandwidthswap/map/v1';
+const MAX_MAP_MINTS = 64;
 const KEY = 'status';
 const MAX_BODY = 64 * 1024;
 const MAX_HISTORY = 48;
@@ -276,6 +279,33 @@ export function checkRecord(rec, text) {
   return null;
 }
 
+// The map: {kind: "map", proto: 1, by: <NYM>, at: <unix>, map: {mints: [{nym, name, domain}], ...}, sig}, signed by
+// `by` over "bandwidthswap/map/v1", a newline and the canonical JSON without sig. `map.mints` names the Mints that
+// are listed, by NYM, each with a name and a domain (names, or null) that fill in what the Mint's own report does not
+// say; anything else in `map` (the places, say) is kept as posted and served by GET /map. The membership keeps this
+// file for the pilot (PLAN.md 2.4); when Mints reconcile the map among themselves, ADMIN_MINTS goes away.
+export function checkMap(rec, text) {
+  if (!isObj(rec)) return 'the body must be a JSON object';
+  if (rec.kind !== 'map') return 'kind must be "map"';
+  if (rec.proto !== 1) return 'proto must be 1';
+  if (typeof rec.by !== 'string' || !NYM.test(rec.by)) return 'by must be an ed25519 NYM';
+  if (!Number.isInteger(rec.at) || rec.at <= 0) return 'at must be Unix seconds';
+  if (typeof rec.sig !== 'string' || !SIG.test(rec.sig)) return 'sig must be a base64url Ed25519 signature';
+  if (!isObj(rec.map)) return 'map must be an object';
+  if (!Array.isArray(rec.map.mints) || rec.map.mints.length > MAX_MAP_MINTS) return 'map.mints is a list of at most ' + MAX_MAP_MINTS;
+  const seen = new Set();
+  for (const m of rec.map.mints) {
+    if (!isObj(m) || typeof m.nym !== 'string' || !NYM.test(m.nym)) return 'each listed Mint has a nym';
+    if (seen.has(m.nym)) return 'a Mint is listed once';
+    seen.add(m.nym);
+    if (!nameOpt(m.name) || !nameOpt(m.domain)) return 'a listed Mint\'s name and domain are names or null';
+  }
+  for (const pat of PRIVATE) {
+    if (pat.test(text)) return 'a map may not carry an address';
+  }
+  return null;
+}
+
 // True when `sig` is `nym`'s signature over the domain string, a newline and the canonical JSON of `record`.
 // `record` must be the parsed text with `sig` removed by `delete`, so canon keeps the floats the signer wrote.
 async function verifies(nym, domain, record, sig) {
@@ -440,6 +470,38 @@ async function getAbout(env) {
 
 const MINT_PATH = /^\/mints\/(ed25519:[A-Za-z0-9_-]{43})\/(status|history)$/;
 
+// POST /map: the signed map from an admin Mint. It replaces the one stored map and resets who is listed.
+async function postMap(request, env) {
+  const text = (await request.text()).trim();
+  if (byteLength(text) > MAX_BODY) return json({ error: 'too large' }, 413);
+  let rec;
+  try { rec = bsp.parse(text); } catch (e) { return json({ error: 'bad JSON' }, 400); }
+  const why = checkMap(rec, text);
+  if (why) return json({ error: why }, 422);
+  const admins = new Set((env.ADMIN_MINTS || '').split(',').map((x) => x.trim()).filter(Boolean));
+  if (!admins.has(rec.by)) return json({ error: 'by is not one of the Mints that may post the map' }, 403);
+  const sig = rec.sig;
+  delete rec.sig;
+  if (!(await verifies(rec.by, MAP_DOMAIN, rec, sig))) return json({ error: 'the signature does not verify under by' }, 401);
+  const now = Math.floor(Date.now() / 1000);
+  const [stored, meter] = await Promise.all([
+    env.DB.prepare(SQL.map).first(),
+    env.DB.prepare(SQL.meter).bind(day(now)).first(),
+  ]);
+  if (stored && rec.at <= stored.at) return json({ error: 'at is not newer than the stored map\'s', stored: stored.at }, 409);
+  if (meter && meter.writes >= METER_MAX) return json({ error: 'the day\'s write meter is full; try after midnight UTC' }, 429);
+  const stmts = [
+    env.DB.prepare(SQL.putMap).bind(text, rec.by, rec.at),
+    env.DB.prepare(SQL.unlistAll),
+  ];
+  for (const m of rec.map.mints) stmts.push(env.DB.prepare(SQL.listMint).bind(m.nym, m.name ?? null, m.domain ?? null));
+  const results = await env.DB.batch(stmts);
+  let rows = 0;
+  for (const r of results) rows += (r.meta && r.meta.rows_written) || 0;
+  await env.DB.prepare(SQL.bumpMeter).bind(day(now), rows + 1).run();
+  return json({ stored: true, at: rec.at, listed: rec.map.mints.length }, 200);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -467,9 +529,9 @@ export default {
       return json({ error: 'no such path' }, 404);
     }
 
-    if (url.pathname === '/report') {
-      if (request.method === 'POST') return postReport(request, env);
-      return json({ error: 'method not allowed' }, 405, { Allow: 'POST, OPTIONS' });
+    if (url.pathname === '/report' || url.pathname === '/map') {
+      if (request.method === 'POST') return url.pathname === '/map' ? postMap(request, env) : postReport(request, env);
+      return json({ error: 'method not allowed' }, 405, { Allow: 'GET, POST, OPTIONS' });
     }
 
     if (url.pathname !== '/status') return json({ error: 'no such path' }, 404);
