@@ -81,6 +81,9 @@ figcaption{font-size:14px;color:var(--muted);margin-top:6px;max-width:65ch}
 .lab-head>div{min-width:0;flex:1 1 420px}
 .lab-sum{margin:6px 0 0;text-align:right;font:500 12px/1.6 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);white-space:nowrap;max-width:none}
 .lab-sum .m{color:var(--muted)}.lab-sum.off{color:var(--signal)}
+.lab-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.lab-pick{margin:0;font:400 12px/1.4 var(--mono);color:var(--muted)}.lab-pick select{font:inherit;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:3px 6px;margin-left:6px}
+.lab-span{margin:0 0 8px;font:400 12px/1.5 var(--mono);color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap;max-width:none}.lab-span button{font:500 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:3px;padding:6px 9px;cursor:pointer}.lab-span button.on{border-color:var(--accent);color:var(--accent)}.lab-span button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .lab-map{position:relative;height:var(--map-h,320px);margin:4px 0 18px}
 .lab .node{position:absolute;width:200px;min-height:92px;box-sizing:border-box;padding:10px 14px;display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font:400 14px/1.35 var(--body)}
 .lab .node b{font:700 18px/1.2 var(--display)}
@@ -105,8 +108,9 @@ figcaption{font-size:14px;color:var(--muted);margin-top:6px;max-width:65ch}
 .lab .lbl.la{left:196px;top:169px;text-align:left}.lab .lbl.lb{right:196px;top:169px;text-align:right}
 .lab .lbl.cm{left:0;right:0;top:296px}
 .lab .lbl.ck{left:0;right:0;top:314px;font-size:12px}.lab .lbl.ck.ok{color:var(--accent)}.lab .lbl.ck.bad{color:var(--signal)}
+.lab .lbl.sg{left:0;right:0;top:332px;font-size:12px}.lab .lbl.sg.ok{color:var(--accent)}.lab .lbl.sg.bad{color:var(--signal)}
 .lab .pulse{position:absolute;left:181px;top:107px;width:10px;height:10px;border-radius:50%;background:var(--accent);opacity:0;pointer-events:none}
-.lab-ledger{display:grid;grid-template-columns:140px repeat(12,minmax(0,1fr));gap:6px;align-items:end;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px 12px;min-width:640px}
+.lab-ledger{display:grid;grid-template-columns:140px repeat(var(--cols,12),minmax(0,1fr));gap:6px;align-items:end;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px 12px;min-width:640px}
 .lab-ledger:empty{display:none}
 .lab-ledger .rl{height:64px;display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:0}
 .lab-ledger .rl b{font:700 16px/1.2 var(--display)}.lab-ledger .rl span{font:400 12px/1.3 var(--body);color:var(--muted)}.lab-ledger .rl .c{font:500 11px/1.4 var(--mono);color:var(--accent);letter-spacing:.04em}
@@ -122,7 +126,7 @@ figcaption{font-size:14px;color:var(--muted);margin-top:6px;max-width:65ch}
 .lab-legend .up{color:var(--accent)}.lab-legend .stale{color:var(--signal)}.lab-legend .idle{color:var(--muted)}
 .lab .note{font:400 13px/1.5 var(--mono);color:var(--muted);margin:10px 0 8px;max-width:none}
 @media (max-width:1000px){.lab-map{height:auto;display:flex;flex-direction:column;gap:10px}.lab .node,.lab .node.mint,.lab .node.quiet{position:static;width:100%;min-height:0;margin:0}
-.lab .ln,.lab .head,.lab .pulse,.lab .lbl.la,.lab .lbl.lb{display:none}.lab .lbl.ta,.lab .lbl.tb,.lab .lbl.cm,.lab .lbl.ck{position:static;text-align:left;white-space:normal}.lab .lbl.tb,.lab .lbl.cm,.lab .lbl.ck{margin-top:-6px}.lab-sum{text-align:left}}
+.lab .ln,.lab .head,.lab .pulse,.lab .lbl.la,.lab .lbl.lb{display:none}.lab .lbl.ta,.lab .lbl.tb,.lab .lbl.cm,.lab .lbl.ck,.lab .lbl.sg{position:static;text-align:left;white-space:normal}.lab .lbl.tb,.lab .lbl.cm,.lab .lbl.ck,.lab .lbl.sg{margin-top:-6px}.lab-sum{text-align:left}.lab-side{align-items:flex-start}}
 .callout{border-left:3px solid var(--signal);padding:4px 0 4px 14px;margin:0 0 16px;max-width:65ch}
 .callout p{margin-bottom:8px}
 .contact{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 14px}
@@ -289,18 +293,23 @@ signed by payer</code></pre>
     <div>
       <p class="eyebrow">Phase 0, on the bench and next door</p>
       <h2>Lab status</h2>
-      <p>Four Raspberry Pi 3 B boards running <a href="https://github.com/bandwidthswap/kit">the kit</a>. Three sit on a bench at the house, on one home network. The fourth, <code>bw-neighbor</code>, is at a neighbor's house, reached over a tailnet, and since October 18 it is the hop the house pays: <code>bw-house</code> buys 100 MB an hour through it, signs a receipt for the bytes that crossed, <code>bw-neighbor</code> answers with its own count, and <code>bw-mint</code> settles the window at the smaller of the two. Those windows settle as disputes, at the payer's count: a relayed path counts retransmissions, so the hop's count runs about ten percent above the payer's, past the one percent margin that was set on a wired bench and is recorded in <a href="docs/OPEN-QUESTIONS.md">the backlog</a> as B11. <code>bw-forest</code>, the bench hop, stays installed and idle. Every two minutes the Mint posts a summary of its ledger; the map and the ledger below are that summary. No node accepts a connection from the internet.</p>
+      <p>Four Raspberry Pi 3 B boards running <a href="https://github.com/bandwidthswap/kit">the kit</a>. Three sit on a bench at the house, on one home network. The fourth, <code>bw-neighbor</code>, is at a neighbor's house, reached over a tailnet, and since October 18 it is the hop the house pays: <code>bw-house</code> buys 100 MB an hour through it, signs a receipt for the bytes that crossed, <code>bw-neighbor</code> answers with its own count, and <code>bw-mint</code> settles the window at the smaller of the two. Those windows settle as disputes, at the payer's count: a relayed path counts retransmissions, so the hop's count runs about ten percent above the payer's, past the one percent margin that was set on a wired bench and is recorded in <a href="docs/OPEN-QUESTIONS.md">the backlog</a> as B11. <code>bw-forest</code>, the bench hop, stays installed and idle. Every ten minutes, and right after each hour's commitment, the Mint posts a summary of its ledger, signed with its own key; the map and the ledger below are that summary, and this page checks the signature in your browser. No node accepts a connection from the internet.</p>
     </div>
-    <p class="lab-sum" id="lab-sum" aria-live="polite"><span class="k">loading</span><br><span class="m">status feed</span></p>
+    <div class="lab-side">
+      <p class="lab-sum" id="lab-sum" aria-live="polite"><span class="k">loading</span><br><span class="m">status feed</span></p>
+      <p class="lab-pick" id="lab-pick" hidden></p>
+    </div>
   </div>
   <div class="lab-map" id="lab-map" role="img" aria-label="The nodes the Mint reports: the payer, the hop it pays over the tunnel, any idle hop, and the Mint below, which settles each window at the smaller count"></div>
-  <div class="tablewrap"><div class="lab-ledger" id="lab-ledger" role="table" aria-label="The ledger: one row per node with windows in the last twelve hours, one column per hour"></div></div>
+  <p class="lab-span" id="lab-span" hidden><span>the ledger over</span><button type="button" class="on" data-span="12h">the last 12 hours</button><button type="button" data-span="7d">the last 7 days</button></p>
+  <div class="tablewrap"><div class="lab-ledger" id="lab-ledger" role="table" aria-label="The ledger: one row per node with windows in the span shown, one column per hour of the last twelve or per day of the last seven"></div></div>
   <p class="lab-legend"><span><span class="up">●</span> up: receipt within 90 min &nbsp; <span class="stale">●</span> stale &nbsp; <span class="idle">○</span> idle: a hop not in use &nbsp; <span class="sw"></span> disputed: the two counts differed by more than one percent; settled at the smaller</span><span>empty: no receipt · bars are log scale</span></p>
   <p class="note" id="lab-note" aria-live="polite">Loading the status feed…</p>
   <noscript><p class="note">The map and the ledger need JavaScript. The feed itself is plain JSON at <a href="https://status.bandwidthswap.com/status">status.bandwidthswap.com/status</a>.</p></noscript>
-  <p>A node is <strong>up</strong> when the Mint has a receipt from it within the last 90 minutes (receipts are hourly); the Mint is up when its report is under five minutes old and its ledger service answers. A hop is <strong>idle</strong> when it is not the one the house pays and has had no receipt in that time. A <strong>disputed</strong> window is one where the two signed counts differed by more than one percent; it settles at the smaller count, like every other window. Under the Mint is its latest <strong>commitment</strong>, a signed root over the hour's settlements that anyone holding the receipts can rebuild with the kit and check. The feed carries names, roles, times and byte counts, and nothing about the networks the boards sit on.</p>
+  <p>A node is <strong>up</strong> when the Mint has a receipt from it within the last 90 minutes (receipts are hourly); the Mint is up when its report is under fifteen minutes old (it posts every ten) and its ledger service answers. A hop is <strong>idle</strong> when it is not the one the house pays and has had no receipt in that time. A <strong>disputed</strong> window is one where the two signed counts differed by more than one percent; it settles at the smaller count, like every other window. Under the Mint is its latest <strong>commitment</strong>, a signed root over the hour's settlements that anyone holding the receipts can rebuild with the kit and check. The report itself is <strong>signed</strong> by the Mint, and this page checks that signature and the commitment's proof in your browser with <code>docs/bsp.js</code>, so the feed that relays the report has nothing to be trusted with: it can delay a report or drop one, and cannot alter one. The feed carries names, roles, times and byte counts, and nothing about the networks the boards sit on.</p>
   <p><a href="docs/verify.html">Check a proof in your browser</a>: paste a proof from the Mint's <code>bwkit prove</code> and a second implementation of the rules, sharing no code with the kit, checks the Mint's signature on the hour's root and each settlement's place in it, sending nothing anywhere.</p>
   <p><a href="docs/steward.html">The Steward's book</a>: the rule that takes five percent of every fee and can only spend it as offers to buy bandwidth on links the network wants; its balances, open offers and payouts, drawn from the feed once it runs.</p>
+  <p><a href="docs/network.html">The network</a>: every Mint the map lists, with its domain, its places and its last report, and the map itself, a record signed by the Mint that keeps it. One Mint so far; the feed takes any Mint's signed report, and the map says who is listed.</p>
   <p><a href="docs/dashboard/">What an operator sees</a>: the dashboard every node serves at its own address, in snapshots of the lab's four nodes taken on October 18, 2026. One page, three views: the Mint's, a node's (a hop or a payer), and the fleet's, for someone running several nodes or Mints. Nothing on them is live; a node's own page is.</p>
 </section>
 
@@ -407,8 +416,11 @@ signed by payer</code></pre>
   var sec=document.getElementById('lab'); if(!sec||!window.fetch) return;
   var q=null;try{q=new URLSearchParams(location.search).get('feed');}catch(e){}
   var OVERRIDE=q&&/^(?!\/\/)[\w./-]+$/.test(q)?q:null;   /* ?feed=<relative path> draws a fixture instead of the live feed, for testing; nothing is saved then */
-  var SRC=OVERRIDE||sec.getAttribute('data-src')||'https://status.bandwidthswap.com/status', UP_S=90*60, MINT_S=5*60, KEY='bw.lab.status', COLS=12, H=3600;
-  var drawSeq=0, bspLoad=null;
+  var BASE='https://status.bandwidthswap.com', mq=null;try{mq=new URLSearchParams(location.search).get('mint');}catch(e){}
+  var MINT=mq&&/^ed25519:[A-Za-z0-9_-]{43}$/.test(mq)?mq:null;   /* ?mint=<NYM> draws that Mint's report instead of the default Mint's */
+  var SRC=OVERRIDE||(MINT?BASE+'/mints/'+MINT+'/status':sec.getAttribute('data-src')||BASE+'/status'), UP_S=90*60, MINT_S=15*60, KEY='bw.lab.status'+(MINT?':'+MINT:''), COLS=12, H=3600, WEEK_H=168;
+  var drawSeq=0, bspLoad=null, pickLoaded=false;
+  var spanEl=document.getElementById('lab-span'), pick=document.getElementById('lab-pick'), span='12h', hist=null, lastA=null, lastNow=0;
   var ROLE={payer:'gateway, payer',hop:'relay, hop',mint:'settles at the smaller count',peer:'peer'};
   var SUB={payer:'bytes signed',hop:'bytes counted',mint:'windows settled',peer:'no receipts yet'};
   var FALLBACK=[{name:'bw-house',role:'payer'},{name:'bw-neighbor',role:'hop'},{name:'bw-forest',role:'hop'},{name:'bw-mint',role:'mint'}];
@@ -497,15 +509,26 @@ signed by payer</code></pre>
       cm.title='the Mint\'s signed root over the settlements of the hour starting '+when(C.window)+': '+plural(C.count||0,'settlement')+(C.t?', made '+hms(C.t):'')+'; root '+C.root;
     }else cm.textContent='commitment · none yet';
     map.appendChild(cm);
-    /* The check mark: when the feed carries the Mint's NYM and the committed hour's proof, verify them in this browser with docs/bsp.js (the signature on the root, every settlement's path to it). The feed's text is used, not the parsed report, so the numbers hash as the Mint wrote them. Without those fields nothing new is drawn. */
+    /* The two check marks: the report's own signature (the Mint signs what it posts, the feed stores the bytes it signed and serves them with received_at added) and, when the feed carries the committed hour's proof, the proof (the signature on the root, every settlement's path to it). Both are checked in this browser with docs/bsp.js, on the feed's text rather than the parsed report, so the numbers hash as the Mint wrote them. */
     var mintNym=rep&&(rep.mint||(C&&C.mint)), seq=++drawSeq;
-    if(rep&&C&&C.root&&rep.proof&&mintNym&&A.text){
-      var ck=el('div','lbl ck','checking the proof in your browser…');map.appendChild(ck);height=Math.max(height,336);
+    if(rep&&mintNym&&A.text){
+      var hasProof=!!(C&&C.root&&rep.proof), ck=null, sg=el('div','lbl sg','checking the report\'s signature in your browser…');
+      if(hasProof){ck=el('div','lbl ck','checking the proof in your browser…');map.appendChild(ck);}
+      else sg.style.top='314px';
+      map.appendChild(sg);height=Math.max(height,hasProof?354:336);
       verifyFeed(A.text,mintNym).then(function(res){
         if(seq!==drawSeq)return;
-        ck.textContent=res.ok?'✓ verified in your browser against the Mint\'s key: '+plural(res.count,'settlement')+' in the root':'✗ not verified: '+res.reason;
-        ck.className='lbl ck '+(res.ok?'ok':'bad');
-        ck.title=(res.ok?'docs/bsp.js checked the Mint\'s Ed25519 signature on this hour\'s root and each settlement\'s Merkle path to it, with no code from the kit':'the feed\'s proof did not check out')+' · '+mintNym;
+        if(ck&&res.proof){
+          ck.textContent=res.proof.ok?'✓ proof verified against the Mint\'s key: '+plural(res.proof.count,'settlement')+' in the root':'✗ proof not verified: '+res.proof.reason;
+          ck.className='lbl ck '+(res.proof.ok?'ok':'bad');
+          ck.title=(res.proof.ok?'docs/bsp.js checked the Mint\'s Ed25519 signature on this hour\'s root and each settlement\'s Merkle path to it, with no code from the kit':'the feed\'s proof did not check out')+' · '+mintNym;
+        }
+        if(res.signed===null){sg.textContent='the feed carries no signature on this report (a reporter older than bwkit 0.5.0)';sg.className='lbl sg';}
+        else{
+          sg.textContent=res.signed?'✓ report signed by the Mint: its bytes verify under the Mint\'s key':'✗ the report\'s signature does not verify under the Mint\'s key';
+          sg.className='lbl sg '+(res.signed?'ok':'bad');
+          sg.title=(res.signed?'docs/bsp.js checked the Mint\'s Ed25519 signature over the report as served, less received_at and sig, so the feed that relayed it could not have altered it':'the report as served does not match its signature; the feed, or the path to it, changed the bytes')+' · '+mintNym;
+        }
       });
     }
     function arrow(side){
@@ -527,15 +550,26 @@ signed by payer</code></pre>
     return states;
   }
   function verifyFeed(text,mintNym){
+    /* {signed: true | false | null (no signature in the feed), proof: {ok, count, reason} | null (no proof in the feed)} */
     bspLoad=bspLoad||import('./docs/bsp.js');
     return bspLoad.then(function(bsp){
-      var rep=bsp.parse(text), C=rep.commitment, P=rep.proof;
-      if(!P||typeof P!=='object')return {ok:false,reason:'the feed carries no proof'};
-      if(P.window!==C.window||P.root!==C.root||P.count!==C.count||P.signature!==C.signature)return {ok:false,reason:'the proof is for a different commitment than the one shown'};
-      return bsp.verifyProof(P,{mint:mintNym}).then(function(r){
-        return {ok:r.ok,count:r.settlements.length,reason:r.reason||(r.commitment&&r.commitment.reason)||'the proof did not check out'};
+      var rep=bsp.parse(text), C=rep.commitment, P=rep.proof, sig=rep.sig, out={signed:null,proof:null}, sigDone=Promise.resolve(null);
+      if(typeof sig==='string'&&typeof rep.mint==='string'){
+        delete rep.sig;delete rep.received_at;   /* what the Mint signed: the record without sig, and received_at is the feed's addition; delete keeps the parser's note of which numbers were floats */
+        try{
+          var bytes=new TextEncoder().encode('bandwidthswap/status/v1\n'+bsp.canon(rep));
+          sigDone=bsp.verifySignature(bsp.pubOfNym(rep.mint),bytes,bsp.unb64u(sig)).then(function(ok){return !!ok;},function(){return false;});
+        }catch(e){sigDone=Promise.resolve(false);}
+      }
+      return sigDone.then(function(signed){
+        out.signed=signed;
+        if(!P||typeof P!=='object'||!C||!C.root)return out;
+        if(P.window!==C.window||P.root!==C.root||P.count!==C.count||P.signature!==C.signature){out.proof={ok:false,reason:'the proof is for a different commitment than the one shown'};return out;}
+        return bsp.verifyProof(P,{mint:mintNym}).then(function(r){
+          out.proof={ok:r.ok,count:r.settlements.length,reason:r.reason||(r.commitment&&r.commitment.reason)||'the proof did not check out'};return out;
+        });
       });
-    }).catch(function(e){return {ok:false,reason:'the verifier could not run ('+(e&&e.message||e)+')'};});
+    }).catch(function(e){return {signed:false,proof:{ok:false,reason:'the verifier could not run ('+(e&&e.message||e)+')'}};});
   }
   function buckets(n){
     var b={};(n&&n.history||[]).forEach(function(w){
@@ -547,11 +581,11 @@ signed by payer</code></pre>
     });return b;
   }
   function drawLedger(now,A){
-    /* One row per node with windows in the last twelve hours, in the map's order. */
+    /* One row per node with windows in the last twelve hours, in the map's order, from the report itself. */
     var nodes=A.items.map(function(it){return it.n;}).filter(function(n){return n.history&&n.history.length;}), last=Math.floor(now/H), first=last-(COLS-1);
     var per=nodes.map(buckets), max=0;
     nodes.forEach(function(n,i){if(n.role!=='mint')for(var k in per[i])if(per[i][k].bytes>max)max=per[i][k].bytes;});
-    ledger.textContent='';
+    ledger.style.setProperty('--cols',COLS);ledger.textContent='';
     if(!nodes.length)return;
     nodes.forEach(function(n,i){
       var isMint=n.role==='mint', rl=el('div','rl'+(isMint?' m':''));
@@ -575,6 +609,75 @@ signed by payer</code></pre>
     ledger.appendChild(el('div','hl first','last 12 h, '+tz()));
     for(var k=first;k<=last;k++)ledger.appendChild(el('div','hl'+(k===last?' now':''),pad2(new Date(k*H*1000).getHours())));
   }
+  function dayKey(t){var d=new Date(t*1000);return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();}
+  function drawWeek(now,A,h){
+    /* One row per node with windows in the last seven days, one column per local day, from the feed's /history (the Worker keeps a month of every node's windows). Bars sum the day's bytes; the Mint's row is a dot per day with settled windows. */
+    var days=[];for(var i=6;i>=0;i--){var d=new Date(now*1000);d.setHours(0,0,0,0);d.setDate(d.getDate()-i);days.push(d);}
+    var keys=days.map(function(d){return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();});
+    var order=A.items.map(function(it){return it.n.name;}), roles={};A.items.forEach(function(it){roles[it.n.name]=it.n.role;});
+    var per={};(h&&h.windows||[]).forEach(function(w){
+      if(!w||typeof w.t_last!=='number'||!w.node)return;
+      var k=dayKey(w.t_last), row=per[w.node]||(per[w.node]={}), o=row[k]||(row[k]={bytes:0,settled:0,disputed:false,count:0,anySettled:false,disputes:0});
+      o.bytes+=w.bytes||0;o.count++;
+      if(w.settled_bytes!=null){o.settled+=w.settled_bytes;o.anySettled=true;}
+      if(w.disputed===true){o.disputed=true;o.disputes++;}
+      if(!roles[w.node])roles[w.node]=w.role;
+    });
+    var nodes=Object.keys(per).sort(function(a,b){var ia=order.indexOf(a),ib=order.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b);});
+    var max=0;nodes.forEach(function(n){if(roles[n]!=='mint')for(var k in per[n])if(per[n][k].bytes>max)max=per[n][k].bytes;});
+    ledger.style.setProperty('--cols',7);ledger.textContent='';
+    if(!nodes.length){ledger.appendChild(el('div','rl',''));ledger.appendChild(el('div','hl first','no windows in the last 7 days'));return;}
+    nodes.forEach(function(n){
+      var isMint=roles[n]==='mint', rl=el('div','rl'+(isMint?' m':'')), tot=0;
+      for(var k in per[n])tot+=per[n][k].count;
+      rl.appendChild(el('b',null,n));rl.appendChild(el('span',null,SUB[roles[n]]||roles[n]||''));
+      rl.appendChild(el('span','c',(isMint?plural(tot,'window'):plural(tot,'receipt')).toUpperCase()));
+      ledger.appendChild(rl);
+      keys.forEach(function(k,i){
+        var o=per[n][k], cell=el('div','cell'+(isMint?' m':'')), label=days[i].toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+        if(o&&isMint&&o.anySettled){
+          cell.appendChild(el('span','pip'+(o.disputed?' disputed':'')));
+          cell.title=label+': '+plural(o.count,'window')+' settled, '+bytes(o.settled)+(o.disputes?', '+o.disputes+' disputed':'');
+        }else if(o&&!isMint&&o.bytes>0){
+          var bar=el('div','bar'+(o.disputed?' disputed':''));
+          bar.style.height=Math.max(3,Math.round(60*Math.log(o.bytes+1)/Math.log(max+1)))+'px';
+          cell.appendChild(bar);
+          cell.title=label+': '+bytes(o.bytes)+(roles[n]==='hop'?' counted':' signed')+' over '+plural(o.count,'window')+(o.anySettled?', settled '+bytes(o.settled):'')+(o.disputes?', '+o.disputes+' disputed':'');
+        }else cell.title=label+': no receipt';
+        ledger.appendChild(cell);
+      });
+    });
+    ledger.appendChild(el('div','hl first','last 7 days, '+tz()));
+    keys.forEach(function(k,i){ledger.appendChild(el('div','hl'+(i===6?' now':''),days[i].toLocaleDateString(undefined,{weekday:'short'})));});
+  }
+  function setSpan(which){
+    span=which;
+    spanEl.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-span')===which);});
+  }
+  function redrawLedger(){
+    if(!lastA)return;
+    if(span!=='7d'||!lastA.mintNym){drawLedger(lastNow,lastA);return;}
+    var nym=lastA.mintNym, got=hist&&hist.mint===nym?Promise.resolve(hist):fetch(BASE+'/mints/'+nym+'/history?hours='+WEEK_H,{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(h){hist=h;return h;});
+    got.then(function(h){if(span==='7d')drawWeek(lastNow,lastA,h);}).catch(function(){
+      if(span!=='7d')return;
+      setSpan('12h');drawLedger(lastNow,lastA);
+      note.textContent+=' · the week\'s history did not load from the feed';
+    });
+  }
+  spanEl.querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){setSpan(b.getAttribute('data-span'));redrawLedger();});});
+  function loadMints(current){
+    /* The Mint picker: shown when the map lists more than one Mint. Choosing one reloads the section for that Mint's report. */
+    if(pickLoaded||OVERRIDE)return;pickLoaded=true;
+    fetch(BASE+'/mints',{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){
+      var mints=j&&j.mints||[];
+      if(mints.length<2){pick.hidden=true;return;}
+      pick.textContent='';
+      var lbl=el('label',null,'Mint'), sel=document.createElement('select');
+      mints.forEach(function(m){var o=document.createElement('option');o.value=m.mint;o.textContent=(m.name||m.mint.slice(8,20))+(m.domain?' · '+m.domain:'');if(m.mint===current)o.selected=true;sel.appendChild(o);});
+      sel.addEventListener('change',function(){location.href=location.pathname+'?mint='+encodeURIComponent(sel.value)+'#lab';});
+      lbl.appendChild(sel);pick.appendChild(lbl);pick.hidden=false;
+    }).catch(function(){pick.hidden=true;});
+  }
   function pulse(){
     var dot=sec.querySelector('.pulse'), mint=sec.querySelector('.node.mint');
     if(!dot||!mint||!dot.animate||getComputedStyle(dot).display==='none')return;
@@ -583,13 +686,16 @@ signed by payer</code></pre>
     dot.animate([{transform:'translate(0,0)',opacity:0},{transform:'translate(0,20px)',opacity:1,offset:.15},{transform:'translate(0,130px)',opacity:1,offset:.5},{transform:'translate('+(dx-6)+'px,130px)',opacity:1,offset:.95},{transform:'translate('+dx+'px,130px)',opacity:0}],{duration:1800,easing:'ease-in-out'});
   }
   function draw(rep,now,fetched,text){
-    var A=arrange(rep);A.text=text||null;
+    var A=arrange(rep);A.text=text||null;A.mintNym=rep&&(rep.mint||(rep.commitment&&rep.commitment.mint))||null;
     var states=drawMap(rep,now,A), all=Object.keys(states);
     var idle=all.filter(function(k){return states[k]==='idle';}).length, up=all.filter(function(k){return states[k]==='up';}).length, counted=all.length-idle;
     sum.classList.toggle('off',!rep||up<counted);
     sum.querySelector('.k').textContent=!rep?'status unavailable':(up===counted?'all '+count(counted)+' up':count(up)+' of '+count(counted)+' up')+(idle?', '+count(idle)+' idle':'');
-    sum.querySelector('.m').textContent=rep?'Mint report '+hms(rep.generated_at)+' '+tz():'no report';
-    drawLedger(now,A);
+    sum.querySelector('.m').textContent=rep?(A.mint&&MINT?A.mint.name+' · ':'')+'Mint report '+hms(rep.generated_at)+' '+tz():'no report';
+    lastA=A;lastNow=now;hist=null;
+    spanEl.hidden=!(rep&&A.mintNym&&!OVERRIDE);
+    if(span==='7d'&&!spanEl.hidden)redrawLedger();else{if(span==='7d')setSpan('12h');drawLedger(now,A);}
+    if(rep)loadMints(A.mintNym);
     var L=rep&&rep.ledger||{}, parts=[];
     if(!rep)parts.push('Status unavailable: the feed at status.bandwidthswap.com did not answer, and this browser has no earlier report to show.');
     else{

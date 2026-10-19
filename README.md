@@ -5,7 +5,7 @@ Source for the Bandwidth Swap project site and whitepaper. Served by GitHub Page
 - **Site:** https://bandwidthswap.com
 - **Paper (LaTeX-style):** https://bandwidthswap.com/docs/paper.html; the same paper in plain words: https://bandwidthswap.com/docs/paper-plain.html; for operators: https://bandwidthswap.com/docs/paper-operators.html
 - **What changed in v0.6 (Oct 18, 2026):** https://bandwidthswap.com/docs/whitepaper-diff-v0.6.html; v0.4 to v0.5: https://bandwidthswap.com/docs/whitepaper-diff-v0.5.html; v0.3 to v0.4: https://bandwidthswap.com/docs/whitepaper-diff-v0.4.html; v0.2 to v0.3: https://bandwidthswap.com/docs/whitepaper-diff-v0.3.html; from the 2021 paper to v0.2: https://bandwidthswap.com/docs/whitepaper-diff.html
-- **Lab status, live from the four nodes:** https://bandwidthswap.com/#lab
+- **Lab status, live from the four nodes:** https://bandwidthswap.com/#lab; the network, every Mint the map lists: https://bandwidthswap.com/docs/network.html; the Steward's book: https://bandwidthswap.com/docs/steward.html
 - **Field notes:** https://bandwidthswap.com/notes/
 - **The kit (receipt daemon, Mint, node provisioning):** https://github.com/bandwidthswap/kit
 - **Open questions:** [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md)

@@ -18,7 +18,8 @@ The kit and the lab keep their own list, in the kit's `PUNCH-LIST.md`.
 
 **P2 is done too** (Oct 19, 2026, 05:05 to 05:11 UTC): bw-mint runs bwkit 0.5.0 and posts its report signed, every ten minutes and after each commitment; the map is posted and `/mints` lists bw-mint; the Worker's token path, its secret and its KV namespace are gone (`POST /status` is 410). The P1 list's "Done" section has the minutes. The four missing `FLOAT_FIELDS` are in the kit's `bsp.js` and vendored here.
 
+**P3 is done** (Oct 19, 2026, later the same night): the Lab status checks the report's signature in the browser beside the proof and says so; the Mint is stale after fifteen minutes, not five; the ledger strip toggles between the last twelve hours and the last seven days (one column per local day, from `/history`); a Mint picker appears when `/mints` lists more than one, and `?mint=<NYM>` draws that Mint on the Lab status and the Steward's book; `docs/steward.html` reads the kit's 0.4.0 book beside the Oct 17 shape; `docs/network.html` lists the Mints the map names and the map itself, its signature checked. The pages were run headless under jsdom against the live feed before the push (32 checks); nothing in the kit changed.
+
 **What remains.**
-1. **P3, on the site:** the signature checked in the browser, the Mint picker, the seven-day strip from `/history`, the network page; `steward.html` brought to the 0.4.0 shape.
-2. **P4, the words:** both repos' CLAUDE.md, one sentence for the paper's Section 9 on the proof sheet (the spec's Section 9 note is written).
-3. **The other three nodes still run 0.4.0.** The protocol is unchanged and only the Mint reports, so nothing is wrong; `SSH_SUFFIX=-ts phase0/provision.sh update` brings them to 0.5.0 when wanted (bw-forest through `FOREST_JUMP=bw-house-ts`).
+1. **P4, the words:** both repos' CLAUDE.md in full, one sentence for the paper's Section 9 on the proof sheet (the spec's Section 9 note is written), and the page's prose where it still describes the two-minute feed in passing.
+2. **The other three nodes still run 0.4.0.** The protocol is unchanged and only the Mint reports, so nothing is wrong; `SSH_SUFFIX=-ts phase0/provision.sh update` brings them to 0.5.0 when wanted (bw-forest through `FOREST_JUMP=bw-house-ts`).

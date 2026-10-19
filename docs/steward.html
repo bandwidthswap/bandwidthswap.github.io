@@ -37,6 +37,8 @@ header.masthead{border-bottom:1px solid var(--line);padding-block:28px 22px}
 main{max-width:980px;margin:0 auto;padding-top:36px}
 .eyebrow{font:600 12px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--signal);margin:0 0 10px}
 .eyebrow a{color:inherit;text-decoration:none}
+.state .sig{font:500 12px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;margin-left:8px}.state .sig.ok{color:var(--accent)}.state .sig.bad{color:var(--signal)}
+#pick{margin-top:-6px}#pick select{font:inherit;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:3px 6px}
 h1{font:700 clamp(32px,5vw,48px)/1.05 var(--display);margin:0 0 10px;letter-spacing:-.01em;text-wrap:balance}
 .meta{font:400 13px/1.5 var(--mono);color:var(--muted);margin:0 0 22px}
 h2{font:700 26px/1.15 var(--display);margin:40px 0 12px;letter-spacing:-.005em;text-wrap:balance}
@@ -100,6 +102,7 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding-top:16px;font-si
   <h1>The Steward's book</h1>
   <p class="meta">Drawn from the Mint's status feed · names only · amounts in cents to three places</p>
   <div class="state" id="state" aria-live="polite"><span class="k">Loading</span>Reading the status feed…</div>
+  <p class="note" id="pick" hidden></p>
   <noscript><p class="note">This page draws the feed with JavaScript. The feed itself is plain JSON at <a href="https://status.bandwidthswap.com/status">status.bandwidthswap.com/status</a>; its <code>steward</code> object is the book.</p></noscript>
 
   <h2 id="rule">The rule</h2>
@@ -177,10 +180,11 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding-top:16px;font-si
 
 <script>
 (function(){
-  /* The Steward's book from the Mint's report: its `steward` object (PLAN.md 2.5) when the Steward has run, the rule and the plan's map when it has not. The last good report is kept in this browser for when the feed is away. ?feed=<relative path> draws a fixture instead, for testing, and saves nothing. */
-  var q=null;try{q=new URLSearchParams(location.search).get('feed');}catch(e){}
+  /* The Steward's book from the Mint's report: its `steward` object (PLAN.md 2.5) when the Steward has run, the rule and the plan's map when it has not. The last good report is kept in this browser for when the feed is away. ?feed=<relative path> draws a fixture instead, for testing, and saves nothing; ?mint=<NYM> draws that Mint's report instead of the default Mint's. The report's signature is checked here with bsp.js and said beside the state. */
+  var q=null,mq=null;try{var sp=new URLSearchParams(location.search);q=sp.get('feed');mq=sp.get('mint');}catch(e){}
   var OVERRIDE=q&&/^(?!\/\/)[\w./-]+$/.test(q)?q:null;
-  var SRC=OVERRIDE||'https://status.bandwidthswap.com/status', KEY='bw.steward.report', PRICE=0.10;
+  var BASE='https://status.bandwidthswap.com', MINT=mq&&/^ed25519:[A-Za-z0-9_-]{43}$/.test(mq)?mq:null;
+  var SRC=OVERRIDE||(MINT?BASE+'/mints/'+MINT+'/status':BASE+'/status'), KEY='bw.steward.report'+(MINT?':'+MINT:''), PRICE=0.10, bspLoad=null;
   var DEFAULTS={f:0.05,m:0.04,cap_margin:0.01,program_windows:168,first_link_usd:1.0,domain:'earth',unit:'USD',mint:'bw-mint'};
   var PROGRAM={payer:'a payer\'s own offer',match:'program 1, matching',second_bridge:'program 2, second bridge',first_link:'program 3, first link'};
   var $=function(id){return document.getElementById(id);};
@@ -206,6 +210,55 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding-top:16px;font-si
     if(p.program==='first_link')return 'First link to '+p.route.to;
     if(p.program==='second_bridge')return 'A second path around '+p.route.from+' ⇄ '+p.route.to;
     return 'Keep '+p.route.to+' in use';
+  }
+  function normalize(st){
+    /* The book as bwkit 0.4.0 posts it and the Oct 17 shape this page was written for, read alike: a payout's window is an hour or {t_first, t_last}; a link carries payer and hop with fees_usd (what the link's windows paid) and take_usd (the Steward's share this program window), or place_from and place_to with paid_usd and fee_usd; the map has domains keyed by name and places with an id and a free-text name, or domain, unit and mint with places named by id; a purchase's refund is refund_usd or refunded_usd; the cap is margin or cap_margin; the program window is seconds or windows. */
+    if(!st||typeof st!=='object')return st;
+    var o=Object.assign({},st);
+    if(o.cap_margin==null&&typeof o.margin==='number')o.cap_margin=o.margin;
+    if(o.program_windows==null&&typeof o.program_window_s==='number')o.program_windows=Math.round(o.program_window_s/3600);
+    o.purchases=(st.purchases||[]).map(function(p){var q=Object.assign({},p);if(q.refunded_usd==null&&typeof q.refund_usd==='number')q.refunded_usd=q.refund_usd;return q;});
+    o.payouts=(st.payouts||[]).map(function(y){var z=Object.assign({},y);if(z.window&&typeof z.window==='object'){z.window_end=z.window.t_last;z.window=z.window.t_first;}return z;});
+    if(st.links)o.links=st.links.map(function(l){
+      var k=Object.assign({},l);
+      if(k.payer&&k.hop){k.place_from=k.place_from||k.from;k.place_to=k.place_to||k.to;k.from=k.payer;k.to=k.hop;}
+      if(k.paid_usd==null&&typeof k.fees_usd==='number')k.paid_usd=k.fees_usd;
+      if(k.fee_usd==null&&typeof k.take_usd==='number')k.fee_usd=k.take_usd;
+      return k;
+    });
+    if(st.map&&typeof st.map==='object'){
+      var m=Object.assign({},st.map);
+      if(m.domains&&typeof m.domains==='object'){var dk=Object.keys(m.domains)[0]||null, d=dk&&m.domains[dk]||{};m.domain=m.domain||dk;m.unit=m.unit||d.unit;m.mint=m.mint||d.mint;}
+      m.places=(m.places||[]).map(function(pl){var q=Object.assign({},pl), id=q.id||q.name;q.label=q.id&&q.name!==q.id?q.name:null;q.name=id;if(q.linked===true)q.linked=[id];else if(!Array.isArray(q.linked))q.linked=[];if(q.mapped==null)q.mapped=true;return q;});
+      o.map=m;
+    }
+    return o;
+  }
+  function loadMints(current){
+    /* The Mint picker: shown when the map lists more than one Mint. */
+    if(OVERRIDE)return;
+    fetch(BASE+'/mints',{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(j){
+      var mints=j&&j.mints||[], P=$('pick');
+      if(mints.length<2){P.hidden=true;return;}
+      P.textContent='';var lbl=el('label',null,'Mint '), sel=document.createElement('select');
+      mints.forEach(function(m){var op=document.createElement('option');op.value=m.mint;op.textContent=(m.name||m.mint.slice(8,20))+(m.domain?' · '+m.domain:'');if(m.mint===current)op.selected=true;sel.appendChild(op);});
+      sel.addEventListener('change',function(){location.href=location.pathname+'?mint='+encodeURIComponent(sel.value);});
+      lbl.appendChild(sel);P.appendChild(lbl);P.hidden=false;
+    }).catch(function(){});
+  }
+  function signNote(text,rep){
+    /* The report's signature, checked here: the Mint signs what it posts and the feed serves those bytes with received_at added. */
+    var S=$('state');
+    if(!text||!rep||typeof rep.sig!=='string'||typeof rep.mint!=='string')return;
+    bspLoad=bspLoad||import('./bsp.js');
+    bspLoad.then(function(bsp){
+      var r=bsp.parse(text), sig=r.sig;delete r.sig;delete r.received_at;
+      return bsp.verifySignature(bsp.pubOfNym(r.mint),new TextEncoder().encode('bandwidthswap/status/v1\n'+bsp.canon(r)),bsp.unb64u(sig));
+    }).then(function(ok){
+      var e=el('span','sig '+(ok?'ok':'bad'),ok?' Signed by the Mint ✓':' The report\'s signature does not verify ✗');
+      e.title=(ok?'bsp.js checked the Mint\'s Ed25519 signature over the report as served, less received_at and sig':'the report as served does not match its signature')+' · '+rep.mint;
+      S.appendChild(e);
+    }).catch(function(){});
   }
   function params(st,rep){
     var P=$('params');P.textContent='';
@@ -340,8 +393,9 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding-top:16px;font-si
     t.innerHTML='<thead><tr><th>Place</th><th>Medium</th><th>Range</th><th>Linked</th></tr></thead>';
     var standing={};st.purchases.forEach(function(p){if(p.program==='first_link')standing[p.route.to]=true;});
     st.map.places.forEach(function(pl){
-      var r=el('tr');r.appendChild(el('td',null,pl.name));r.appendChild(el('td',null,pl.medium||'—'));r.appendChild(el('td',null,pl.range_class||'—'));
-      var linked=pl.linked&&pl.linked.length?'yes · '+pl.linked.join(', '):'no'+(standing[pl.name]?' · first-link offer open':'');
+      var r=el('tr');r.appendChild(el('td',null,pl.label?pl.name+' · '+pl.label:pl.name));r.appendChild(el('td',null,pl.medium||'—'));r.appendChild(el('td',null,pl.range_class||'—'));
+      var others=(pl.linked||[]).filter(function(x){return x!==pl.name;});
+      var linked=pl.linked&&pl.linked.length?'yes'+(others.length?' · '+others.join(', '):''):'no'+(standing[pl.name]?' · first-link offer open':'');
       r.appendChild(el('td',null,linked));tb.appendChild(r);
     });
     t.appendChild(tb);box.appendChild(t);M.appendChild(box);
@@ -365,14 +419,15 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding-top:16px;font-si
     $('op').textContent=lines.join('\n');
   }
   function draw(rep,now,fetched){
-    var st=rep&&rep.steward||null, S=$('state');
+    var st=rep&&rep.steward?normalize(rep.steward):null, S=$('state');
     S.textContent='';S.classList.toggle('off',!rep);
     params(st,rep);
     if(!rep){
       S.appendChild(el('span','k','Status unavailable'));S.appendChild(document.createTextNode('The feed at status.bandwidthswap.com did not answer, and this browser has no earlier report to show. The rule and its parameters are below.'));
       $('book').hidden=true;$('plan').hidden=false;operator(null,null);$('foot-real').textContent='';return;
     }
-    var tail=' Report '+ago(rep.generated_at,now)+(fetched?'; the feed is unavailable right now, this is the last good report, fetched '+when(fetched):'')+(OVERRIDE?'; drawn from '+OVERRIDE+', not the live feed':'')+'.';
+    var mintNode=(rep.nodes||[]).filter(function(n){return n.role==='mint';})[0];
+    var tail=' Report '+ago(rep.generated_at,now)+(MINT&&mintNode?' from '+mintNode.name:'')+(fetched?'; the feed is unavailable right now, this is the last good report, fetched '+when(fetched):'')+(OVERRIDE?'; drawn from '+OVERRIDE+', not the live feed':'')+'.';
     if(!st){
       S.appendChild(el('span','k','Not running yet'));S.appendChild(document.createTextNode('The Steward has not run yet; the rule and its parameters are below. The fees it will take are being settled now: '+plural((rep.ledger||{}).settlements||0,'window')+' on the ledger, five percent of each to the Steward once it runs.'+tail));
       $('book').hidden=true;$('plan').hidden=false;operator(null,rep);
@@ -385,14 +440,18 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding-top:16px;font-si
     strip(st,rep);cards(st,rep);payouts(st);income(st,rep);mapTable(st);operator(st,rep);
     $('foot-real').textContent='Everything above is the Steward\'s own book as the Mint reports it: its income from the fees, what it posted, what it paid against receipts, what came back. The lab cannot collect every offer it posts; an offer that waits is the program working as written, not a fault.';
   }
+  var picked=false;
   function load(){
-    fetch(SRC,{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(rep){
-      var now=Math.floor(Date.now()/1000);draw(rep,now,null);
-      if(!OVERRIDE){try{localStorage.setItem(KEY,JSON.stringify({fetched:now,report:rep}));}catch(e){}}
+    fetch(SRC,{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();}).then(function(text){
+      var rep=JSON.parse(text), now=Math.floor(Date.now()/1000);draw(rep,now,null);signNote(text,rep);
+      if(!picked){picked=true;loadMints(rep.mint||null);}
+      if(!OVERRIDE){try{localStorage.setItem(KEY,JSON.stringify({fetched:now,text:text}));}catch(e){}}
     }).catch(function(){
       var saved=null;try{saved=JSON.parse(localStorage.getItem(KEY));}catch(e){}
       var now=Math.floor(Date.now()/1000);
-      if(saved&&saved.report&&!OVERRIDE)draw(saved.report,now,saved.fetched);else draw(null,now,null);
+      if(saved&&saved.text&&!OVERRIDE){var rep=JSON.parse(saved.text);draw(rep,now,saved.fetched);signNote(saved.text,rep);}
+      else if(saved&&saved.report&&!OVERRIDE)draw(saved.report,now,saved.fetched);
+      else draw(null,now,null);
     });
   }
   load();
