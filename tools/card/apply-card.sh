@@ -70,21 +70,33 @@ cat > /usr/local/sbin/bwkit-join-tailnet <<'EOF2'
 # Joins the tailnet with the key in /etc/bwkit-join/tailnet.env, once, then shreds the key and disables itself.
 set -u
 . /etc/bwkit-join/tailnet.env
-for i in $(seq 1 60); do curl -fsI https://tailscale.com >/dev/null 2>&1 && break; sleep 10; done
+# A Pi has no clock until it syncs, and with the clock weeks off every HTTPS connection fails its certificate check
+# (bw-cabin's first try, Oct 19, 2026): wait for time sync, then for the network, then try; on failure exit 1 so the
+# unit's Restart= tries again in five minutes, the key kept for it.
+for i in $(seq 1 60); do [ "$(timedatectl show -p NTPSynchronized --value 2>/dev/null)" = yes ] && break; sleep 10; done
+for i in $(seq 1 30); do curl -fsI https://tailscale.com >/dev/null 2>&1 && break; sleep 10; done
 command -v tailscale >/dev/null || curl -fsSL https://tailscale.com/install.sh | sh >/dev/null 2>&1
-tailscale up --authkey "$TS_AUTHKEY" --hostname "$(hostname)" $TS_EXTRA >/dev/null 2>&1 && echo "$(hostname): on the tailnet at $(tailscale ip -4)" || echo "$(hostname): tailscale up failed; the key stays until the next boot tries again"
-if tailscale ip -4 >/dev/null 2>&1; then shred -u /etc/bwkit-join/tailnet.env 2>/dev/null || rm -f /etc/bwkit-join/tailnet.env; systemctl disable bwkit-join-tailnet.service >/dev/null 2>&1; fi
+if tailscale up --authkey "$TS_AUTHKEY" --hostname "$(hostname)" $TS_EXTRA >/dev/null 2>&1 && tailscale ip -4 >/dev/null 2>&1; then
+  echo "$(hostname): on the tailnet at $(tailscale ip -4)"
+  shred -u /etc/bwkit-join/tailnet.env 2>/dev/null || rm -f /etc/bwkit-join/tailnet.env
+  systemctl disable bwkit-join-tailnet.service >/dev/null 2>&1
+else
+  echo "$(hostname): tailscale up failed (clock synced: $(timedatectl show -p NTPSynchronized --value 2>/dev/null)); again in five minutes, the key kept"
+  exit 1
+fi
 EOF2
 chmod 755 /usr/local/sbin/bwkit-join-tailnet
 cat > /etc/systemd/system/bwkit-join-tailnet.service <<'EOF2'
 [Unit]
 Description=bandwidthswap: join the tailnet once with the key the card carried
-After=network-online.target
-Wants=network-online.target
+After=network-online.target time-sync.target
+Wants=network-online.target time-sync.target
 ConditionPathExists=/etc/bwkit-join/tailnet.env
 [Service]
 Type=oneshot
 ExecStart=/usr/local/sbin/bwkit-join-tailnet
+Restart=on-failure
+RestartSec=300
 [Install]
 WantedBy=multi-user.target
 EOF2
