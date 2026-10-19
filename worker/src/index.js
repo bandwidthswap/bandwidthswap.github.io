@@ -408,7 +408,7 @@ function serveReport(row, maxAge) {
 async function getLatest(env, mint, fallback) {
   const row = await env.DB.prepare(SQL.latest).bind(mint).first();
   if (row) return serveReport(row, 30);
-  if (fallback) {
+  if (fallback && env.STATUS) {
     const raw = await env.STATUS.get(KEY);
     if (raw) return new Response(raw, { status: 200, headers: headers({ 'Cache-Control': 'public, max-age=30' }) });
   }
@@ -570,7 +570,7 @@ export default {
         if (meter && meter.writes >= METER_MAX) return json({ error: 'the day\'s write meter is full; try after midnight UTC' }, 429);
         await store(env, { mint, report, text, sig: null, received_at, pruned_at: mintRow ? mintRow.pruned_at : null });
       }
-      await env.STATUS.put(KEY, JSON.stringify({ ...report, received_at }));
+      if (env.STATUS) await env.STATUS.put(KEY, JSON.stringify({ ...report, received_at }));   // absent on a self-hosted copy
       return json({ stored: true, received_at }, 200);
     }
 

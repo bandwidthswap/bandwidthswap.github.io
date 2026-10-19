@@ -441,6 +441,15 @@ r = await call('/mints');
 check('a later report from a listed Mint leaves it listed', r.status === 200 && (await r.json()).mints[0].mint === HOP);
 r = await call('/map', { method: 'DELETE' });
 check('DELETE /map is 405', r.status === 405, r.status);
+
+// A self-hosted copy has no KV binding (README, "Running your own"): nothing throws without it.
+const own = { ...env, STATUS: undefined, DB: fakeD1() };
+r = await worker.fetch(new Request(BASE + '/status'), own);
+check('without a KV binding and an empty D1, GET /status is 404, not an error', r.status === 404, r.status);
+r = await worker.fetch(new Request(BASE + '/status', { method: 'POST', headers: { Authorization: 'Bearer ' + env.STATUS_TOKEN }, body: JSON.stringify(report) }), own);
+check('…and the token path stores into D1 alone', r.status === 200 && own.DB.tables.reports.get(LAB)?.sig === null, r.status);
+r = await worker.fetch(new Request(BASE + '/status'), own);
+check('…from where GET /status then serves it', r.status === 200 && (await r.json()).sig === null, r.status);
 Date.now = realNow;
 
 console.log(failures ? failures + ' failed' : 'all passed');
