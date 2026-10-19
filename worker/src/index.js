@@ -2,10 +2,16 @@
 // back. The Worker keeps the bytes the Mint signed and serves them with the signature, so it can delay or drop a
 // report and cannot make one up or alter one; a reader checks the signature with docs/bsp.js (worker/PLAN.md).
 //
-//   POST /report   a signed status record (below); 200 {stored, received_at}
-//   POST /status   the Phase 0 lab's Mint with the bearer token, until the kit signs its reports (P2 removes it)
-//   GET  /status   the default Mint's latest report, with `received_at` (Unix seconds) added
-//   GET  /         what this is
+//   POST /report                      a signed status record (below); 200 {stored, received_at}
+//   POST /status                      the Phase 0 lab's Mint with the bearer token, until the kit signs its reports (P2 removes it)
+//   GET  /status                      the default Mint's latest report, with `received_at` (Unix seconds) added
+//   GET  /mints                       the Mints the map lists, and how many are not
+//   GET  /mints/<nym>/status          that Mint's latest report, listed or not
+//   GET  /mints/<nym>/history?hours=  its nodes' windows and its commitments over the span (default a week, at most 31 days)
+//   GET  /map                         the membership's map, as last posted
+//   GET  /                            what this is, the routes, and whether Ed25519 works here
+//
+// Every GET answers any origin: the feed is public and a reader checks the signature itself.
 //
 // The signed record is the report as `bwkit report --print` prints it (names, roles, times and byte counts, each
 // node's windows of the last twelve hours, the Mint's NYM, the committed hour's proof, the Steward's book), with
@@ -18,6 +24,7 @@
 
 import * as bsp from '../../docs/bsp.js';
 import { SQL } from './sql.js';
+import { ed25519Ok } from './selftest.js';
 
 // Decided here, not by bsp's probe: on Workers a URL import of the noble fallback fails, verifySignature returns
 // false rather than throwing, and a failed probe would answer 401 to every good report. Workers have Ed25519.
@@ -32,8 +39,8 @@ const RATE_S = 60;              // one accepted report per Mint per this
 const METER_MAX = 80000;        // rows written a day before the Worker answers 429 (D1's free plan stops at 100,000)
 const KEEP_S = 30 * 86400;      // windows and commitments older than this are pruned
 const PRUNE_EVERY_S = 3600;     // at most once an hour per Mint: a delete is a write too
+const HISTORY_DEFAULT_H = 168, HISTORY_MAX_H = 744;
 const ROLES = new Set(['payer', 'hop', 'mint', 'peer']);
-const ORIGINS = new Set(['https://bandwidthswap.com', 'https://www.bandwidthswap.com']);
 const PRIVATE = [
   /\b\d{1,3}(?:\.\d{1,3}){3}\b/,              // an IPv4 address
   /\b[0-9a-f]{2}(?::[0-9a-f]{2}){5}\b/i,      // a MAC address
@@ -47,26 +54,12 @@ const TEST_NYMS = new Set([
 ]);
 const enc = new TextEncoder();
 
-// The site, and a local copy of the page while working on it.
-function allowOrigin(origin) {
-  if (!origin) return null;
-  if (ORIGINS.has(origin)) return origin;
-  if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return origin;
-  return null;
+function headers(extra) {
+  return { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'Access-Control-Allow-Origin': '*', ...extra };
 }
 
-function headers(origin, extra) {
-  const h = { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', ...extra };
-  const o = origin === '*' ? '*' : allowOrigin(origin);
-  if (o) {
-    h['Access-Control-Allow-Origin'] = o;
-    if (o !== '*') h['Vary'] = 'Origin';
-  }
-  return h;
-}
-
-function json(obj, status, origin, extra) {
-  return new Response(JSON.stringify(obj), { status, headers: headers(origin, extra) });
+function json(obj, status, extra) {
+  return new Response(JSON.stringify(obj), { status, headers: headers(extra) });
 }
 
 // Compare two strings without leaking where they differ: hash both, compare the digests.
@@ -345,42 +338,117 @@ async function store(env, { mint, report, text, sig, received_at, pruned_at }) {
 // POST /report: a signed status record. The body is its own credential.
 async function postReport(request, env) {
   const text = (await request.text()).trim();
-  if (byteLength(text) > MAX_BODY) return json({ error: 'too large' }, 413, '*');
+  if (byteLength(text) > MAX_BODY) return json({ error: 'too large' }, 413);
   let rec;
-  try { rec = bsp.parse(text); } catch (e) { return json({ error: 'bad JSON' }, 400, '*'); }
+  try { rec = bsp.parse(text); } catch (e) { return json({ error: 'bad JSON' }, 400); }
   const why = checkRecord(rec, text);
-  if (why) return json({ error: why }, 422, '*');
-  if (TEST_NYMS.has(rec.mint) && !env.ALLOW_TEST_KEYS) return json({ error: 'a test key from the spec\'s vectors is refused here' }, 403, '*');
+  if (why) return json({ error: why }, 422);
+  if (TEST_NYMS.has(rec.mint) && !env.ALLOW_TEST_KEYS) return json({ error: 'a test key from the spec\'s vectors is refused here' }, 403);
   const sig = rec.sig;
   delete rec.sig;                                   // not a spread copy: that would lose the floats the Mint wrote
-  if (!(await verifies(rec.mint, STATUS_DOMAIN, rec, sig))) return json({ error: 'the signature does not verify under mint' }, 401, '*');
+  if (!(await verifies(rec.mint, STATUS_DOMAIN, rec, sig))) return json({ error: 'the signature does not verify under mint' }, 401);
   const now = Math.floor(Date.now() / 1000);
-  if (Math.abs(now - rec.generated_at) > FRESH_S) return json({ error: 'generated_at is more than ' + FRESH_S + ' s from the clock here', now }, 409, '*');
+  if (Math.abs(now - rec.generated_at) > FRESH_S) return json({ error: 'generated_at is more than ' + FRESH_S + ' s from the clock here', now }, 409);
   const [prev, mintRow, meter] = await Promise.all([
     env.DB.prepare(SQL.report).bind(rec.mint).first(),
     env.DB.prepare(SQL.mintRow).bind(rec.mint).first(),
     env.DB.prepare(SQL.meter).bind(day(now)).first(),
   ]);
-  if (prev && rec.generated_at <= prev.generated_at) return json({ error: 'generated_at is not newer than the stored report', stored: prev.generated_at }, 409, '*');
+  if (prev && rec.generated_at <= prev.generated_at) return json({ error: 'generated_at is not newer than the stored report', stored: prev.generated_at }, 409);
   if (prev && now - prev.received_at < RATE_S) {
     const wait = RATE_S - (now - prev.received_at);
-    return json({ error: 'one report a minute per Mint', retry_after: wait }, 429, '*', { 'Retry-After': String(wait) });
+    return json({ error: 'one report a minute per Mint', retry_after: wait }, 429, { 'Retry-After': String(wait) });
   }
-  if (meter && meter.writes >= METER_MAX) return json({ error: 'the day\'s write meter is full; try after midnight UTC' }, 429, '*');
+  if (meter && meter.writes >= METER_MAX) return json({ error: 'the day\'s write meter is full; try after midnight UTC' }, 429);
   await store(env, { mint: rec.mint, report: rec, text, sig, received_at: now, pruned_at: mintRow ? mintRow.pruned_at : null });
-  return json({ stored: true, received_at: now }, 200, '*');
+  return json({ stored: true, received_at: now }, 200);
 }
+
+// A stored report, served as the bytes the Mint signed with `received_at` spliced in before the last brace (and
+// `"sig":null` for a report that came through the token path). Re-serialising would drop the floats the Mint
+// wrote, and a reader could no longer check the signature: a reader removes `received_at` and `sig` and verifies.
+function serveReport(row, maxAge) {
+  const end = row.body.lastIndexOf('}');
+  const tail = ',"received_at":' + row.received_at + (row.sig === null ? ',"sig":null' : '') + '}';
+  return new Response(row.body.slice(0, end) + tail, { status: 200, headers: headers({ 'Cache-Control': 'public, max-age=' + maxAge }) });
+}
+
+// GET /status and GET /mints/<nym>/status: the Mint's latest report. The default Mint falls back to the KV key of the
+// token path while D1 holds nothing for it, so the page keeps drawing through the change.
+async function getLatest(env, mint, fallback) {
+  const row = await env.DB.prepare(SQL.latest).bind(mint).first();
+  if (row) return serveReport(row, 30);
+  if (fallback) {
+    const raw = await env.STATUS.get(KEY);
+    if (raw) return new Response(raw, { status: 200, headers: headers({ 'Cache-Control': 'public, max-age=30' }) });
+  }
+  return json({ error: 'no report yet' }, 404);
+}
+
+// GET /mints: the Mints the map lists, with what a network page needs, and how many have posted unlisted.
+async function getMints(env) {
+  const [{ results }, unlisted] = await Promise.all([
+    env.DB.prepare(SQL.listed).all(),
+    env.DB.prepare(SQL.unlisted).first('n'),
+  ]);
+  const mints = results.map((r) => ({ mint: r.mint, name: r.name, domain: r.domain, places: JSON.parse(r.places || '[]'), last_seen: r.last_seen, windows_settled: r.windows_settled }));
+  return json({ mints, unlisted: unlisted || 0 }, 200, { 'Cache-Control': 'public, max-age=30' });
+}
+
+// GET /mints/<nym>/history?hours=: the Mint's nodes' windows and its commitments whose hour began within the span.
+async function getHistory(env, mint, hoursParam) {
+  let hours = HISTORY_DEFAULT_H;
+  if (hoursParam !== null) {
+    if (!/^\d{1,4}$/.test(hoursParam) || Number(hoursParam) < 1) return json({ error: 'hours is a whole number of hours, 1 to ' + HISTORY_MAX_H }, 400);
+    hours = Math.min(Number(hoursParam), HISTORY_MAX_H);
+  }
+  const known = await env.DB.prepare(SQL.report).bind(mint).first();
+  if (!known) return json({ error: 'no report yet' }, 404);
+  const since = Math.floor(Date.now() / 1000) - hours * 3600;
+  const [w, c] = await Promise.all([
+    env.DB.prepare(SQL.windowsSince).bind(mint, since).all(),
+    env.DB.prepare(SQL.commitmentsSince).bind(mint, since).all(),
+  ]);
+  const windows = w.results.map((x) => ({ ...x, disputed: x.disputed === null ? null : x.disputed === 1 }));
+  return json({ mint, hours, since, windows, commitments: c.results }, 200, { 'Cache-Control': 'public, max-age=60' });
+}
+
+// GET /map: the membership's map as last posted, a signed record.
+async function getMap(env) {
+  const row = await env.DB.prepare(SQL.map).first();
+  if (!row) return json({ error: 'no map yet' }, 404);
+  return new Response(row.body, { status: 200, headers: headers({ 'Cache-Control': 'public, max-age=60' }) });
+}
+
+// GET /: what this is, with the Ed25519 self-test (selftest.js) so a deploy proves the signature check works here.
+async function getAbout(env) {
+  return json({
+    what: 'status.bandwidthswap.com: the status feed of the Bandwidth Swap pilot. A Mint posts a report of its ledger signed with its own key; the Worker keeps the bytes it signed and a reader checks the signature. See https://bandwidthswap.com/#lab',
+    source: 'https://github.com/bandwidthswap/bandwidthswap.github.io/tree/main/worker',
+    routes: {
+      'POST /report': 'a signed status record: kind "status", proto 1, mint (the NYM), the report, sig over "bandwidthswap/status/v1", a newline and the canonical JSON without sig',
+      'GET /status': 'the default Mint\'s latest report, with received_at',
+      'GET /mints': 'the Mints the map lists, and how many are not',
+      'GET /mints/<nym>/status': 'that Mint\'s latest report, listed or not',
+      'GET /mints/<nym>/history?hours=168': 'its nodes\' windows and its commitments over the span, at most 744 hours',
+      'GET /map': 'the map, as last posted',
+    },
+    default_mint: env.DEFAULT_MINT || null,
+    ed25519: (await ed25519Ok()) ? 'ok' : 'failed',
+  });
+}
+
+const MINT_PATH = /^\/mints\/(ed25519:[A-Za-z0-9_-]{43})\/(status|history)$/;
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const origin = request.headers.get('Origin') || '';
 
     if (request.method === 'OPTIONS') {
-      const posts = url.pathname === '/report';
+      const posts = url.pathname === '/report' || url.pathname === '/map';
       return new Response(null, {
         status: 204,
-        headers: headers(posts ? '*' : origin, {
+        headers: headers({
           'Access-Control-Allow-Methods': posts ? 'GET, POST, OPTIONS' : 'GET, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type',
           'Access-Control-Max-Age': '86400',
@@ -388,46 +456,46 @@ export default {
       });
     }
 
-    if (url.pathname === '/' && request.method === 'GET') {
-      return new Response('status.bandwidthswap.com: GET /status is the Phase 0 lab\'s status, posted by the Mint. See https://bandwidthswap.com/#lab\n',
-        { status: 200, headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' } });
+    if (request.method === 'GET') {
+      if (url.pathname === '/') return getAbout(env);
+      if (url.pathname === '/status') return getLatest(env, env.DEFAULT_MINT, true);
+      if (url.pathname === '/mints') return getMints(env);
+      if (url.pathname === '/map') return getMap(env);
+      const m = MINT_PATH.exec(url.pathname);
+      if (m) return m[2] === 'status' ? getLatest(env, m[1], false) : getHistory(env, m[1], url.searchParams.get('hours'));
+      if (url.pathname === '/report') return json({ error: 'method not allowed' }, 405, { Allow: 'POST, OPTIONS' });
+      return json({ error: 'no such path' }, 404);
     }
 
     if (url.pathname === '/report') {
       if (request.method === 'POST') return postReport(request, env);
-      return json({ error: 'method not allowed' }, 405, '*', { Allow: 'POST, OPTIONS' });
+      return json({ error: 'method not allowed' }, 405, { Allow: 'POST, OPTIONS' });
     }
 
-    if (url.pathname !== '/status') return json({ error: 'no such path' }, 404, origin);
-
-    if (request.method === 'GET') {
-      const raw = await env.STATUS.get(KEY);
-      if (!raw) return json({ error: 'no report yet' }, 404, origin);
-      return new Response(raw, { status: 200, headers: headers(origin, { 'Cache-Control': 'public, max-age=30' }) });
-    }
+    if (url.pathname !== '/status') return json({ error: 'no such path' }, 404);
 
     if (request.method === 'POST') {
-      if (!env.STATUS_TOKEN) return json({ error: 'no token configured' }, 503, origin);
+      if (!env.STATUS_TOKEN) return json({ error: 'no token configured' }, 503);
       const auth = request.headers.get('Authorization') || '';
       const given = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
       if (!given || !(await sameToken(given, env.STATUS_TOKEN))) {
-        return json({ error: 'bad token' }, 401, origin, { 'WWW-Authenticate': 'Bearer' });
+        return json({ error: 'bad token' }, 401, { 'WWW-Authenticate': 'Bearer' });
       }
       const text = await request.text();
-      if (byteLength(text) > MAX_BODY) return json({ error: 'too large' }, 413, origin);
+      if (byteLength(text) > MAX_BODY) return json({ error: 'too large' }, 413);
       let report;
       try {
         report = JSON.parse(text);
       } catch (e) {
-        return json({ error: 'bad JSON' }, 400, origin);
+        return json({ error: 'bad JSON' }, 400);
       }
       const why = checkReport(report, text);
-      if (why) return json({ error: why }, 400, origin);
+      if (why) return json({ error: why }, 400);
       const received_at = Math.floor(Date.now() / 1000);
       await env.STATUS.put(KEY, JSON.stringify({ ...report, received_at }));
-      return json({ stored: true, received_at }, 200, origin);
+      return json({ stored: true, received_at }, 200);
     }
 
-    return json({ error: 'method not allowed' }, 405, origin, { Allow: 'GET, POST, OPTIONS' });
+    return json({ error: 'method not allowed' }, 405, { Allow: 'GET, POST, OPTIONS' });
   },
 };

@@ -53,7 +53,7 @@ delete noHistory.since;
 
 let r = await call('/status', { headers: { Origin: SITE } });
 check('GET before any report is 404', r.status === 404, r.status);
-check('…with CORS for the site', r.headers.get('Access-Control-Allow-Origin') === SITE);
+check('…with CORS for any origin', r.headers.get('Access-Control-Allow-Origin') === '*');
 
 r = await post(report, null);
 check('POST without a token is 401', r.status === 401, r.status);
@@ -98,12 +98,10 @@ check('GET after the post is 200', r.status === 200, r.status);
 const got = await r.json();
 check('…returns the report with received_at added', got.generated_at === report.generated_at && got.received_at === posted.received_at && got.nodes.length === 3);
 check('…history and totals intact', got.nodes[0].history.length === 3 && got.nodes[0].history[2].settled_bytes === null && got.nodes[0].total_bytes === 65846000 && got.since === report.since);
-check('…with CORS for https://bandwidthswap.com', r.headers.get('Access-Control-Allow-Origin') === SITE);
+check('…with CORS for any origin', r.headers.get('Access-Control-Allow-Origin') === '*');
 check('…and a short cache', r.headers.get('Cache-Control') === 'public, max-age=30');
 r = await call('/status', { headers: { Origin: 'https://example.com' } });
-check('GET from another origin has no CORS header', r.status === 200 && r.headers.get('Access-Control-Allow-Origin') === null);
-r = await call('/status', { headers: { Origin: 'http://localhost:8765' } });
-check('GET from localhost has CORS (a local copy of the page)', r.headers.get('Access-Control-Allow-Origin') === 'http://localhost:8765');
+check('GET from another origin gets * too: the feed is public', r.status === 200 && r.headers.get('Access-Control-Allow-Origin') === '*');
 // bwkit 0.3.0 adds the Mint's NYM, the committed hour's proof and, once the Steward runs, its book (PLAN.md 2.5).
 // The two fixtures are a real report with a real proof from bw-mint, and the same with a hand-made Steward object.
 const fixture = (name) => JSON.parse(readFileSync(new URL('../tools/fixtures/' + name, import.meta.url), 'utf8'));
@@ -199,7 +197,8 @@ check('DELETE is 405', r.status === 405, r.status);
 r = await call('/elsewhere');
 check('another path is 404', r.status === 404, r.status);
 r = await call('/');
-check('/ is one line of text', r.status === 200 && (r.headers.get('Content-Type') || '').startsWith('text/plain'));
+const about = await r.json();
+check('/ says what this is, the routes, the default Mint, and that Ed25519 works here', r.status === 200 && about.ed25519 === 'ok' && about.default_mint === LAB && Object.keys(about.routes).length === 6, JSON.stringify(about).slice(0, 200));
 r = await worker.fetch(new Request(BASE + '/status', { method: 'POST', headers: { Authorization: 'Bearer x' }, body: '{}' }), { STATUS: env.STATUS });
 check('POST with no token configured is 503', r.status === 503, r.status);
 
@@ -330,6 +329,50 @@ r = await call('/report', { method: 'OPTIONS', headers: { Origin: 'https://examp
 check('OPTIONS /report allows POST from any origin', r.status === 204 && r.headers.get('Access-Control-Allow-Methods') === 'GET, POST, OPTIONS' && r.headers.get('Access-Control-Allow-Origin') === '*');
 r = await call('/report');
 check('GET /report is 405', r.status === 405, r.status);
+
+// ---------------------------------------------------------------- the GETs (PLAN.md 2.3)
+r = await call('/status');
+let got2 = await r.json();
+check('/status falls back to the KV key while D1 has nothing for the default Mint', r.status === 200 && got2.generated_at === live.generated_at && got2.sig === undefined, r.status);
+check('…with any origin allowed and the short cache', r.headers.get('Access-Control-Allow-Origin') === '*' && r.headers.get('Cache-Control') === 'public, max-age=30');
+r = await call('/mints/' + MINT + '/status');
+const rawMint = await r.text();
+stored = db.tables.reports.get(MINT);
+check('/mints/<nym>/status serves the Mint\'s latest report', r.status === 200 && rawMint.startsWith(stored.body.slice(0, -1)), r.status);
+got2 = JSON.parse(rawMint);
+check('…as the bytes it signed with received_at added', got2.sig === stored.sig && got2.received_at === stored.received_at && got2.name === 'lab' && rawMint.endsWith('"received_at":' + stored.received_at + '}'));
+check('…so that removing received_at and sig gives back the signed text', JSON.stringify(JSON.parse(rawMint.replace(',"received_at":' + stored.received_at + '}', '}'))) === JSON.stringify(JSON.parse(stored.body)));
+r = await call('/mints/' + HOP + '/status');
+check('an unlisted Mint is reachable by its NYM', r.status === 200, r.status);
+r = await call('/mints/ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM/status');
+check('a Mint that never posted is 404', r.status === 404, r.status);
+r = await call('/mints/not-a-nym/status');
+check('a path with something that is not a NYM is 404', r.status === 404, r.status);
+r = await call('/mints');
+got2 = await r.json();
+check('/mints before any map lists nobody and counts the two unlisted', r.status === 200 && got2.mints.length === 0 && got2.unlisted === 2, JSON.stringify(got2));
+r = await call('/mints/' + MINT + '/history');
+got2 = await r.json();
+check('/history defaults to a week and names the span', r.status === 200 && got2.hours === 168 && got2.since === now() - 168 * 3600 && got2.mint === MINT, JSON.stringify(got2).slice(0, 120));
+check('…with the windows of every report the Mint posted in it', got2.windows.length === [...db.tables.windows.values()].filter((w) => w.mint === MINT).length && got2.windows.every((w) => w.t_first >= got2.since) && live.nodes.every((n) => (n.history || []).every((w) => got2.windows.some((x) => x.node === n.name && x.t_first === w.t_first))), got2.windows.length + ' of ' + db.tables.windows.size);
+check('…disputed as a flag again, settled_bytes null while unsettled', got2.windows.some((w) => w.disputed === true) && got2.windows.some((w) => w.disputed === null && w.settled_bytes === null));
+check('…and its commitments, oldest first', got2.commitments.length === 2 && got2.commitments[0].window < got2.commitments[1].window && got2.commitments[1].root === live.commitment.root, JSON.stringify(got2.commitments));
+check('…cached for a minute', r.headers.get('Cache-Control') === 'public, max-age=60');
+r = await call('/mints/' + MINT + '/history?hours=1');
+got2 = await r.json();
+check('?hours=1 narrows the span', got2.hours === 1 && got2.windows.length === 0 && got2.commitments.length === 0, JSON.stringify(got2).slice(0, 120));
+r = await call('/mints/' + MINT + '/history?hours=9999');
+check('?hours above 744 is clamped to 744', (await r.json()).hours === 744);
+r = await call('/mints/' + MINT + '/history?hours=soon');
+check('?hours that is not a number is 400', r.status === 400, r.status);
+r = await call('/mints/' + HOP + '/history');
+check('an unlisted Mint\'s history is served too, only its own windows', r.status === 200 && (await r.json()).windows.length === 5, r.status);
+r = await call('/mints/ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM/history');
+check('a history of a Mint that never posted is 404', r.status === 404, r.status);
+r = await call('/map');
+check('/map before any map is 404', r.status === 404, r.status);
+r = await call('/map', { method: 'OPTIONS', headers: { Origin: SITE, 'Access-Control-Request-Method': 'POST' } });
+check('OPTIONS /map allows POST', r.status === 204 && r.headers.get('Access-Control-Allow-Methods') === 'GET, POST, OPTIONS');
 Date.now = realNow;
 
 console.log(failures ? failures + ' failed' : 'all passed');
