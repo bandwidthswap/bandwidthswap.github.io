@@ -1,6 +1,6 @@
 # Phase 1 of the multi-tenant Worker: the punch list
 
-Written Oct 18, 2026, and paused by the owner before any code was written. **Built later the same day**, on the branch `worker/p1-multi-tenant`, one commit per item with its tests (160 checks in `test.mjs`, and `smoke.mjs` against workerd); the live Worker is still the Oct 16 build until the owner's section at the end is run. `PLAN.md` is the design; this is the work of its phase P1 (Section 3) in order, with what each item is done when, what was found while reading, and what was found while building.
+Written Oct 18, 2026, and paused by the owner before any code was written. **Built later the same day**, on the branch `worker/p1-multi-tenant`, one commit per item with its tests (160 checks in `test.mjs`, and `smoke.mjs` against workerd); **deployed Oct 19, 2026 at 04:15 UTC** (the evening of Oct 18 in Texas); the owner's section at the end records it. `PLAN.md` is the design; this is the work of its phase P1 (Section 3) in order, with what each item is done when, what was found while reading, and what was found while building.
 
 ## Before you start
 
@@ -86,6 +86,14 @@ Written Oct 18, 2026, and paused by the owner before any code was written. **Bui
 - **Wrangler 3.114 runs the local Worker on a runtime whose latest compatibility date is 2025-07-18** and falls back to it from the 2025-09-01 in `wrangler.toml`; Ed25519 verifies there all the same (`GET /` says `ok`). `d1 execute --local` and `dev --local` take the placeholder `database_id`; the local database lives under `worker/.wrangler/` (ignored).
 - **The vendored `bsp.js` bundles clean.** Its import of noble from jsDelivr stays in the bundle unused; `useEd25519('webcrypto')` at module start keeps the probe from ever running.
 - **`mints` gained two columns** beyond PLAN.md 2.2, `places` (a JSON list of place ids from the Mint's last report) and `pruned_at`; the map table's signer column is `signer`, since `BY` is a keyword.
+
+## Done: the deploy of Oct 19, 2026, 04:15 UTC
+
+Run from the `isiah` Mac as the steps below say. `d1 create` made `bandwidthswap-status` (`ae297e69-fcf1-4644-a87c-8be0fd8da50b`, region WNAM); the id is in `wrangler.toml`; the migration ran 6 queries on the remote database (13 rows written, before the meter existed); a dry run bundled 44 KiB (12 KiB gzipped); the deploy is version `b7a29d89-5d7f-4a01-a0df-12515feb8978` on `status.bandwidthswap.com`. `GET /` answered `"ed25519": "ok"` at once. The lab's Mint posted at 04:16:04 UTC through the token path, 62 seconds after the deploy, and from then `GET /status` is served from D1 with `"sig":null`; the remote database then held 1 report, 36 windows, 1 commitment, 1 Mint, and the meter said 42 rows, what the smoke had measured. The Lab status drew before and after that post.
+
+**One thing the deploy fixed that nobody had listed.** Before the post landed in D1, the Lab status said `✗ not verified: 1 of 1 settlements fail` under the Mint's commitment; after it, `✓ verified in your browser against the Mint's key: 1 settlement in the root`. The KV path wrote the report with `JSON.stringify`, which turned the settlement's `from_steward_usd: 0.0`, `refund_usd: 0.0` and `steward_held_usd: 0.0` into `0`, and the leaf no longer hashed to the one in the root. The page parses with `bsp.parse`, so the verbatim bytes from D1 verify. Two things follow for later phases: `bsp.js`'s fallback list for documents that arrive already parsed (`FLOAT_FIELDS`) lacks `steward_fee`, `from_poster_usd`, `from_steward_usd` and `steward_held_usd`, the four settlement doubles spec Section 3 names that it does not; and until P2, any reader that re-serialises the feed will see the same failure.
+
+**Not done, by design:** no map is posted (`GET /map` is 404, `/mints` lists nobody and counts one unlisted). The first map needs the lab Mint's signature, its key is on bw-mint, and the kit has no command to sign a map record yet; that goes with P2.
 
 ## Left for the owner: needs the Cloudflare login
 
