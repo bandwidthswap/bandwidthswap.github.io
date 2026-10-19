@@ -99,4 +99,6 @@ The decision came out as **through trees** (no line of sight from the house to t
 
 Still to buy for the house-side dongle: the outdoor-rated shielded Ethernet run from the switch to where the dongle is mounted (Phase 1A lists 100 ft, about $30), a J-mount or pole mount (high matters more than anything else through trees), UV-rated zip ties and sealing tape. The forest-side dongle takes its 5 V from the Phase 2 battery box's buck converter, so it needs none of the PoE parts.
 
+**Two more Raspberry Pi 3 Model B boards arrived on Oct 19.** The kit's `radio/PLAN.md` makes them nodes: `bw-cabin`, the hop at the third mapped place and the Phase 1 forest node (it carries T-Beam 3 and the HaLow STA end), and `bw-mint2`, a second Mint on the bench once Phase 1's test has passed, the cabin's cold spare until then. Each needs what Phase 0 gives a node: a 5.1 V 2.5 A supply, a 16 GB A1 card, and for the cabin a case with heatsinks before it leaves the bench; the T-Beam for the cabin is one of the three already bought.
+
 Not bought and not needed yet: Phase 2 power and enclosure, 18650 cells for the T-Beams.
