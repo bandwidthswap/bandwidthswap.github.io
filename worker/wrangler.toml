@@ -15,7 +15,7 @@ routes = [
 [[d1_databases]]
 binding = "DB"
 database_name = "bandwidthswap-status"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "ae297e69-fcf1-4644-a87c-8be0fd8da50b"
 
 # One key ("status") holds the latest report of the bearer-token path, until P2 removes that path. Made once with
 #   npx -y wrangler@3 kv namespace create STATUS
