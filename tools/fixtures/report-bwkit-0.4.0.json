@@ -1,0 +1,937 @@
+{
+ "bwkit": "0.4.0",
+ "commitment": {
+  "count": 1,
+  "mint": "ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM",
+  "root": "59be77030c188f58576654203ea976a62a1f2f88329e9f09681707e83a56dc6f",
+  "signature": "vgVSGOe1Bhnlj0FGXNwj84y5yo1_Ap3aCBOozeNR3aHmtrV10Z_IeD025ySFVMLajI8uyoYxZdE2Ywlkf9J3DA",
+  "t": 1792375201,
+  "window": 1792371600
+ },
+ "generated_at": 1792378562,
+ "ledger": {
+  "acks": 60,
+  "acks_without_receipt": 0,
+  "disputed": 7,
+  "receipts": 61,
+  "receipts_without_ack": 1,
+  "settlements": 60
+ },
+ "mint": "ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM",
+ "nodes": [
+  {
+   "disputed": 7,
+   "history": [
+    {
+     "bytes": 113890436,
+     "disputed": false,
+     "settled_bytes": 113890436,
+     "t_first": 1792332001,
+     "t_last": 1792335601
+    },
+    {
+     "bytes": 110759011,
+     "disputed": false,
+     "settled_bytes": 110759011,
+     "t_first": 1792335601,
+     "t_last": 1792339201
+    },
+    {
+     "bytes": 114654158,
+     "disputed": false,
+     "settled_bytes": 114654158,
+     "t_first": 1792339201,
+     "t_last": 1792342801
+    },
+    {
+     "bytes": 115872568,
+     "disputed": false,
+     "settled_bytes": 115872568,
+     "t_first": 1792342801,
+     "t_last": 1792346401
+    },
+    {
+     "bytes": 124112228,
+     "disputed": false,
+     "settled_bytes": 124112228,
+     "t_first": 1792346401,
+     "t_last": 1792350001
+    },
+    {
+     "bytes": 115603562,
+     "disputed": false,
+     "settled_bytes": 115603562,
+     "t_first": 1792350001,
+     "t_last": 1792353601
+    },
+    {
+     "bytes": 113738237,
+     "disputed": false,
+     "settled_bytes": 113738237,
+     "t_first": 1792353601,
+     "t_last": 1792357201
+    },
+    {
+     "bytes": 115675490,
+     "disputed": false,
+     "settled_bytes": 115675490,
+     "t_first": 1792357201,
+     "t_last": 1792360801
+    },
+    {
+     "bytes": 113724934,
+     "disputed": false,
+     "settled_bytes": 113724934,
+     "t_first": 1792360801,
+     "t_last": 1792364401
+    },
+    {
+     "bytes": 117594894,
+     "disputed": false,
+     "settled_bytes": 117594894,
+     "t_first": 1792364401,
+     "t_last": 1792368001
+    },
+    {
+     "bytes": 113746676,
+     "disputed": false,
+     "settled_bytes": 113746676,
+     "t_first": 1792368001,
+     "t_last": 1792371601
+    },
+    {
+     "bytes": 113831383,
+     "disputed": false,
+     "settled_bytes": 113831383,
+     "t_first": 1792371601,
+     "t_last": 1792375201
+    }
+   ],
+   "last_receipt": 1792375201,
+   "name": "bw-house",
+   "receipts": 61,
+   "role": "payer",
+   "total_bytes": 2633339072,
+   "window_bytes": 113831383,
+   "window_t_first": 1792371601,
+   "window_t_last": 1792375201,
+   "windows": 60
+  },
+  {
+   "disputed": 2,
+   "history": [],
+   "last_receipt": 1792299601,
+   "name": "bw-forest",
+   "receipts": 38,
+   "role": "hop",
+   "total_bytes": 66280652,
+   "window_bytes": 12064,
+   "window_t_first": 1792296546,
+   "window_t_last": 1792299601,
+   "windows": 38
+  },
+  {
+   "disputed": 5,
+   "history": [
+    {
+     "bytes": 117537273,
+     "disputed": false,
+     "settled_bytes": 113890436,
+     "t_first": 1792332001,
+     "t_last": 1792335601
+    },
+    {
+     "bytes": 113192088,
+     "disputed": false,
+     "settled_bytes": 110759011,
+     "t_first": 1792335601,
+     "t_last": 1792339201
+    },
+    {
+     "bytes": 115582909,
+     "disputed": false,
+     "settled_bytes": 114654158,
+     "t_first": 1792339201,
+     "t_last": 1792342801
+    },
+    {
+     "bytes": 116197277,
+     "disputed": false,
+     "settled_bytes": 115872568,
+     "t_first": 1792342801,
+     "t_last": 1792346401
+    },
+    {
+     "bytes": 127262790,
+     "disputed": false,
+     "settled_bytes": 124112228,
+     "t_first": 1792346401,
+     "t_last": 1792350001
+    },
+    {
+     "bytes": 122033855,
+     "disputed": false,
+     "settled_bytes": 115603562,
+     "t_first": 1792350001,
+     "t_last": 1792353601
+    },
+    {
+     "bytes": 115107349,
+     "disputed": false,
+     "settled_bytes": 113738237,
+     "t_first": 1792353601,
+     "t_last": 1792357201
+    },
+    {
+     "bytes": 115996956,
+     "disputed": false,
+     "settled_bytes": 115675490,
+     "t_first": 1792357201,
+     "t_last": 1792360801
+    },
+    {
+     "bytes": 117264919,
+     "disputed": false,
+     "settled_bytes": 113724934,
+     "t_first": 1792360801,
+     "t_last": 1792364401
+    },
+    {
+     "bytes": 130174959,
+     "disputed": false,
+     "settled_bytes": 117594894,
+     "t_first": 1792364401,
+     "t_last": 1792368001
+    },
+    {
+     "bytes": 115139649,
+     "disputed": false,
+     "settled_bytes": 113746676,
+     "t_first": 1792368001,
+     "t_last": 1792371601
+    },
+    {
+     "bytes": 119057976,
+     "disputed": false,
+     "settled_bytes": 113831383,
+     "t_first": 1792371601,
+     "t_last": 1792375201
+    }
+   ],
+   "last_receipt": 1792375201,
+   "name": "bw-neighbor",
+   "receipts": 22,
+   "role": "hop",
+   "total_bytes": 2680795050,
+   "window_bytes": 119057976,
+   "window_t_first": 1792371601,
+   "window_t_last": 1792375201,
+   "windows": 22
+  },
+  {
+   "disputed": 7,
+   "history": [
+    {
+     "bytes": 113890436,
+     "disputed": false,
+     "settled_bytes": 113890436,
+     "t_first": 1792332001,
+     "t_last": 1792335601
+    },
+    {
+     "bytes": 110759011,
+     "disputed": false,
+     "settled_bytes": 110759011,
+     "t_first": 1792335601,
+     "t_last": 1792339201
+    },
+    {
+     "bytes": 114654158,
+     "disputed": false,
+     "settled_bytes": 114654158,
+     "t_first": 1792339201,
+     "t_last": 1792342801
+    },
+    {
+     "bytes": 115872568,
+     "disputed": false,
+     "settled_bytes": 115872568,
+     "t_first": 1792342801,
+     "t_last": 1792346401
+    },
+    {
+     "bytes": 124112228,
+     "disputed": false,
+     "settled_bytes": 124112228,
+     "t_first": 1792346401,
+     "t_last": 1792350001
+    },
+    {
+     "bytes": 115603562,
+     "disputed": false,
+     "settled_bytes": 115603562,
+     "t_first": 1792350001,
+     "t_last": 1792353601
+    },
+    {
+     "bytes": 113738237,
+     "disputed": false,
+     "settled_bytes": 113738237,
+     "t_first": 1792353601,
+     "t_last": 1792357201
+    },
+    {
+     "bytes": 115675490,
+     "disputed": false,
+     "settled_bytes": 115675490,
+     "t_first": 1792357201,
+     "t_last": 1792360801
+    },
+    {
+     "bytes": 113724934,
+     "disputed": false,
+     "settled_bytes": 113724934,
+     "t_first": 1792360801,
+     "t_last": 1792364401
+    },
+    {
+     "bytes": 117594894,
+     "disputed": false,
+     "settled_bytes": 117594894,
+     "t_first": 1792364401,
+     "t_last": 1792368001
+    },
+    {
+     "bytes": 113746676,
+     "disputed": false,
+     "settled_bytes": 113746676,
+     "t_first": 1792368001,
+     "t_last": 1792371601
+    },
+    {
+     "bytes": 113831383,
+     "disputed": false,
+     "settled_bytes": 113831383,
+     "t_first": 1792371601,
+     "t_last": 1792375201
+    }
+   ],
+   "last_receipt": 1792375201,
+   "name": "bw-mint",
+   "receipts": 121,
+   "role": "mint",
+   "total_bytes": 2611391372,
+   "window_bytes": 113831383,
+   "window_t_first": 1792371601,
+   "window_t_last": 1792375201,
+   "windows": 60
+  }
+ ],
+ "phase": 0,
+ "proof": {
+  "count": 1,
+  "impl": "bwkit/0.4.0",
+  "kind": "proof",
+  "mint": "ed25519:lQLEToBb2f98uPsrOIfVCV0YRN2VTJ8IVeJ0uDk6ysM",
+  "proto": 1,
+  "root": "59be77030c188f58576654203ea976a62a1f2f88329e9f09681707e83a56dc6f",
+  "settlements": [
+   {
+    "index": 0,
+    "leaf": "59be77030c188f58576654203ea976a62a1f2f88329e9f09681707e83a56dc6f",
+    "path": [],
+    "settlement": {
+     "ack_sig": "RaVYoQ5uirLASNWXnKOQPrj-ih7akfemY3bWOkHs9phXlEMLXgK8h-GMwCq38_ilQ5He6R7qxTa7AD_GT7xHCQ",
+     "amount_usd": 0.011383,
+     "fee_usd": 0.000683,
+     "from_poster_usd": 0.002277,
+     "from_steward_usd": 0,
+     "hop": "ed25519:Y_rtP6d0teob8J1qJttIOoZ17FLi5PG29HaZ-tE7IoY",
+     "hop_bytes": 119057976,
+     "hop_index": 1,
+     "kind": "settlement",
+     "link": "d0f46e3381b29880a31b368dffaa8514c56d5ff2b6f6a6d3630a94252cccbe88",
+     "margin": 0.1,
+     "match": "21be7013d9d06034bcb2342037d452423d7a8627ab2766677bc5d0edf56a1b0f",
+     "min_bytes": 65536,
+     "payer": "ed25519:fz1ziSB-Ggpq4gRkskV0phBwkSDfHoR0vDqeY42wSx0",
+     "payer_bytes": 113831383,
+     "premium_usd": 0.002277,
+     "price_usd_per_gb": 0.1,
+     "proto": 1,
+     "purchase": "601627675647f8345ccaa764993280490eddcb8cddf42e6a57c5a673eb6ccc58",
+     "receipt_sig": "vmfMbYR5fgOsiP9_rmfPjrfUsbnCRn9t8uM3SVVi9xGMB6U9X6ZkWrqdZU0uQRb87UvnONhJMO071eRcStkdBg",
+     "refund_usd": 0,
+     "rule": "the smaller of the two signed counts; neither party is bound beyond what it signed",
+     "settled_bytes": 113831383,
+     "status": "settled",
+     "steward_fee": 0.05,
+     "steward_held_usd": 0,
+     "t": 1792375201,
+     "t_first": 1792371601,
+     "t_last": 1792375201
+    }
+   }
+  ],
+  "signature": "vgVSGOe1Bhnlj0FGXNwj84y5yo1_Ap3aCBOozeNR3aHmtrV10Z_IeD025ySFVMLajI8uyoYxZdE2Ywlkf9J3DA",
+  "window": 1792371600
+ },
+ "proto": 1,
+ "service": true,
+ "since": 1792185254,
+ "steward": {
+  "escrow_usd": 0.000442,
+  "f": 0.05,
+  "first_link_usd": 1,
+  "held_by_cap_usd": 0,
+  "in_offers_usd": 0.011897,
+  "income_usd": 0.012339,
+  "last_run": 1792375502,
+  "links": [
+   {
+    "bytes": 44327832,
+    "fees_usd": 0.004421,
+    "from": "house",
+    "hop": "bw-forest",
+    "payer": "bw-house",
+    "take_usd": 0,
+    "to": "house",
+    "windows": 38
+   },
+   {
+    "bytes": 2567063540,
+    "fees_usd": 0.256705,
+    "from": "house",
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "take_usd": 0.012339,
+    "to": "next-door",
+    "windows": 22
+   }
+  ],
+  "m": 0.04,
+  "map": {
+   "domains": {
+    "earth": {
+     "mint": "bw-mint",
+     "name": "Earth",
+     "unit": "USD"
+    }
+   },
+   "places": [
+    {
+     "id": "house",
+     "linked": true,
+     "medium": "wire",
+     "name": "the house",
+     "range_class": "building"
+    },
+    {
+     "id": "next-door",
+     "linked": true,
+     "medium": "wifi",
+     "name": "next door",
+     "range_class": "building"
+    },
+    {
+     "id": "the-cabin",
+     "linked": false,
+     "medium": "lora",
+     "name": "the cabin",
+     "range_class": "hill"
+    }
+   ]
+  },
+  "margin": 0.01,
+  "nym": "ed25519:77itfob3IonHBoK2O3OGcBIWsNoxkOzfYCCc5O53K_o",
+  "paid_usd": 0,
+  "payouts": [
+   {
+    "from_poster_usd": 0.002277,
+    "from_steward_usd": 0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.002277,
+    "purchase": "601627675647f834",
+    "refund_usd": 0,
+    "settled_bytes": 113831383,
+    "t": 1792375201,
+    "window": {
+     "t_first": 1792371601,
+     "t_last": 1792375201
+    }
+   },
+   {
+    "from_poster_usd": 0.002275,
+    "from_steward_usd": 0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.002275,
+    "purchase": "601627675647f834",
+    "refund_usd": 0,
+    "settled_bytes": 113746676,
+    "t": 1792371601,
+    "window": {
+     "t_first": 1792368001,
+     "t_last": 1792371601
+    }
+   },
+   {
+    "from_poster_usd": 0.002352,
+    "from_steward_usd": 0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.002352,
+    "purchase": "601627675647f834",
+    "refund_usd": 0,
+    "settled_bytes": 117594894,
+    "t": 1792368001,
+    "window": {
+     "t_first": 1792364401,
+     "t_last": 1792368001
+    }
+   },
+   {
+    "from_poster_usd": 0.002274,
+    "from_steward_usd": 0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.002274,
+    "purchase": "601627675647f834",
+    "refund_usd": 0,
+    "settled_bytes": 113724934,
+    "t": 1792364402,
+    "window": {
+     "t_first": 1792360801,
+     "t_last": 1792364401
+    }
+   },
+   {
+    "from_poster_usd": 0.002314,
+    "from_steward_usd": 0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.002314,
+    "purchase": "601627675647f834",
+    "refund_usd": 0,
+    "settled_bytes": 115675490,
+    "t": 1792360802,
+    "window": {
+     "t_first": 1792357201,
+     "t_last": 1792360801
+    }
+   },
+   {
+    "from_poster_usd": 0.002275,
+    "from_steward_usd": 0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.002275,
+    "purchase": "601627675647f834",
+    "refund_usd": 0,
+    "settled_bytes": 113738237,
+    "t": 1792357202,
+    "window": {
+     "t_first": 1792353601,
+     "t_last": 1792357201
+    }
+   },
+   {
+    "from_poster_usd": 0.002312,
+    "from_steward_usd": 0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.002312,
+    "purchase": "601627675647f834",
+    "refund_usd": 0,
+    "settled_bytes": 115603562,
+    "t": 1792353601,
+    "window": {
+     "t_first": 1792350001,
+     "t_last": 1792353601
+    }
+   },
+   {
+    "from_poster_usd": 0.002482,
+    "from_steward_usd": 0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.002482,
+    "purchase": "601627675647f834",
+    "refund_usd": 0,
+    "settled_bytes": 124112228,
+    "t": 1792350001,
+    "window": {
+     "t_first": 1792346401,
+     "t_last": 1792350001
+    }
+   },
+   {
+    "from_poster_usd": 0.002317,
+    "from_steward_usd": 0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.002317,
+    "purchase": "601627675647f834",
+    "refund_usd": 0,
+    "settled_bytes": 115872568,
+    "t": 1792346401,
+    "window": {
+     "t_first": 1792342801,
+     "t_last": 1792346401
+    }
+   },
+   {
+    "from_poster_usd": 0.002293,
+    "from_steward_usd": 0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.002293,
+    "purchase": "601627675647f834",
+    "refund_usd": 0,
+    "settled_bytes": 114654158,
+    "t": 1792342801,
+    "window": {
+     "t_first": 1792339201,
+     "t_last": 1792342801
+    }
+   },
+   {
+    "from_poster_usd": 0.002215,
+    "from_steward_usd": 0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.002215,
+    "purchase": "601627675647f834",
+    "refund_usd": 0,
+    "settled_bytes": 110759011,
+    "t": 1792339201,
+    "window": {
+     "t_first": 1792335601,
+     "t_last": 1792339201
+    }
+   },
+   {
+    "from_poster_usd": 0.002278,
+    "from_steward_usd": 0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.002278,
+    "purchase": "601627675647f834",
+    "refund_usd": 0,
+    "settled_bytes": 113890436,
+    "t": 1792335601,
+    "window": {
+     "t_first": 1792332001,
+     "t_last": 1792335601
+    }
+   },
+   {
+    "from_poster_usd": 0.002273,
+    "from_steward_usd": 0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.002273,
+    "purchase": "601627675647f834",
+    "refund_usd": 0,
+    "settled_bytes": 113660652,
+    "t": 1792332001,
+    "window": {
+     "t_first": 1792328401,
+     "t_last": 1792332001
+    }
+   },
+   {
+    "from_poster_usd": 0.002279,
+    "from_steward_usd": 0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.002279,
+    "purchase": "601627675647f834",
+    "refund_usd": 0,
+    "settled_bytes": 113938462,
+    "t": 1792328401,
+    "window": {
+     "t_first": 1792324801,
+     "t_last": 1792328401
+    }
+   },
+   {
+    "from_poster_usd": 0.002346,
+    "from_steward_usd": 0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.002346,
+    "purchase": "601627675647f834",
+    "refund_usd": 0,
+    "settled_bytes": 117304615,
+    "t": 1792324801,
+    "window": {
+     "t_first": 1792321201,
+     "t_last": 1792324801
+    }
+   },
+   {
+    "from_poster_usd": 0.002272,
+    "from_steward_usd": 0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.002272,
+    "purchase": "601627675647f834",
+    "refund_usd": 0,
+    "settled_bytes": 113605702,
+    "t": 1792321201,
+    "window": {
+     "t_first": 1792317601,
+     "t_last": 1792321201
+    }
+   },
+   {
+    "from_poster_usd": 0.002354,
+    "from_steward_usd": 0,
+    "hop": "bw-neighbor",
+    "payer": "bw-house",
+    "premium_usd": 0.002354,
+    "purchase": "601627675647f834",
+    "refund_usd": 0,
+    "settled_bytes": 117706884,
+    "t": 1792317601,
+    "window": {
+     "t_first": 1792314001,
+     "t_last": 1792317601
+    }
+   }
+  ],
+  "posted_usd": 0.015833,
+  "program_window_s": 604800,
+  "purchases": [
+   {
+    "deadline": 1792919187,
+    "escrow_usd": 0.000559,
+    "id": "b639d50f3e01e67f",
+    "match_usd": null,
+    "min_bytes": 3616926,
+    "paid_usd": 0,
+    "posted_at": 1792314387,
+    "poster": "steward",
+    "premium_per_gb": 0.00092,
+    "program": "second_bridge",
+    "refund_usd": 0,
+    "route": {
+     "from": "house",
+     "not_via": [
+      "house",
+      "next-door"
+     ],
+     "to": "next-door"
+    },
+    "status": "open",
+    "topups_usd": 0,
+    "windows": 168,
+    "windows_left": 168
+   },
+   {
+    "deadline": 1792919192,
+    "escrow_usd": 1,
+    "id": "601627675647f834",
+    "match_usd": 5.2e-05,
+    "min_bytes": 50000000,
+    "paid_usd": 0.039188,
+    "posted_at": 1792314392,
+    "poster": "bw-house",
+    "premium_per_gb": 0.02,
+    "program": "payer",
+    "refund_usd": 0,
+    "route": {
+     "from": "bw-house",
+     "not_via": [],
+     "to": "bw-neighbor"
+    },
+    "status": "open",
+    "topups_usd": 0,
+    "windows": 168,
+    "windows_left": 151
+   },
+   {
+    "deadline": 1792919192,
+    "escrow_usd": 5.2e-05,
+    "id": "21be7013d9d06034",
+    "match_usd": null,
+    "min_bytes": 50000000,
+    "paid_usd": 0,
+    "posted_at": 1792317904,
+    "poster": "steward",
+    "premium_per_gb": 0.02,
+    "program": "match",
+    "refund_usd": 0,
+    "route": {
+     "from": "bw-house",
+     "not_via": [],
+     "to": "bw-neighbor"
+    },
+    "status": "open",
+    "topups_usd": 0,
+    "windows": 168,
+    "windows_left": 151
+   },
+   {
+    "deadline": 1792922704,
+    "escrow_usd": 0.011286,
+    "id": "b8dd8ed39e0251bd",
+    "match_usd": null,
+    "min_bytes": 0,
+    "paid_usd": 0,
+    "posted_at": 1792317904,
+    "poster": "steward",
+    "premium_per_gb": 0.05,
+    "program": "first_link",
+    "refund_usd": 0,
+    "route": {
+     "from": null,
+     "not_via": [],
+     "to": "the-cabin"
+    },
+    "status": "open",
+    "topups_usd": 0.010609,
+    "windows": 168,
+    "windows_left": 168
+   },
+   {
+    "deadline": 1792926304,
+    "escrow_usd": 0.000655,
+    "id": "bd6004a180445e6c",
+    "match_usd": null,
+    "min_bytes": 0,
+    "paid_usd": 0,
+    "posted_at": 1792321504,
+    "poster": "steward",
+    "premium_per_gb": 0.05,
+    "program": "first_link",
+    "refund_usd": 0,
+    "route": {
+     "from": null,
+     "not_via": [],
+     "to": "the-cabin"
+    },
+    "status": "closed",
+    "topups_usd": 0,
+    "windows": 168,
+    "windows_left": 168
+   },
+   {
+    "deadline": 1792929902,
+    "escrow_usd": 0.000676,
+    "id": "4ef3716c2e4f8f70",
+    "match_usd": null,
+    "min_bytes": 0,
+    "paid_usd": 0,
+    "posted_at": 1792325102,
+    "poster": "steward",
+    "premium_per_gb": 0.05,
+    "program": "first_link",
+    "refund_usd": 0,
+    "route": {
+     "from": null,
+     "not_via": [],
+     "to": "the-cabin"
+    },
+    "status": "closed",
+    "topups_usd": 0,
+    "windows": 168,
+    "windows_left": 168
+   },
+   {
+    "deadline": 1792933502,
+    "escrow_usd": 0.000657,
+    "id": "d6abf521dfeb1a80",
+    "match_usd": null,
+    "min_bytes": 0,
+    "paid_usd": 0,
+    "posted_at": 1792328702,
+    "poster": "steward",
+    "premium_per_gb": 0.05,
+    "program": "first_link",
+    "refund_usd": 0,
+    "route": {
+     "from": null,
+     "not_via": [],
+     "to": "the-cabin"
+    },
+    "status": "closed",
+    "topups_usd": 0,
+    "windows": 168,
+    "windows_left": 168
+   },
+   {
+    "deadline": 1792937102,
+    "escrow_usd": 0.000654,
+    "id": "e4ac2b7dd6d91be3",
+    "match_usd": null,
+    "min_bytes": 0,
+    "paid_usd": 0,
+    "posted_at": 1792332302,
+    "poster": "steward",
+    "premium_per_gb": 0.05,
+    "program": "first_link",
+    "refund_usd": 0,
+    "route": {
+     "from": null,
+     "not_via": [],
+     "to": "the-cabin"
+    },
+    "status": "closed",
+    "topups_usd": 0,
+    "windows": 168,
+    "windows_left": 168
+   },
+   {
+    "deadline": 1792940702,
+    "escrow_usd": 0.000656,
+    "id": "50497b91567dbc9a",
+    "match_usd": null,
+    "min_bytes": 0,
+    "paid_usd": 0,
+    "posted_at": 1792335902,
+    "poster": "steward",
+    "premium_per_gb": 0.05,
+    "program": "first_link",
+    "refund_usd": 0,
+    "route": {
+     "from": null,
+     "not_via": [],
+     "to": "the-cabin"
+    },
+    "status": "closed",
+    "topups_usd": 0,
+    "windows": 168,
+    "windows_left": 168
+   },
+   {
+    "deadline": 1792944302,
+    "escrow_usd": 0.000638,
+    "id": "60f577047024616f",
+    "match_usd": null,
+    "min_bytes": 0,
+    "paid_usd": 0,
+    "posted_at": 1792339502,
+    "poster": "steward",
+    "premium_per_gb": 0.05,
+    "program": "first_link",
+    "refund_usd": 0,
+    "route": {
+     "from": null,
+     "not_via": [],
+     "to": "the-cabin"
+    },
+    "status": "closed",
+    "topups_usd": 0,
+    "windows": 168,
+    "windows_left": 168
+   }
+  ],
+  "refunded_usd": 0.003936,
+  "reserve_usd": 0.000442
+ },
+ "v": 1,
+ "window_s": 3600
+}
