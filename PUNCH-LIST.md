@@ -16,7 +16,9 @@ The kit and the lab keep their own list, in the kit's `PUNCH-LIST.md`.
 
 **The login exists on the `isiah` Mac.** The handoff was written on the `wendi` account of another Mac; on the `isiah` account of Roberts-MacBook-Pro-3, `npx -y wrangler@3 whoami` names the Cloudflare account, and the deploy was run from there. The kit is cloned beside this repo there; the lab's `-ts` Tailscale aliases and `~/.config/bwkit` are not.
 
+**P2 is done too** (Oct 19, 2026, 05:05 to 05:11 UTC): bw-mint runs bwkit 0.5.0 and posts its report signed, every ten minutes and after each commitment; the map is posted and `/mints` lists bw-mint; the Worker's token path, its secret and its KV namespace are gone (`POST /status` is 410). The P1 list's "Done" section has the minutes. The four missing `FLOAT_FIELDS` are in the kit's `bsp.js` and vendored here.
+
 **What remains.**
-1. **P2, in the kit:** `bwkit report` signs its report with the Mint's key, posts to `/report`, and drops the bearer token; a `bwkit` command to sign and post the map, so the lab Mint can post the first one (`/map` is 404 and `/mints` lists nobody until then); then the token path and the KV namespace leave the Worker. The kit's own `PUNCH-LIST.md` has the item under "Waiting on the site repo", which it no longer is.
-2. **P3, on the site:** the signature checked in the browser, the Mint picker, the seven-day strip from `/history`, the network page; `steward.html` brought to the 0.4.0 shape; the four missing `FLOAT_FIELDS` added in the kit's `bsp.js` and vendored here.
-3. **P4, the words:** both repos' CLAUDE.md, the spec's note, one sentence for the paper's Section 9 on the proof sheet.
+1. **P3, on the site:** the signature checked in the browser, the Mint picker, the seven-day strip from `/history`, the network page; `steward.html` brought to the 0.4.0 shape.
+2. **P4, the words:** both repos' CLAUDE.md, one sentence for the paper's Section 9 on the proof sheet (the spec's Section 9 note is written).
+3. **The other three nodes still run 0.4.0.** The protocol is unchanged and only the Mint reports, so nothing is wrong; `SSH_SUFFIX=-ts phase0/provision.sh update` brings them to 0.5.0 when wanted (bw-forest through `FOREST_JUMP=bw-house-ts`).
