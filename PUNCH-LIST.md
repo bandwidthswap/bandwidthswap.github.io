@@ -4,6 +4,24 @@ Work set aside to finish later, newest first. Each item says what it is, where i
 
 The kit and the lab keep their own list, in the kit's `PUNCH-LIST.md`.
 
+## A sentence for the paper's Section 9: the margin followed the download path
+
+*Drafted Oct 30, 2026, for the proof sheet.*
+
+**What.** On Oct 30 bw-neighbor re-announced its link with a 3% agreement margin, set from the Mint's ledger: the week of Oct 18 to 23 had the hop's count over the payer's by a median 7.4% (p95 10.1%, max 10.95%, climbing daily), and since the house changed its download sources on Oct 24 the same link's two meters have agreed to within about 1% (141 full windows, median 0.9%, p99 1.5%). Section 9 records the first night's tenth and says that is why 3.6 makes the margin a link parameter; it does not yet say what the week showed, which is that the loss belonged to the download path through the relay, not to the link, and moved when that path did. `OPEN-QUESTIONS.md` B11 and the kit's `PUNCH-LIST.md` hold the numbers.
+
+**The card.** Paper edits are never applied on a chat go-ahead; this is an exact before/after pair for the proof sheet. It edits the "Phase 0, continued (October 17 and 18)" paragraph of Section 9. The before text matches `paper/BANDWIDTH-whitepaper-v0.6.md` exactly once; the readings do not repeat the passage, so no card for them.
+
+*Before:*
+
+> which is why Section 3.6 now makes the margin a parameter of the link. The first full purchase moved 104,857,600 bytes in 230 seconds, about 3.6 megabits a second, through a 2.4 GHz Wi-Fi, a satellite uplink and the relay.
+
+*After:*
+
+> which is why Section 3.6 now makes the margin a parameter of the link. The week that followed put the gap between four and eleven percent and climbing; when the house changed where it downloaded from, on October 24, the same link's two meters came within about one percent of each other, and on October 30 the relay announced a three percent margin. The loss was the download path's through the relay, not the link's, and the margin followed it. The first full purchase moved 104,857,600 bytes in 230 seconds, about 3.6 megabits a second, through a 2.4 GHz Wi-Fi, a satellite uplink and the relay.
+
+When it is approved, apply it to `paper/BANDWIDTH-whitepaper-v0.6.md` and run `tools/build.sh`.
+
 ## The status Worker, made multi-tenant
 
 *Set aside Oct 18, 2026.*
