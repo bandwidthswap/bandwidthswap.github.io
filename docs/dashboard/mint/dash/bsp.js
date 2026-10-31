@@ -1,3 +1,5 @@
+// This file is the Bandwidth Swap verifier as the kit carries it (kit: dashboard/bsp.js); the two copies must stay
+// identical, and tools/check-vectors.mjs fails when they differ. Edit the kit's copy and copy it here.
 /* bsp.js: the commitment half of the Bandwidth Swap Protocol (pilot profile 1), checked in the browser.
 
    This is the second implementation. The reference is bwkit.py in github.com/bandwidthswap/kit
@@ -32,7 +34,8 @@ const LEAF_SKIP = new Set(['t']);
 export const RECEIPT_FIELDS = ['payer', 'hop', 'hop_index', 'merkle_root', 'bytes', 't_first', 't_last', 'prev_sig'];
 const WINDOW_S = 3600;
 /* Fields whose whole-number values are still floats in the kit's records (used only for a document that arrives parsed). */
-const FLOAT_FIELDS = new Set(['amount_usd', 'price_usd_per_gb', 'fee_usd', 'premium_usd', 'refund_usd', 'price', 'fee', 'margin', 'premium', 'refund']);
+const FLOAT_FIELDS = new Set(['amount_usd', 'price_usd_per_gb', 'fee_usd', 'premium_usd', 'refund_usd', 'from_poster_usd', 'from_steward_usd',
+  'steward_held_usd', 'steward_fee', 'price', 'fee', 'margin', 'premium', 'refund']);   // the settlement's doubles, spec Section 3, and the announcement's
 export const NOBLE_URL = 'https://cdn.jsdelivr.net/npm/@noble/ed25519@2.3.0/index.js';
 
 const enc = new TextEncoder();

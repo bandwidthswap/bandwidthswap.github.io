@@ -18,6 +18,10 @@ window.BW = window.BW || {};
 
   function parseJsonl(text){ var out=[]; String(text||'').split('\n').forEach(function(l){ l=l.trim(); if(!l) return; try{ out.push(JSON.parse(l)); }catch(e){} }); return out; }
   BW.parseJsonl = parseJsonl;
+  // /ledger?since= returns the lines at or after that second, so the last second held comes back again: keep each entry once.
+  function entryKey(e){ return e.kind+'|'+(e.sig||e.receipt_sig||e.signature||JSON.stringify(e)); }
+  function addNew(have, more){ var seen={}; have.forEach(function(e){ seen[entryKey(e)]=1; }); return have.concat(more.filter(function(e){ var k=entryKey(e); if(seen[k]) return false; seen[k]=1; return true; })); }
+  BW.addNew = addNew;
 
   function get(base, path, text){
     return fetch(base+path, {cache:'no-store'}).then(function(r){ if(!r.ok) throw new Error(path+' answered '+r.status); return text ? r.text() : r.json(); });
@@ -49,7 +53,7 @@ window.BW = window.BW || {};
       D.status=st; var role=st.role;
       var jobs=[];
       if(role==='mint'){
-        jobs.push(get(b, '/ledger'+(D.since?'?since='+D.since:''), true).then(function(t){ var more=parseJsonl(t); D.ledger = D.since ? D.ledger.concat(more) : more; D.since = D.ledger.length ? (D.ledger[D.ledger.length-1].received_at||D.ledger[D.ledger.length-1].t||0) : 0; }));
+        jobs.push(get(b, '/ledger'+(D.since?'?since='+D.since:''), true).then(function(t){ var more=parseJsonl(t); D.ledger = D.since ? addNew(D.ledger, more) : more; D.since = D.ledger.length ? (D.ledger[D.ledger.length-1].received_at||D.ledger[D.ledger.length-1].t||0) : 0; }));
         jobs.push(opt(b, '/commitments', false, []).then(function(v){ D.commitments=v||[]; }));
         jobs.push(opt(b, '/purchases', true, '').then(function(v){ D.purchases=typeof v==='string'?parseJsonl(v):(v||[]); }));
         jobs.push(opt(b, '/steward', false, null).then(function(v){ D.steward=v; }));
@@ -113,7 +117,11 @@ window.BW = window.BW || {};
     var peers={};
     for(var n in names){ var nm=names[n]; if(nm==='steward'||(role==='mint'&&n===st.nym)) continue; peers[n]={nym:n,name:nm,roles:{},windows:0,lastSeen:lastSeen[nm]||0,place:place[nm]||null}; }
     S.forEach(function(s){ if(peers[s.payer]){ peers[s.payer].roles.payer=1; peers[s.payer].windows++; } if(peers[s.hop]){ peers[s.hop].roles.hop=1; peers[s.hop].windows++; } });
-    var paidOn={}; S.forEach(function(s){ if(s.purchase){ var p=paidOn[s.purchase]=paidOn[s.purchase]||{premium:0,refund:0,windows:0,steward:0,rows:[]}; p.premium+=s.premium_usd||0; p.refund+=s.refund_usd||0; p.steward+=s.from_steward_usd||0; p.windows++; p.rows.push(s); } });
+    // paidOn[id]: the windows settled against a purchase and what they drew. `own` is the poster's pool (from_poster_usd); the
+    // Steward's draws are credited to the pool they came from, the match when there is one (as the Mint's book does), so
+    // escrow - own - drawn is what a purchase's pool has left, and what returns to whoever put it in once it is closed.
+    var paidOn={}, slot=function(id){ return paidOn[id]=paidOn[id]||{premium:0,refund:0,windows:0,steward:0,own:0,drawn:0,rows:[]}; };
+    S.forEach(function(s){ if(s.purchase){ var p=slot(s.purchase); p.premium+=s.premium_usd||0; p.refund+=s.refund_usd||0; p.steward+=s.from_steward_usd||0; p.own+=s.from_poster_usd||0; p.windows++; p.rows.push(s); if(s.from_steward_usd) slot(s.match||s.purchase).drawn+=s.from_steward_usd; } });
     // purchases: the records as posted, with closes and top-ups applied as of `now`
     var recs=(D.purchases||[]).filter(function(p){ return (p.posted_at||0)<=now; }), byId={};
     recs.forEach(function(p){ if(p.kind==='purchase'){ var q=Object.assign({}, p); q.escrow_posted=p.escrow; q.topups=[]; q.closed=false; byId[q.id]=q; } });
