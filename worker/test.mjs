@@ -24,11 +24,15 @@ function check(name, ok, detail) {
   if (!ok) failures++;
 }
 
-// The clock is the test's: Date.now is skewed forward by tick() so the per-Mint rate (60 s) and freshness (300 s)
-// rules can be exercised without waiting.
+// The clock is the test's, and it does not read the machine's: it starts at a fixed instant and moves only when
+// tick() moves it, so the per-Mint rate (60 s) and freshness (300 s) rules can be exercised without waiting, and the
+// fixtures' windows, fixed in October 2026, stay inside the week /history serves by default however long after they
+// were written the test runs. The instant is an hour after the newest fixture's generated_at (report-bwkit-0.4.0.json,
+// Oct 19, 2026, 02:56 UTC), so those windows fall inside the week and outside ?hours=1.
+const START_S = 1792378562 + 3600;
 const realNow = Date.now;
 let skew = 0;
-Date.now = () => realNow() + skew;
+Date.now = () => START_S * 1000 + skew;
 const tick = (s = 61) => { skew += s * 1000; };
 const now = () => Math.floor(Date.now() / 1000);
 const today = () => new Date(Date.now()).toISOString().slice(0, 10);

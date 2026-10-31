@@ -151,8 +151,9 @@ if (withNoble) {
   }
 } else console.log('\n(pass --noble to also run the proofs through the noble-ed25519 fallback; it loads from jsDelivr)');
 // The kit carries the same verifier for every node's dashboard (dashboard/bsp.js). The two copies must stay identical.
+// The kit is expected beside this repo, where the vectors above were read from.
 {
-  const kitCopy = '/Users/wendi/Documents/GitHub/kit/dashboard/bsp.js';
+  const kitCopy = resolve(repo, '..', 'kit', 'dashboard', 'bsp.js');
   if (existsSync(kitCopy)) {
     const same = readFileSync(kitCopy, 'utf8') === readFileSync(new URL('../docs/bsp.js', import.meta.url), 'utf8');
     check('docs/bsp.js is identical to the kit\'s dashboard/bsp.js', same, 'the two copies differ; copy the newer one over the other');
