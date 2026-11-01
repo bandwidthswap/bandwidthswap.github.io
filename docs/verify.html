@@ -158,7 +158,7 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding-top:16px;font-si
   <p>On a Mint, for the hour starting at midnight local time on October 18, 2026 (the example above):</p>
   <pre><code>sudo -u bwkit bwkit prove 2026-10-18T00 &gt; proof.json
 bwkit verify-proof proof.json --mint "$(sudo -u bwkit bwkit nym)"</code></pre>
-  <p>The second line is the kit's own check. This page is the other implementation: <a href="bsp.js">bsp.js</a>, one ES module with no dependencies, SHA-256 and Ed25519 from the browser's WebCrypto. Where a browser's WebCrypto has no Ed25519 yet, the page loads a pinned copy of noble-ed25519 from jsDelivr for that one step, and says so under the result. In the site's repository, <code>node tools/check-vectors.mjs</code> runs the same module over real proofs from the lab's Mint and tampered copies of them, and over the kit's test vectors once those exist, so the two implementations are held to the same bytes.</p>
+  <p>The second line is the kit's own check. This page is the other implementation: <a href="bsp.js">bsp.js</a>, one ES module with no dependencies and nothing to fetch: SHA-256 and Ed25519 from the browser's WebCrypto where it has them, and otherwise its own SHA-256 and SHA-512 in plain JavaScript and an embedded copy of noble-ed25519 2.3.0, so a plain-http page with no WebCrypto at all, which is how a node's own page is opened on its network, checks the same bytes; the line under the result says which ran. In the site's repository, <code>node tools/check-vectors.mjs</code> runs the same module over real proofs from the lab's Mint and tampered copies of them, and over the kit's test vectors once those exist, so the two implementations are held to the same bytes.</p>
 </main>
 
 <footer>Bandwidth Swap · <a href="../#lab">lab status</a> · <a href="../notes/the-receipt-is-the-proof.html">the receipt is the proof</a> · <a href="paper.html">the paper</a> · <a href="../">home</a></footer>
@@ -252,9 +252,10 @@ function nymCell(nym) {
   const td = el('td', 'id'); const c = el('code', null, short(nym)); c.title = String(nym); td.appendChild(c); return td;
 }
 function backendLine() {
-  const b = bsp.ed25519Backend();
-  return b === 'noble' ? 'Ed25519 via noble-ed25519 2.3.0 from jsDelivr, because this browser\'s WebCrypto has no Ed25519; SHA-256 via WebCrypto.'
-    : 'SHA-256 and Ed25519 via this browser\'s WebCrypto.';
+  const b = bsp.backends();
+  const ed = b.ed25519 === 'noble' ? 'Ed25519 via the embedded noble-ed25519 ' + bsp.NOBLE_VERSION + (b.hashes === 'js' ? ', because this page has no WebCrypto' : ', because this browser\'s WebCrypto has no Ed25519') : 'Ed25519 via WebCrypto';
+  const h = b.hashes === 'js' ? 'SHA-256 in this page\'s own JavaScript' : 'SHA-256 via WebCrypto';
+  return ed + '; ' + h + '. Nothing was fetched.';
 }
 function row(dt, dd, cls) {
   cdl.appendChild(el('dt', null, dt));

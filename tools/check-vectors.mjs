@@ -14,6 +14,7 @@
 // Node 20 or newer: WebCrypto with Ed25519 (Node calls it experimental and says so once; that notice is muted here).
 
 import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { join, resolve, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as bsp from '../docs/bsp.js';
@@ -127,8 +128,7 @@ async function runDir(dir) {
 }
 
 const args = process.argv.slice(2);
-const withNoble = args.includes('--noble');
-const dirs = args.filter((a) => a !== '--noble');
+const dirs = args.filter((a) => a !== '--noble');   // --noble is accepted and means nothing now: the fallback pass always runs
 if (!dirs.length) {
   dirs.push(join(repo, 'tools', 'fixtures'));
   const vectors = resolve(repo, '..', 'kit', 'spec', 'vectors');
@@ -136,20 +136,30 @@ if (!dirs.length) {
   else console.log('(no kit vectors yet at ' + vectors + '; running the fixtures alone)');
 }
 for (const d of dirs) await runDir(d);
-// With --noble, the fallback a browser without Ed25519 in WebCrypto takes: the pinned noble-ed25519 from jsDelivr (needs the network).
-if (withNoble) {
-  console.log('\nnoble-ed25519, the fallback');
-  // Node cannot import an https: URL, so the pinned file is fetched and imported as a data: URL.
-  const src = await (await fetch(bsp.NOBLE_URL)).text();
-  await bsp.useEd25519('noble', await import('data:text/javascript;base64,' + Buffer.from(src).toString('base64')));
-  for (const d of dirs) {
-    for (const f of readdirSync(d).filter((f) => f.endsWith('.json') && /^proof/.test(f)).sort()) {
-      const r = await bsp.verifyProof(readFileSync(join(d, f), 'utf8'));
-      const want = !/tampered|bad/.test(f);
-      check(f + (want ? ' verifies' : ' fails') + ' under noble', r.ok === want, r.reason);
-    }
+const first = JSON.stringify(bsp.backends());
+// The fallbacks a browser without WebCrypto takes: the file's own SHA-256 and SHA-512 and the embedded noble-ed25519,
+// nothing fetched. The same proofs must pass and the same tampered copies fail under them.
+console.log('\nthe embedded fallbacks: the file\'s own hashes and noble-ed25519 ' + bsp.NOBLE_VERSION);
+bsp.useHashes('js');
+await bsp.useEd25519('noble');
+for (const d of dirs) {
+  for (const f of readdirSync(d).filter((f) => f.endsWith('.json') && /^proof/.test(f)).sort()) {
+    const r = await bsp.verifyProof(readFileSync(join(d, f), 'utf8'));
+    const want = !/tampered|bad/.test(f);
+    check(f + (want ? ' verifies' : ' fails') + ' under the fallbacks', r.ok === want && !r.unavailable, r.reason);
   }
-} else console.log('\n(pass --noble to also run the proofs through the noble-ed25519 fallback; it loads from jsDelivr)');
+}
+// And with no WebCrypto at all, in a child process: a plain-http page at any address but localhost has no crypto.subtle.
+{
+  const src = readFileSync(new URL('../docs/bsp.js', import.meta.url), 'utf8');
+  const proof = readFileSync(join(repo, 'tools', 'fixtures', readdirSync(join(repo, 'tools', 'fixtures')).filter((f) => /^proof.*\.json$/.test(f) && !/tampered|bad/.test(f)).sort()[0]), 'utf8');
+  const script = "Object.defineProperty(globalThis, 'crypto', { value: {}, configurable: true });"
+    + "const bsp = await import(process.argv[1]); const r = await bsp.verifyProof(process.argv[2]);"
+    + "console.log(JSON.stringify({ ok: r.ok, unavailable: r.unavailable, reason: r.reason, backends: bsp.backends() }));";
+  const out = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script, 'data:text/javascript;base64,' + Buffer.from(src).toString('base64'), proof], { encoding: 'utf8' }).trim());
+  check('a real proof verifies with no crypto.subtle at all, on the file\'s own hashes and the embedded noble',
+    out.ok === true && out.unavailable === false && out.backends.hashes === 'js' && out.backends.ed25519 === 'noble', JSON.stringify(out));
+}
 // The kit carries the same verifier for every node's dashboard (dashboard/bsp.js). The two copies must stay identical.
 // The kit is expected beside this repo, where the vectors above were read from.
 {
@@ -162,5 +172,5 @@ if (withNoble) {
   }
 }
 
-console.log('\n' + (failures ? failures + ' of ' + checks + ' checks FAILED' : 'all ' + checks + ' checks passed') + ' · Ed25519 via ' + bsp.ed25519Backend());
+console.log('\n' + (failures ? failures + ' of ' + checks + ' checks FAILED' : 'all ' + checks + ' checks passed') + ' · first with ' + first + ', then with ' + JSON.stringify(bsp.backends()));
 process.exit(failures ? 1 : 0);
