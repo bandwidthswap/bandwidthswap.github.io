@@ -66,6 +66,7 @@ Legend for "Build reveals": **sim** = answerable with a simulation or spreadshee
 **Options.** (a) Window sized so the exposure is below the payer's bond, and the bond is slashed on non-payment. (b) Prepaid windows: the payer locks the window's value before bytes move. (c) Streaming micropayments per chunk, Orchid-style probabilistic nanopayments.
 **Build reveals.** *proto.* The throughput cost of (b) and (c) can only be measured by running them.
 **Default to start.** (b), with hourly windows, for backhaul. Decide between (a) and (c) only if interactive traffic is added.
+**Designed.** Nov 1, 2026: the kit's `spec/PREPAYMENT-DRAFT.md` draws (b) for the pilot without a rail, deposits held at the Mint, a lock per window, a claim for a payer who leaves; not built, and it raises B8's custody question, which it names rather than answers.
 
 ### B3. Last hop acknowledgment
 **Unresolved.** v0.2 requires a bonded recipient for third-party delivery. That makes relay service work only between network members. The paper's definition of relay service ("query an unknown location") is ambiguous about whether the recipient is a member or the public internet.
