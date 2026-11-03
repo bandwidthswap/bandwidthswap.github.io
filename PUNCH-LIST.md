@@ -4,6 +4,14 @@ Work set aside to finish later, newest first. Each item says what it is, where i
 
 The kit and the lab keep their own list, in the kit's `PUNCH-LIST.md`.
 
+## The Lab status does not draw the prepayment book
+
+*Set aside Nov 3, 2026.*
+
+**What.** Since Nov 2, 2026 the feed's report carries `prepaid` (the kit's `status_report`, spec Section 16): per payer by name, deposits, what open locks hold, what covered windows drew, what released, the balance, every amount an integer in micro-units, and how many windows were covered; `{}` until a deposit or a lock exists. The page's `#lab` section reads the report and draws none of it, so the first day of locks (nine windows by the evening of Nov 2) shows on the nodes' own pages and in the feed's JSON and not on the site.
+
+**Where it stands.** Nothing built. The obvious drawing: under the payer's card, its balance and the lock ahead ("88¢ at the Mint · 1.4¢ locked for the 19:00 window") and a *covered* count beside its windows; a settled dot on the Mint's row could carry a covered mark once the report's per-node `history` entries say so, which they do not yet (each carries `t_first`, `t_last`, `bytes`, `settled_bytes`, `disputed` only). The Worker stores `prepaid` already (the live feed carries it); `docs/steward.html` and `docs/network.html` need nothing. Pick it up in `index.html`'s lab script, run headless under jsdom against the live feed as the P3 work was, and say in the legend what *covered* means.
+
 ## A sentence for the paper's Section 9: the margin followed the download path
 
 *Drafted Oct 30, 2026, for the proof sheet.*
