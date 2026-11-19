@@ -109,6 +109,7 @@ figcaption{font-size:14px;color:var(--muted);margin-top:6px;max-width:65ch}
 .lab .lbl.cm{left:0;right:0;top:296px}
 .lab .lbl.ck{left:0;right:0;top:314px;font-size:12px}.lab .lbl.ck.ok{color:var(--accent)}.lab .lbl.ck.bad{color:var(--signal)}
 .lab .lbl.sg{left:0;right:0;top:332px;font-size:12px}.lab .lbl.sg.ok{color:var(--accent)}.lab .lbl.sg.bad{color:var(--signal)}
+.lab .lbl.pp{left:0;top:120px;width:178px;font-size:12px;text-align:left;white-space:normal}.lab .lbl.pp span{display:block}.lab .lbl.pp .ok{color:var(--accent)}.lab .lbl.pp .bad{color:var(--signal)}
 .lab .pulse{position:absolute;left:181px;top:107px;width:10px;height:10px;border-radius:50%;background:var(--accent);opacity:0;pointer-events:none}
 .lab-ledger{display:grid;grid-template-columns:140px repeat(var(--cols,12),minmax(0,1fr));gap:6px;align-items:end;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px 12px;min-width:640px}
 .lab-ledger:empty{display:none}
@@ -126,7 +127,7 @@ figcaption{font-size:14px;color:var(--muted);margin-top:6px;max-width:65ch}
 .lab-legend .up{color:var(--accent)}.lab-legend .stale{color:var(--signal)}.lab-legend .idle{color:var(--muted)}
 .lab .note{font:400 13px/1.5 var(--mono);color:var(--muted);margin:10px 0 8px;max-width:none}
 @media (max-width:1000px){.lab-map{height:auto;display:flex;flex-direction:column;gap:10px}.lab .node,.lab .node.mint,.lab .node.quiet{position:static;width:100%;min-height:0;margin:0}
-.lab .ln,.lab .head,.lab .pulse,.lab .lbl.la,.lab .lbl.lb{display:none}.lab .lbl.ta,.lab .lbl.tb,.lab .lbl.cm,.lab .lbl.ck,.lab .lbl.sg{position:static;text-align:left;white-space:normal}.lab .lbl.tb,.lab .lbl.cm,.lab .lbl.ck,.lab .lbl.sg{margin-top:-6px}.lab-sum{text-align:left}.lab-side{align-items:flex-start}}
+.lab .ln,.lab .head,.lab .pulse,.lab .lbl.la,.lab .lbl.lb{display:none}.lab .lbl.ta,.lab .lbl.tb,.lab .lbl.cm,.lab .lbl.ck,.lab .lbl.sg,.lab .lbl.pp{position:static;text-align:left;white-space:normal}.lab .lbl.pp{width:auto}.lab .lbl.tb,.lab .lbl.cm,.lab .lbl.ck,.lab .lbl.sg,.lab .lbl.pp{margin-top:-6px}.lab-sum{text-align:left}.lab-side{align-items:flex-start}}
 .callout{border-left:3px solid var(--signal);padding:4px 0 4px 14px;margin:0 0 16px;max-width:65ch}
 .callout p{margin-bottom:8px}
 .contact{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 14px}
@@ -293,7 +294,7 @@ signed by payer</code></pre>
     <div>
       <p class="eyebrow">Phases 0 and 1, on the bench and next door</p>
       <h2>Lab status</h2>
-      <p>Six Raspberry Pi 3 B boards running <a href="https://github.com/bandwidthswap/kit">the kit</a>, at two houses. Three sit at the house on one home network: <code>bw-house</code>, the payer and the Mint's radio gateway; <code>bw-mint</code>, the Mint; and <code>bw-forest</code>, the bench hop, installed and idle. Three are next door, on the neighbor's Wi-Fi and reached over a tailnet: <code>bw-neighbor</code>, since October 18 the hop the house pays (<code>bw-house</code> buys 100 MB an hour through it, signs a receipt for the bytes that crossed, <code>bw-neighbor</code> answers with its own count, and <code>bw-mint</code> settles the window at the smaller of the two); <code>bw-cabin</code>, the future forest node; and <code>bw-mint2</code>, an empty second Mint whose LoRa board relays for <code>bw-neighbor</code>. The link's agreement margin is three percent since October 30, set from a week of windows (<a href="docs/OPEN-QUESTIONS.md">the backlog</a>, B11): the two meters now agree to within about one percent, and a window past the margin settles as a dispute, at the smaller count. October's invoice, written by the Mint itself on November 1: 336 windows, 35.22 GB, $3.65 to the relay. Since November 2 the house pays ahead: a dollar on deposit at the Mint, a lock for the coming window posted after each receipt, and every window since ten that morning settled against its lock (<a href="docs/OPEN-QUESTIONS.md">the backlog</a>, B2). The T-Beams carry receipts and acknowledgements over LoRa since October 24, and on October 26 a window settled with the tunnel to next door blocked. Every ten minutes, and right after each hour's commitment, the Mint posts a summary of its ledger, signed with its own key; the map and the ledger below are that summary, and this page checks the signature in your browser. No node accepts a connection from the internet.</p>
+      <p>Six Raspberry Pi 3 B boards running <a href="https://github.com/bandwidthswap/kit">the kit</a>, at two houses. Three sit at the house on one home network: <code>bw-house</code>, the payer and the Mint's radio gateway; <code>bw-mint</code>, the Mint; and <code>bw-forest</code>, the bench hop, installed and idle. Three are next door, on the neighbor's Wi-Fi and reached over a tailnet: <code>bw-neighbor</code>, since October 18 the hop the house pays (<code>bw-house</code> buys 100 MB an hour through it, signs a receipt for the bytes that crossed, <code>bw-neighbor</code> answers with its own count, and <code>bw-mint</code> settles the window at the smaller of the two); <code>bw-cabin</code>, the future forest node; and <code>bw-mint2</code>, an empty second Mint whose LoRa board relays for <code>bw-neighbor</code>. The link's agreement margin is three percent since October 30, set from a week of windows (<a href="docs/OPEN-QUESTIONS.md">the backlog</a>, B11): the two meters now agree to within about one percent, and a window past the margin settles as a dispute, at the smaller count. October's invoice, written by the Mint itself on November 1: 336 windows, 35.22 GB, $3.65 to the relay. Since November 2 the house pays ahead: a dollar on deposit at the Mint and a lock for the coming window posted after each receipt (<a href="docs/OPEN-QUESTIONS.md">the backlog</a>, B2). The first dollar covered 82 windows and ran out on the evening of November 5; the windows after it settled on credit until a second dollar went in on November 18, and the lines under the payer's card below say where the balance stands now. The T-Beams carry receipts and acknowledgements over LoRa since October 24, and on October 26 a window settled with the tunnel to next door blocked. Every ten minutes, and right after each hour's commitment, the Mint posts a summary of its ledger, signed with its own key; the map and the ledger below are that summary, and this page checks the signature in your browser. No node accepts a connection from the internet.</p>
     </div>
     <div class="lab-side">
       <p class="lab-sum" id="lab-sum" aria-live="polite"><span class="k">loading</span><br><span class="m">status feed</span></p>
@@ -303,10 +304,10 @@ signed by payer</code></pre>
   <div class="lab-map" id="lab-map" role="img" aria-label="The nodes the Mint reports: the payer, the hop it pays over the tunnel, any idle hop, and the Mint below, which settles each window at the smaller count"></div>
   <p class="lab-span" id="lab-span" hidden><span>the ledger over</span><button type="button" class="on" data-span="12h">the last 12 hours</button><button type="button" data-span="7d">the last 7 days</button></p>
   <div class="tablewrap"><div class="lab-ledger" id="lab-ledger" role="table" aria-label="The ledger: one row per node with windows in the span shown, one column per hour of the last twelve or per day of the last seven"></div></div>
-  <p class="lab-legend"><span><span class="up">●</span> up: receipt within 90 min &nbsp; <span class="stale">●</span> stale &nbsp; <span class="idle">○</span> idle: a hop not in use &nbsp; <span class="sw"></span> disputed: the two counts differed by more than the link's margin; settled at the smaller</span><span>empty: no receipt · bars are log scale</span></p>
+  <p class="lab-legend"><span><span class="up">●</span> up: receipt within 90 min &nbsp; <span class="stale">●</span> stale &nbsp; <span class="idle">○</span> idle: a hop not in use &nbsp; <span class="sw"></span> disputed: the two counts differed by more than the link's margin; settled at the smaller</span><span>covered: settled against a lock posted ahead · empty: no receipt · bars are log scale</span></p>
   <p class="note" id="lab-note" aria-live="polite">Loading the status feed…</p>
   <noscript><p class="note">The map and the ledger need JavaScript. The feed itself is plain JSON at <a href="https://status.bandwidthswap.com/status">status.bandwidthswap.com/status</a>.</p></noscript>
-  <p>A node is <strong>up</strong> when the Mint has a receipt from it within the last 90 minutes (receipts are hourly); the Mint is up when its report is under fifteen minutes old (it posts every ten) and its ledger service answers. A hop is <strong>idle</strong> when it is not the one the house pays and has had no receipt in that time. A <strong>disputed</strong> window is one where the two signed counts differed by more than the link's announced margin (three percent on the neighbor link since October 30, 2026; one percent is the pilot's default); it settles at the smaller count, like every other window. Under the Mint is its latest <strong>commitment</strong>, a signed root over the hour's settlements that anyone holding the receipts can rebuild with the kit and check. The report itself is <strong>signed</strong> by the Mint, and this page checks that signature and the commitment's proof in your browser with <code>docs/bsp.js</code>, so the feed that relays the report has nothing to be trusted with: it can delay a report or drop one, and cannot alter one. The feed carries names, roles, times and byte counts, since November 2 each payer's prepaid balance, and nothing about the networks the boards sit on.</p>
+  <p>A node is <strong>up</strong> when the Mint has a receipt from it within the last 90 minutes (receipts are hourly); the Mint is up when its report is under fifteen minutes old (it posts every ten) and its ledger service answers. A hop is <strong>idle</strong> when it is not the one the house pays and has had no receipt in that time. A <strong>disputed</strong> window is one where the two signed counts differed by more than the link's announced margin (three percent on the neighbor link since October 30, 2026; one percent is the pilot's default); it settles at the smaller count, like every other window. Under the payer is its <strong>prepayment</strong>, when it has one: the balance it holds at the Mint, what is locked ahead for the window open now, and how many windows were <strong>covered</strong>, settled against a lock the payer posted before the window opened; a window with no lock settles <strong>on credit</strong>, on the month's invoice, and the page says so when no lock is open. Under the Mint is its latest <strong>commitment</strong>, a signed root over the hour's settlements that anyone holding the receipts can rebuild with the kit and check. The report itself is <strong>signed</strong> by the Mint, and this page checks that signature and the commitment's proof in your browser with <code>docs/bsp.js</code>, so the feed that relays the report has nothing to be trusted with: it can delay a report or drop one, and cannot alter one. The feed carries names, roles, times and byte counts, since November 2 each payer's prepaid balance, and nothing about the networks the boards sit on.</p>
   <p><a href="docs/verify.html">Check a proof in your browser</a>: paste a proof from the Mint's <code>bwkit prove</code> and a second implementation of the rules, sharing no code with the kit, checks the Mint's signature on the hour's root and each settlement's place in it, sending nothing anywhere.</p>
   <p><a href="docs/steward.html">The Steward's book</a>: the rule that takes five percent of every fee and can only spend it as offers to buy bandwidth on links the network wants; its balances, open offers and payouts, drawn from the feed once it runs.</p>
   <p><a href="docs/network.html">The network</a>: every Mint the map lists, with its domain, its places and its last report, and the map itself, a record signed by the Mint that keeps it. One Mint so far; the feed takes any Mint's signed report, and the map says who is listed.</p>
@@ -437,6 +438,35 @@ signed by payer</code></pre>
   function ago(t,now){var s=Math.max(0,now-t);if(s<60)return 'just now';var m=Math.round(s/60);if(m<90)return m+' min ago';var h=Math.round(s/3600);if(h<48)return h+' h ago';return Math.round(s/86400)+' d ago';}
   function bytes(n){if(n==null)return '—';var u=['B','KB','MB','GB','TB'],i=0;while(n>=1000&&i<u.length-1){n/=1000;i++;}return (i?n.toFixed(2):String(n))+' '+u[i];}
   function plural(n,w){return n+' '+w+(n===1?'':'s');}
+  function money(u){return u>=1e6?'$'+(u/1e6).toFixed(2):(u/1e4).toFixed(1)+'¢';}   /* micro-units of a dollar, as the prepayment records carry them */
+  function exact(u){return '$'+(u/1e6).toFixed(6);}
+  function prepaidOf(rep,payer){
+    /* The payer's line of the report's prepayment book (spec Section 16; bwkit 0.5.1 since Nov 2, 2026): integers in micro-units. Nothing when the report has none, the book is empty, or a field is not a whole number. */
+    var b=rep&&payer&&rep.prepaid&&rep.prepaid[payer.name], ks=['deposits','locked','debited','balance','covered'];
+    if(!b||typeof b!=='object')return null;
+    for(var i=0;i<ks.length;i++)if(typeof b[ks[i]]!=='number'||b[ks[i]]%1!==0||b[ks[i]]<0)return null;
+    if(!b.deposits&&!b.locked&&!b.covered)return null;
+    /* What a covered window has drawn on average says about how many more the balance and the open lock will carry. An estimate: the next lock must also fit, and it is larger than the draw. */
+    var per=b.covered>0?b.debited/b.covered:0;
+    return {deposits:b.deposits,locked:b.locked,debited:b.debited,balance:b.balance,covered:b.covered,released:typeof b.released==='number'?b.released:0,per:per,left:per>0?Math.floor((b.balance+b.locked)/per):null};
+  }
+  function prepaidLines(P,payer){
+    /* Under the payer's card: the balance at the Mint, what is locked ahead (or that nothing is, so the window open now settles on credit), how many windows were covered and about how many more the balance carries. */
+    var box=el('div','lbl pp'), open=payer.window_t_last?' The window open now began '+hm(payer.window_t_last)+'.':'';
+    var a=el('span',null,money(P.balance)+' at the Mint');
+    a.title='balance at the Mint: '+exact(P.deposits)+' deposited, less '+exact(P.debited)+' that covered windows drew and '+exact(P.locked)+' that open locks hold = '+exact(P.balance)+(P.released?'; '+exact(P.released)+' released from locks unspent':'');
+    var b=P.locked>0?el('span','ok',money(P.locked)+' locked ahead'):el('span','bad','no lock open: on credit');
+    b.title=(P.locked>0?exact(P.locked)+' held by open locks. After each receipt the payer locks the value of the window that just opened, the Mint countersigns it, and the hop holds it before the bytes move.':'No lock is open, so the window running now settles on credit, on the month\'s invoice. A lock is refused when the balance is smaller than the lock.')+open;
+    var c=el('span',null,plural(P.covered,'window')+' covered');
+    c.title='covered: settled against a lock the payer posted before the window opened, so the hop was paid from money already at the Mint. Every other window settles on credit.';
+    box.appendChild(a);box.appendChild(b);box.appendChild(c);
+    if(P.left!==null){
+      var d=el('span',P.left<24?'bad':null,'about '+plural(P.left,'window')+' left');
+      d.title='an estimate: the balance and the open lock, '+exact(P.balance+P.locked)+', over the '+exact(Math.round(P.per))+' a covered window has drawn on average. Windows are hourly'+(P.left<24?'; under a day is left':'')+'.';
+      box.appendChild(d);
+    }
+    return box;
+  }
   function count(n){return WORDS[n]||String(n);}
   function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
   function arrange(rep){
@@ -488,6 +518,8 @@ signed by payer</code></pre>
     function put(it,top){var k=card(it,rep,now);k.el.style.top=top+'px';states[n(it)]=k.state;map.appendChild(k.el);}
     function n(it){return it.n.name;}
     if(payer)put({n:payer,side:'payer',quiet:false},TOP);
+    var P=prepaidOf(rep,payer);
+    if(P)map.appendChild(prepaidLines(P,payer));
     if(payer&&hop){
       map.appendChild(el('div','ln tunnel'));
       var ta=el('div','lbl ta','to '+hop.name+' · '+bytes(hop.window_bytes)+' this window'), tb=el('div','lbl tb','tunnel · '+bytes(hop.total_bytes)+' counted so far'), w=latestWindow(hop);
@@ -544,6 +576,7 @@ signed by payer</code></pre>
     map.style.setProperty('--map-h',height+'px');
     var idle=A.items.filter(function(it){return states[n(it)]==='idle';}).map(n), parts=[];
     if(payer&&hop)parts.push(payer.name+' pays '+hop.name+' over the tunnel');
+    if(P)parts.push(payer.name+' has '+money(P.balance)+' prepaid at the Mint, '+(P.locked>0?money(P.locked)+' of it locked ahead':'no lock open, so this window is on credit')+', '+plural(P.covered,'window')+' covered');
     if(mint)parts.push((payer&&hop?'both send':'each node sends')+' hourly receipts down to '+mint.name+', which settles each window at the smaller count');
     if(idle.length)parts.push(idle.join(', ')+' idle');
     map.setAttribute('aria-label',parts.join('; ')||'no nodes reported');
