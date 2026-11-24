@@ -8,12 +8,19 @@ When an item is done, move it to "Done" with its date and the commit, and the ne
 
 More than one item can be in hand at once; the rules are in `CLAUDE.md`, "More than one session at a time". One line per item: the item, the session's name, the date it started, what it holds.
 
+<<<<<<< Updated upstream
 - **Item 1, the forfeiture test.** Session `lab` (the `stephen` account's session of Nov 23, 2026), since Nov 23, 22:54 CST. *Holds the nodes.*
 - **Item 8, the *covered* mark.** Session `covered-mark`, Nov 23 and 24, 2026. **Built, on `main`, and waiting on two hands:** the kit's report says `covered` on each window (kit e7fac95), the Worker admits it, keeps it and serves it from `/history` (site 80eca26, with `worker/migrations/0002.sql`), and the page draws a bar under each settled dot of the Mint's row, solid for covered and hollow for on credit (site 0317f11). The Worker is deployed (the owner, Nov 24, 2026, 01:03 CST: the migration, then the deploy; `/history` carries `covered`, `null` until a report says). **It waits on one thing: the kit's rollout onto `bw-mint`, session `lab`'s** (kit e7fac95; only the Mint reports), after which the page marks each window and the item moves to Done. It holds nothing: `bwkit.py` is free.
+=======
+- **The nodes.** Session `lab` (the `stephen` account's session of Nov 23, 2026) *holds the nodes*; it has no item in hand since the forfeiture test ended on Nov 24, 01:00 CST.
+- **Item 8, the *covered* mark.** Session `covered-mark`, Nov 23 and 24, 2026. **Built, on `main`, and waiting on two hands:** the kit's report says `covered` on each window (kit e7fac95), the Worker admits it, keeps it and serves it from `/history` (site 80eca26, with `worker/migrations/0002.sql`), and the page draws a bar under each settled dot of the Mint's row, solid for covered and hollow for on credit (site 0317f11). It waits on the Worker's deploy, the owner's (the migration, then the deploy; `PUNCH-LIST.md`, the first item, has the commands), and then on the kit's rollout onto `bw-mint`, session `lab`'s. In that order no mark is lost; in the other the feed still stays up. It holds nothing: `bwkit.py` is free.
+>>>>>>> Stashed changes
 
 ## Next
 
-1. **The forfeiture test.** The last step of the prepayment rollout: stop the payer's hourly job for two windows and watch the hop claim the window on its own count, up to the lock. *Who:* a session, on the owner's go-ahead; about three hours of watching. *Done when:* the Mint's ledger shows the window settled *claimed*, the hop's page shows it, and the payer's job is running again.
+An item keeps its number when the ones before it are done; a new item takes the next number and is placed where its priority puts it.
+
+13. **The rebuild and a claimed window.** Once a hop has claimed a window and the payer then closes it late, a month rebuilt from the parties' own copies comes out below the Mint's, by the claim's amount: `bwkit owed 2026-11` on `bw-house` and on `bw-neighbor` has differed from the Mint since Nov 19, by $0.0361 after the two claims so far (the kit's `PUNCH-LIST.md`, Kit fixes). The Mint's ledger is right; the rebuild's order is not. It is first because it is the check the pilot's success test rests on, and because money owed is being reckoned two ways. *Who:* a session; it holds `bwkit.py`. *Done when:* the rebuild keeps a claim that came before the late receipt, the spec says so, and `bwkit owed 2026-11` on both nodes reads *matches*.
 2. **The bytes that arrive wrong through `bw-house`.** About one file in ten fetched through that node's SSH tunnel arrived with bytes changed, while the same file fetched on the node itself or over the radio was right every time (the kit's `PUNCH-LIST.md`, Kit fixes). *Who:* a session to measure; the owner if it comes down to a power supply. *Done when:* the cause is named, and the count is clean or the path is one the data plane does not use.
 3. **The HaLow data plane, finished on the bench.** A tunnel over the link's two fixed addresses, `bw-house` metering it, and `bw-cabin`'s first paid window. *Who:* a session. *Done when:* a window between the house and the cabin settles on the Mint with the bytes having crossed the radio.
 4. **The full unplug test.** Pull the house's uplink at five to the hour and show the window still settles by radio. This is the test that defines Phase 1. *Who:* the owner's hands, a session watching. *Needs first:* the LoRa board back on `bw-house`'s USB, on a supply that carries it and the dongle. *Done when:* the hour is settled and committed on the Mint and, once the uplink is back, the public page verifies its proof.
@@ -43,5 +50,6 @@ More than one item can be in hand at once; the rules are in `CLAUDE.md`, "More t
 
 ## Done
 
+- **Nov 24, 2026. Item 1, the forfeiture test.** The payer's hourly job stopped for two windows; the hop claimed the locked window on its own count and was paid to the lock, $0.021868 for 218.68 MB of the 222.61 MB it counted; the payer's first receipt back settled at the hop's count on credit, nothing paid twice. The record is in the kit's `PUNCH-LIST.md`, Protocol. It closes the prepayment rollout's six steps, and it found item 13.
 - **Nov 23, 2026. A payer whose hop is silent still locks in time.** Kit 36918e2; on `bw-house` the same evening.
 - **Nov 23, 2026. A lock is sized for at least 50 MB, and a window that draws more than the balance settles in full, the rest owed** (the owner's decision). Kit 5e5bfa1, site ddefea2; on the five tailnet nodes the same evening.
