@@ -4,9 +4,9 @@ Work set aside to finish later, newest first. Each item says what it is, where i
 
 The kit and the lab keep their own list, in the kit's `PUNCH-LIST.md`.
 
-## The Lab status draws the prepayment book; a covered mark per window is left
+## The Lab status draws the prepayment book and marks each window covered or on credit; the Worker's deploy and the kit's rollout are left
 
-*Set aside Nov 3, 2026. Built Nov 18, 2026, not yet published: it is on `main` once pushed.*
+*Set aside Nov 3, 2026. The book built Nov 18, 2026; the mark per window built Nov 23 and 24, 2026 (session `covered-mark`), on `main` in both repos, not yet deployed or rolled.*
 
 **What.** Since Nov 2, 2026 the feed's report carries `prepaid` (the kit's `status_report`, spec Section 16): per payer by name, deposits, what open locks hold, what covered windows drew, what released, the balance, every amount an integer in micro-units, and how many windows were covered; `{}` until a deposit or a lock exists. Until Nov 18 the page's `#lab` section drew none of it, and the first dollar ran out on Nov 5 with nothing on the site to say so (the kit's `PUNCH-LIST.md`, Protocol, has that fortnight).
 
@@ -14,7 +14,20 @@ The kit and the lab keep their own list, in the kit's `PUNCH-LIST.md`.
 
 **Since Nov 23, 2026** a balance below zero draws too: *owed to the Mint* in the signal colour in place of the balance, with the arithmetic in its title and no *windows left* line. The kit's spec, Section 16, now says a covered window settles in full and what it drew past the balance is owed; before that day `prepaidOf` took any negative figure for a malformed book and drew nothing, at the one moment the line mattered most. Checked on five books with the page's own functions under a stub document (a throwaway script).
 
-**Left.** A *covered* mark on each settled dot of the Mint's row: the report's per-node `history` entries carry `t_first`, `t_last`, `bytes`, `settled_bytes` and `disputed` only, so the page cannot tell a covered window from one on credit. It needs `covered` on each entry in the kit's `status_report`, the Worker's shape check and D1 column for it, then the dot. The lock's window is not named either (the report carries what open locks hold, not which windows), so the line says *locked ahead* and the title says when the window open now began. `docs/steward.html` and `docs/network.html` need nothing.
+**The covered mark, built Nov 23 and 24, 2026** (build order, item 8; session `covered-mark`, on the Mac only). Three parts, each on `main`:
+
+- *The kit* (kit e7fac95). Each entry of a node's `history` in `status_report` carries `covered`: `true` for a window settled against a lock, a claimed one included, `false` for one settled on credit, `null` while no settlement is held. It is the settlement's own field read back, inside the signed bytes. One test of its own and three that say it too (94 tests); the spec's Section 9 note and the README say the field.
+- *The Worker* (site 80eca26). The shape check admits `covered` on a window as true, false or null and still takes a window without it. `migrations/0002.sql` adds `windows.covered`; `/history` serves it as a flag or null, and `/status` serves it as it serves everything, in the bytes the Mint signed. A report that does not say leaves a stored mark alone. `worker/test.mjs` is 159 checks (145 before); `worker/smoke.mjs` passes in workerd against the real SQL, and now moves its fixture's windows to the hour before it runs (they had passed the 30 days the Worker keeps, so its `/history` check had begun to fail on its own).
+- *The page* (site 0317f11). On the Mint's row, under each settled dot, a short bar: solid in the accent colour for a covered window, hollow in the signal colour for one on credit, the two in proportion where a cell holds several windows, as each day of the seven-day view does; the cell's title says it in words. The dot does not move, and a window with no mark draws exactly as before. The legend and the paragraph under it say what the bars mean. Checked with the page's own script under a stub document, this page against `main`'s, on `tools/fixtures/report-with-prepaid.json` and on the live report (23 checks: without the field the ledger and the map are the same element for element, twelve hours and seven days, from the Worker as deployed and from the new one; `null` and a value that is not a flag draw nothing; with the field each dot has its bar and the day's counts add up), and looked at in headless Chrome from a local copy of the feed carrying the marks, light and dark, both spans, and in a frame 390, 375 and 320 px wide, where the legend wraps and nothing overflows. A throwaway script and a throwaway server, not in the repo.
+
+**Left, in this order.**
+
+1. *The Worker's deploy, the owner's.* From `worker/` in a checkout at `main`: `npx -y wrangler@3 whoami`, then `npx -y wrangler@3 d1 execute bandwidthswap-status --remote --file=migrations/0002.sql`, then `npx -y wrangler@3 deploy`. The migration first: the Worker of before it runs unchanged with the column there, and the Worker of after it fails every report on a database without it (`worker/README.md`, Deploying, has both runs). After it `/history` shows `"covered":null` on every window, and the page draws as before.
+2. *The kit's rollout onto `bw-mint`, the `lab` session's* (only the Mint reports). From the next report the twelve-hour strip is marked, and the seven-day view fills in a day at a time.
+
+Neither order takes the feed down: the Worker deployed today already admits a window with a field it does not know (checked on Nov 23 with a record under a vector key: refused for the key, `403`, after the shape had passed, where a malformed window is `422`), and the new Worker takes a report without the field. The order above is for the history: a mark reaches the Worker's table only while its window is in the report's twelve hours, so with the Worker first no mark is lost, and with the Mint first every window that leaves the report before the deploy stays unmarked in the seven-day view. When both are done: look at https://bandwidthswap.com/#lab once, move item 8 to Done in `BUILD-ORDER.md`, and save a live report as a fixture beside `report-with-prepaid.json` if one with marks is wanted (`?feed=` draws it).
+
+**Still not in the report.** The lock's window is not named (the report carries what open locks hold, not which windows), so the line under the payer says *locked ahead* and its title says when the window open now began. `docs/steward.html` and `docs/network.html` need nothing.
 
 ## A sentence for the paper's Section 9: the margin followed the download path
 

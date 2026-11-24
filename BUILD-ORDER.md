@@ -9,7 +9,7 @@ When an item is done, move it to "Done" with its date and the commit, and the ne
 More than one item can be in hand at once; the rules are in `CLAUDE.md`, "More than one session at a time". One line per item: the item, the session's name, the date it started, what it holds.
 
 - **Item 1, the forfeiture test.** Session `lab` (the `stephen` account's session of Nov 23, 2026), since Nov 23, 22:54 CST. *Holds the nodes.*
-- **Item 8, the *covered* mark.** Session `covered-mark`, since Nov 23, 2026. The kit's half is on `main` (kit e7fac95: `covered` on each window of the report's history; `bwkit.py` is free again). The Worker and the page are being built on the Mac; the rollout and the Worker's deploy are handed over.
+- **Item 8, the *covered* mark.** Session `covered-mark`, Nov 23 and 24, 2026. **Built, on `main`, and waiting on two hands:** the kit's report says `covered` on each window (kit e7fac95), the Worker admits it, keeps it and serves it from `/history` (site 80eca26, with `worker/migrations/0002.sql`), and the page draws a bar under each settled dot of the Mint's row, solid for covered and hollow for on credit (site 0317f11). It waits on the Worker's deploy, the owner's (the migration, then the deploy; `PUNCH-LIST.md`, the first item, has the commands), and then on the kit's rollout onto `bw-mint`, session `lab`'s. In that order no mark is lost; in the other the feed still stays up. It holds nothing: `bwkit.py` is free.
 
 ## Next
 
