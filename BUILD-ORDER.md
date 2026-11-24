@@ -9,7 +9,7 @@ When an item is done, move it to "Done" with its date and the commit, and the ne
 More than one item can be in hand at once; the rules are in `CLAUDE.md`, "More than one session at a time". One line per item: the item, the session's name, the date it started, what it holds.
 
 - **Item 1, the forfeiture test.** Session `lab` (the `stephen` account's session of Nov 23, 2026), since Nov 23, 22:54 CST. *Holds the nodes.*
-- **Item 8, the *covered* mark.** Session `covered-mark`, since Nov 23, 2026. *Holds `bwkit.py`.* Builds and tests on the Mac; the rollout and the Worker's deploy are handed over.
+- **Item 8, the *covered* mark.** Session `covered-mark`, since Nov 23, 2026. The kit's half is on `main` (kit e7fac95: `covered` on each window of the report's history; `bwkit.py` is free again). The Worker and the page are being built on the Mac; the rollout and the Worker's deploy are handed over.
 - **Item 9, the plan for a second Mint and reconciliation.** Session `mint-plan`, since Nov 23, 2026. A document only: no code, no nodes.
 
 ## Next
