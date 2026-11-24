@@ -26,10 +26,10 @@ export function fakeD1() {
       t.mints.set(mint, m);
       return wrote(1);
     },
-    putWindow: ([mint, node, role, t_first, t_last, bytes, settled_bytes, disputed]) => {
+    putWindow: ([mint, node, role, t_first, t_last, bytes, settled_bytes, disputed, covered]) => {
       const k = wkey(mint, node, t_first), had = t.windows.get(k);
-      const row = { mint, node, role, t_first, t_last, bytes, settled_bytes: settled_bytes ?? null, disputed: disputed ?? null };
-      if (had && ['role', 't_last', 'bytes', 'settled_bytes', 'disputed'].every((f) => same(had[f], row[f]))) return wrote(0);
+      const row = { mint, node, role, t_first, t_last, bytes, settled_bytes: settled_bytes ?? null, disputed: disputed ?? null, covered: covered ?? (had ? had.covered : null) };   // COALESCE: a NULL leaves the stored mark
+      if (had && ['role', 't_last', 'bytes', 'settled_bytes', 'disputed', 'covered'].every((f) => same(had[f], row[f]))) return wrote(0);
       t.windows.set(k, row);
       return wrote(1);
     },
@@ -52,7 +52,7 @@ export function fakeD1() {
         windows_settled: [...t.windows.values()].filter((w) => w.mint === m.mint && w.settled_bytes !== null).length }))),
     unlisted: () => rows([{ n: [...t.mints.values()].filter((m) => m.listed === 0 && m.last_seen !== null).length }]),
     windowsSince: ([mint, since]) => rows([...t.windows.values()].filter((w) => w.mint === mint && w.t_first >= since)
-      .sort((a, b) => (a.t_first - b.t_first) || cmp(a.node, b.node)).map((w) => pick(w, ['node', 'role', 't_first', 't_last', 'bytes', 'settled_bytes', 'disputed']))),
+      .sort((a, b) => (a.t_first - b.t_first) || cmp(a.node, b.node)).map((w) => pick(w, ['node', 'role', 't_first', 't_last', 'bytes', 'settled_bytes', 'disputed', 'covered']))),
     commitmentsSince: ([mint, since]) => rows([...t.commitments.values()].filter((c) => c.mint === mint && c.window >= since)
       .sort((a, b) => a.window - b.window).map((c) => pick(c, ['window', 'root', 'count', 'signature', 't']))),
     map: () => rows(t.map ? [{ ...t.map }] : []),

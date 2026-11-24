@@ -1,9 +1,12 @@
 // Every SQL statement the Worker runs, by name. test.mjs runs the Worker against a fake D1 that implements each
 // statement by this name and refuses any other text, so the Worker cannot use SQL the tests do not know; the local
-// smoke (smoke.mjs, through `wrangler dev --local`) runs this real text in workerd against migrations/0001.sql.
+// smoke (smoke.mjs, through `wrangler dev --local`) runs this real text in workerd against migrations/0001.sql and
+// 0002.sql. `windows.covered` is 0002's column: run that migration on a database before deploying this text to it.
 //
 // Writes are counted in rows by D1's free plan, so every upsert that could be a no-op says so in its WHERE: an
-// unchanged window or commitment is not written. `IS NOT` compares NULLs as values.
+// unchanged window or commitment is not written. `IS NOT` compares NULLs as values. A window's `covered` is the one
+// column a report may leave unsaid (a reporter from before Nov 23, 2026 sends none): a NULL neither overwrites a
+// stored mark nor counts as a change, so an older reporter cannot erase what a newer one said.
 export const SQL = {
   // before a write
   report: 'SELECT generated_at, received_at FROM reports WHERE mint = ?',
@@ -17,11 +20,12 @@ export const SQL = {
   seenMint: 'INSERT INTO mints (mint, name, domain, places, first_seen, last_seen) VALUES (?, ?, ?, ?, ?, ?)'
     + ' ON CONFLICT(mint) DO UPDATE SET name = COALESCE(excluded.name, mints.name), domain = COALESCE(excluded.domain, mints.domain),'
     + ' places = excluded.places, first_seen = COALESCE(mints.first_seen, excluded.first_seen), last_seen = excluded.last_seen',
-  putWindow: 'INSERT INTO windows (mint, node, role, t_first, t_last, bytes, settled_bytes, disputed) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+  putWindow: 'INSERT INTO windows (mint, node, role, t_first, t_last, bytes, settled_bytes, disputed, covered) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
     + ' ON CONFLICT(mint, node, t_first) DO UPDATE SET role = excluded.role, t_last = excluded.t_last, bytes = excluded.bytes,'
-    + ' settled_bytes = excluded.settled_bytes, disputed = excluded.disputed'
+    + ' settled_bytes = excluded.settled_bytes, disputed = excluded.disputed, covered = COALESCE(excluded.covered, windows.covered)'
     + ' WHERE windows.role IS NOT excluded.role OR windows.t_last IS NOT excluded.t_last OR windows.bytes IS NOT excluded.bytes'
-    + ' OR windows.settled_bytes IS NOT excluded.settled_bytes OR windows.disputed IS NOT excluded.disputed',
+    + ' OR windows.settled_bytes IS NOT excluded.settled_bytes OR windows.disputed IS NOT excluded.disputed'
+    + ' OR (excluded.covered IS NOT NULL AND windows.covered IS NOT excluded.covered)',
   putCommitment: 'INSERT INTO commitments (mint, window, root, count, signature, t) VALUES (?, ?, ?, ?, ?, ?)'
     + ' ON CONFLICT(mint, window) DO UPDATE SET root = excluded.root, count = excluded.count, signature = excluded.signature, t = excluded.t'
     + ' WHERE commitments.root IS NOT excluded.root OR commitments.count IS NOT excluded.count'
@@ -38,7 +42,7 @@ export const SQL = {
     + ' (SELECT COUNT(*) FROM windows w WHERE w.mint = m.mint AND w.settled_bytes IS NOT NULL) AS windows_settled'
     + ' FROM mints m WHERE m.listed = 1 AND m.last_seen IS NOT NULL ORDER BY m.name, m.mint',
   unlisted: 'SELECT COUNT(*) AS n FROM mints WHERE listed = 0 AND last_seen IS NOT NULL',
-  windowsSince: 'SELECT node, role, t_first, t_last, bytes, settled_bytes, disputed FROM windows WHERE mint = ? AND t_first >= ? ORDER BY t_first, node',
+  windowsSince: 'SELECT node, role, t_first, t_last, bytes, settled_bytes, disputed, covered FROM windows WHERE mint = ? AND t_first >= ? ORDER BY t_first, node',
   commitmentsSince: 'SELECT window, root, count, signature, t FROM commitments WHERE mint = ? AND window >= ? ORDER BY window',
   map: 'SELECT body, signer, at FROM map WHERE id = 1',
 

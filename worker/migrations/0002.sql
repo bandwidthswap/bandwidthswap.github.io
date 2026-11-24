@@ -1,0 +1,13 @@
+-- 0002: `covered` on a window (Nov 23, 2026). Since that day the kit's report says of each window in a node's history
+-- whether it settled against a lock (1), on credit (0), or is not settled yet (NULL); the spec's Section 16. A window
+-- stored before the column existed, or posted by a reporter that does not say, keeps NULL, and a reader draws it as
+-- it always was.
+--
+-- Locally:   npx -y wrangler@3 d1 execute bandwidthswap-status --local  --file=migrations/0002.sql
+-- Live:      npx -y wrangler@3 d1 execute bandwidthswap-status --remote --file=migrations/0002.sql
+--
+-- Run it BEFORE deploying the Worker that reads the column: the Worker of before this migration names its columns
+-- and so runs unchanged with the column there, while the Worker of after it fails every report and every /history on
+-- a database without it. Run it once: SQLite has no ADD COLUMN IF NOT EXISTS, and a second run stops with
+-- "duplicate column name: covered", which changes nothing. Adding a nullable column rewrites no row.
+ALTER TABLE windows ADD COLUMN covered INTEGER;

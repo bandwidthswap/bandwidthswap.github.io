@@ -1,6 +1,7 @@
 // The local smoke: the Worker in workerd, the real SQL against a local D1, a signed report posted and every GET read.
 //
 //   npx -y wrangler@3 d1 execute bandwidthswap-status --local --file=migrations/0001.sql    # once
+//   npx -y wrangler@3 d1 execute bandwidthswap-status --local --file=migrations/0002.sql    # once, after it
 //   npx -y wrangler@3 dev --local --var ALLOW_TEST_KEYS:1                                    # another terminal
 //   node smoke.mjs [http://localhost:8787] [--wait]
 //
@@ -28,8 +29,17 @@ const enc = new TextEncoder();
 
 const { key, nym: MINT } = await keyFromSeed(SEEDS.mint.seed);
 const live = JSON.parse(readFileSync(new URL('../tools/fixtures/report-bwkit-0.4.0.json', import.meta.url), 'utf8'));
-const report = () => ({ ...live, kind: 'status', proto: 1, mint: MINT, generated_at: now(), proof: { ...live.proof, mint: MINT }, commitment: { ...live.commitment, mint: MINT } });
+// Since Nov 23, 2026 the kit says of each window whether it settled against a lock. The fixture is from before that day,
+// so the smoke marks its windows itself: settled ones covered and on credit in turn, an unsettled one null.
+// The fixture's windows are of Oct 19, 2026, and the Worker prunes what is older than 30 days and serves a week of
+// history by default: left where they are they are deleted in the batch that stores them. So the smoke moves them, and
+// the commitment with them, by whole hours, to end in the hour before this one (the Worker checks a proof's shape only).
+let turn = 0;
+const shift = Math.floor((now() - 3600 - Math.max(...live.nodes.flatMap((n) => (n.history || []).map((w) => w.t_last)))) / 3600) * 3600;
+const nodes = live.nodes.map((n) => ({ ...n, history: (n.history || []).map((w) => ({ ...w, t_first: w.t_first + shift, t_last: w.t_last + shift, covered: w.settled_bytes === null ? null : turn++ % 2 === 0 })) }));
+const report = () => ({ ...live, nodes, kind: 'status', proto: 1, mint: MINT, generated_at: now(), proof: { ...live.proof, mint: MINT }, commitment: { ...live.commitment, mint: MINT, window: live.commitment.window + shift, t: live.commitment.t + shift } });
 const windowsIn = live.nodes.reduce((n, x) => n + (x.history || []).length, 0);
+const markOf = new Map(nodes.flatMap((n) => n.history.map((w) => [n.name + '|' + w.t_first, w.covered])));
 
 console.log(base);
 let r = await get('/');
@@ -55,10 +65,12 @@ const sig = rec.sig, received_at = rec.received_at;
 delete rec.sig; delete rec.received_at;
 const ok = await bsp.verifySignature(bsp.pubOfNym(MINT), enc.encode(STATUS_DOMAIN + '\n' + bsp.canon(rec)), bsp.unb64u(sig));
 check('…and the served bytes, less received_at and sig, verify under the Mint (floats intact through D1)', ok && Number.isInteger(received_at));
+check('…with each window\'s covered mark as it was signed', rec.nodes.every((n) => (n.history || []).every((w) => w.covered === markOf.get(n.name + '|' + w.t_first))));
 
 r = await get('/mints/' + MINT + '/history');
 j = await r.json();
 check('GET /history has the report\'s windows and its commitment', r.status === 200 && j.windows.length >= windowsIn && j.commitments.length >= 1, r.status + ' ' + (j.windows || []).length + ' windows, ' + (j.commitments || []).length + ' commitments');
+check('…each window with the covered mark the report gave it, as true, false or null (migrations/0002.sql)', r.status === 200 && [...markOf].every(([k, v]) => { const x = j.windows.find((y) => y.node + '|' + y.t_first === k); return x && x.covered === v; }) && j.windows.some((x) => x.covered === true) && j.windows.some((x) => x.covered === false), JSON.stringify((j.windows || []).slice(0, 3)));
 check('…cached for a minute', r.headers.get('Cache-Control') === 'public, max-age=60');
 
 const mapText = await signObject(key, MAP_DOMAIN, { kind: 'map', proto: 1, by: MINT, at: now(), map: { mints: [{ nym: MINT, name: 'vec-mint', domain: 'vectors' }] } });

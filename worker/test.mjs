@@ -37,6 +37,7 @@ const tick = (s = 61) => { skew += s * 1000; };
 const now = () => Math.floor(Date.now() / 1000);
 const today = () => new Date(Date.now()).toISOString().slice(0, 10);
 const meterNow = () => db.tables.meter.get(today()) || 0;
+const myWindows = () => [...db.tables.windows.values()].filter((w) => w.mint === MINT);
 
 const call = (path, init) => worker.fetch(new Request(BASE + path, init), env);
 const postReport = (text, e = env) => worker.fetch(new Request(BASE + '/report', { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: 'https://example.com' }, body: text }), e);
@@ -68,6 +69,9 @@ const report = {
       total_bytes: 43900000, history: [win(1792186134, 1792186147, 2160, 2160, false)] },
   ],
 };
+// The same report as the kit writes it since Nov 23, 2026: each window says whether it settled against a lock. Here the
+// forced dispute of 1792185254 settled on credit, the window after it was covered, and the open one is not settled.
+const marked = (rep) => ({ ...rep, nodes: rep.nodes.map((n) => ({ ...n, history: n.history.map((w) => ({ ...w, covered: w.settled_bytes === null ? null : w.t_first !== 1792185254 })) })) });
 const noHistory = { ...report, nodes: report.nodes.map(({ history, total_bytes, ...n }) => n) };
 delete noHistory.since;
 const fixture = (name) => JSON.parse(readFileSync(new URL('../tools/fixtures/' + name, import.meta.url), 'utf8'));
@@ -103,6 +107,11 @@ r = await post({ ...report, nodes: [{ ...report.nodes[0], total_bytes: -1 }] });
 check('POST with a negative total is 422', r.status === 422, r.status);
 r = await post({ ...report, since: 'yesterday' });
 check('POST with a bad since is 422', r.status === 422, r.status);
+// Since Nov 23, 2026 a window may say whether it settled against a lock (the kit's spec, Section 16): a flag or null.
+r = await post({ ...report, nodes: [{ ...report.nodes[0], history: [{ ...win(1, 2, 9, 9, false), covered: 'yes' }] }] });
+check('POST with a window whose covered is a word is 422', r.status === 422 && /covered/.test((await r.json()).error), r.status);
+r = await post({ ...report, nodes: [{ ...report.nodes[0], history: [{ ...win(1, 2, 9, 9, false), covered: 1 }] }] });
+check('POST with a window whose covered is 1, not true, is 422', r.status === 422, r.status);
 r = await call('/status', { headers: { Origin: SITE } });
 check('nothing was stored by the refused posts', r.status === 404, r.status);
 
@@ -118,6 +127,12 @@ check('GET after the post is 200', r.status === 200, r.status);
 const got = await r.json();
 check('…returns the report with received_at added and the signature kept', got.generated_at === now() && got.received_at === posted.received_at && got.nodes.length === 3 && /^[A-Za-z0-9_-]{86}$/.test(got.sig));
 check('…history and totals intact', got.nodes[0].history.length === 3 && got.nodes[0].history[2].settled_bytes === null && got.nodes[0].total_bytes === 65846000 && got.since === report.since);
+check('…and no window says covered, as the Mint did not', got.nodes.every((n) => n.history.every((w) => !('covered' in w))));
+r = await post(marked(report));
+check('a report whose windows say covered (true, false, and null while unsettled) is 200', r.status === 200, r.status + ' ' + (await r.text()));
+r = await call('/status', { headers: { Origin: SITE } });
+const gotMarked = await r.json();
+check('…and /status serves the marks as the Mint signed them', JSON.stringify(gotMarked.nodes[0].history.map((w) => w.covered)) === '[false,true,null]' && gotMarked.nodes[1].history[0].covered === true && gotMarked.nodes[2].history[0].covered === true, JSON.stringify(gotMarked.nodes[0].history));
 check('…with CORS for any origin', r.headers.get('Access-Control-Allow-Origin') === '*');
 check('…and a short cache', r.headers.get('Cache-Control') === 'public, max-age=30');
 r = await call('/status', { headers: { Origin: 'https://example.com' } });
@@ -285,6 +300,29 @@ const settled = { ...report, nodes: report.nodes.map((n, i) => i ? n : { ...n, h
 r = await postReport(await signed(settled));
 check('a report that settles one window writes that one row more', r.status === 200 && meterNow() - before === 7, (meterNow() - before) + ' ' + r.status);
 check('…and the window is updated in place', [...db.tables.windows.values()].find((w) => w.mint === MINT && w.t_first === 1792186147).settled_bytes === 8416 && [...db.tables.windows.values()].filter((w) => w.mint === MINT).length === 5);
+check('…with no covered mark on any window yet: the reports so far did not say', myWindows().every((w) => w.covered === null));
+
+// The covered mark (Nov 23, 2026): the kit's report says of each window whether it settled against a lock. The Worker
+// keeps it beside the window, and a report that does not say leaves a stored mark alone.
+tick();
+let beforeMarks = meterNow();
+r = await postReport(await signed(marked(settled)));
+check('a report whose windows say covered is 200 and writes each of the five windows once', r.status === 200 && meterNow() - beforeMarks === 8, (meterNow() - beforeMarks) + ' ' + r.status);
+check('…the window settled on credit is stored as 0, the covered ones as 1', myWindows().filter((w) => w.covered === 0).map((w) => w.t_first).join() === '1792185254' && myWindows().filter((w) => w.covered === 1).length === 4, JSON.stringify(myWindows().map((w) => [w.node, w.t_first, w.covered])));
+check('…and the stored bytes carry the marks inside what the Mint signed', /"covered":false/.test(db.tables.reports.get(MINT).body) && /"covered":true/.test(db.tables.reports.get(MINT).body));
+tick();
+beforeMarks = meterNow();
+r = await postReport(await signed(marked(settled)));
+check('the same marks again write no window: 3 rows with the meter', r.status === 200 && meterNow() - beforeMarks === 3, meterNow() - beforeMarks);
+tick();
+beforeMarks = meterNow();
+r = await postReport(await signed(settled));
+check('a report from a reporter that does not say (the shape of before Nov 23) is still 200, and writes no window', r.status === 200 && meterNow() - beforeMarks === 3, (meterNow() - beforeMarks) + ' ' + r.status);
+check('…and leaves the stored marks as they were', myWindows().filter((w) => w.covered === 0).length === 1 && myWindows().filter((w) => w.covered === 1).length === 4);
+tick();
+beforeMarks = meterNow();
+r = await postReport(await signed({ ...marked(settled), nodes: marked(settled).nodes.map((n) => ({ ...n, history: n.history.map((w) => (w.t_first === 1792186147 ? { ...w, covered: false } : w)) })) }));
+check('a mark that changes is written: that one row more', r.status === 200 && meterNow() - beforeMarks === 4 && myWindows().filter((w) => w.covered === 0).length === 2 && myWindows().filter((w) => w.covered === 1).length === 3, meterNow() - beforeMarks);
 
 // The float trap: a settlement in the proof carries a fee the Mint wrote as 0.0 (Python writes a whole-valued float
 // so). The signer signs the text it wrote, bsp.parse keeps the float, and the signature verifies; the same record
@@ -359,6 +397,7 @@ got2 = await r.json();
 check('/history defaults to a week and names the span', r.status === 200 && got2.hours === 168 && got2.since === now() - 168 * 3600 && got2.mint === MINT, JSON.stringify(got2).slice(0, 120));
 check('…with the windows of every report the Mint posted in it', got2.windows.length === [...db.tables.windows.values()].filter((w) => w.mint === MINT).length && got2.windows.every((w) => w.t_first >= got2.since) && live.nodes.every((n) => (n.history || []).every((w) => got2.windows.some((x) => x.node === n.name && x.t_first === w.t_first))), got2.windows.length + ' of ' + db.tables.windows.size);
 check('…disputed as a flag again, settled_bytes null while unsettled', got2.windows.some((w) => w.disputed === true) && got2.windows.some((w) => w.disputed === null && w.settled_bytes === null));
+check('…covered as a flag too where a report said so, null where none did (the fixtures of before Nov 23)', got2.windows.every((w) => w.covered === true || w.covered === false || w.covered === null) && got2.windows.filter((w) => w.covered === true).length === 3 && got2.windows.filter((w) => w.covered === false).length === 2 && live.nodes.every((n) => (n.history || []).every((w) => got2.windows.find((x) => x.node === n.name && x.t_first === w.t_first).covered === null)), JSON.stringify(got2.windows.filter((w) => w.covered !== null)));
 check('…and its commitments, oldest first', got2.commitments.length === 2 && got2.commitments[0].window < got2.commitments[1].window && got2.commitments[1].root === live.commitment.root, JSON.stringify(got2.commitments));
 check('…cached for a minute', r.headers.get('Cache-Control') === 'public, max-age=60');
 r = await call('/mints/' + MINT + '/history?hours=1');

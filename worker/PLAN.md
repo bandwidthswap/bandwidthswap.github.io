@@ -36,7 +36,7 @@ Freshness and replay: `generated_at` must be within five minutes of the Worker's
 KV was the right store for one key and the wrong one for many writers. Cloudflare D1 (SQLite) on the free plan allows 100,000 writes and five million reads a day and five gigabytes, which is a hundred times the writes for the same price. The schema, in `worker/migrations/0001.sql`:
 
 - `reports(mint PRIMARY KEY, name, domain, generated_at, received_at, body, sig)`: the latest report per Mint, as the bytes the Mint signed.
-- `windows(mint, node, role, t_first, t_last, bytes, settled_bytes, disputed, PRIMARY KEY(mint, node, t_first))`: every node's hourly windows, extracted from each report's `history` on arrival. This is what the single-tenant Worker could never have: a public history longer than twelve hours, at no extra writes beyond the report itself. Pruned to 30 days.
+- `windows(mint, node, role, t_first, t_last, bytes, settled_bytes, disputed, PRIMARY KEY(mint, node, t_first))` (and since Nov 23, 2026 `covered`, by `migrations/0002.sql`: whether the window settled against a lock; `README.md` has it): every node's hourly windows, extracted from each report's `history` on arrival. This is what the single-tenant Worker could never have: a public history longer than twelve hours, at no extra writes beyond the report itself. Pruned to 30 days.
 - `commitments(mint, window, root, count, signature, t, PRIMARY KEY(mint, window))`: each Mint's hourly roots as they arrive, so a reader can check any hour of the last month.
 - `mints(mint PRIMARY KEY, name, domain, first_seen, last_seen, listed)`: who has posted, and whether the map lists them.
 - `map(id PRIMARY KEY, body, by, at)`: the membership's map as a signed record.

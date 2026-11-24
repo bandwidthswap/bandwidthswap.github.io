@@ -14,7 +14,8 @@
 // Every GET answers any origin: the feed is public and a reader checks the signature itself.
 //
 // The signed record is the report as `bwkit report --print` prints it (names, roles, times and byte counts, each
-// node's windows of the last twelve hours, the Mint's NYM, the committed hour's proof, the Steward's book), with
+// node's windows of the last twelve hours, each marked `covered` or not since Nov 23, 2026 (the kit's spec, Section
+// 16: settled against a lock, or on credit), the Mint's NYM, the committed hour's proof, the Steward's book), with
 // `kind: "status"`, `proto: 1`, the Mint's NYM in `mint`, and `sig`: Ed25519 by the Mint over the domain string
 // "bandwidthswap/status/v1", a newline, and the canonical JSON of the record without `sig` (the kit's
 // spec/PROTOCOL.md, Section 3). The key is the identity: nothing is registered, no token is issued. The bearer-token
@@ -225,6 +226,10 @@ export function checkReport(report, text) {
         if (!w || typeof w !== 'object' || Array.isArray(w)) return 'each window must be an object';
         if (!Number.isInteger(w.t_first) || !Number.isInteger(w.t_last) || w.t_first < 0 || w.t_last < w.t_first) return 'a window has t_first <= t_last, in Unix seconds';
         if (!Number.isInteger(w.bytes) || w.bytes < 0 || !count(w.settled_bytes) || !flag(w.disputed)) return 'a window has bytes, settled_bytes (or null) and a disputed flag (or null)';
+        // Since Nov 23, 2026 a window may say whether it settled against a lock: true, false (on credit), or null while
+        // no settlement is held. A reporter from before that day sends none: its windows are stored with NULL, and a
+        // mark already stored for a window stays (sql.js, putWindow).
+        if (!flag(w.covered)) return 'a window\'s covered is true, false or null';
       }
     }
   }
@@ -301,6 +306,8 @@ async function verifies(nym, domain, record, sig) {
   return bsp.verifySignature(pub, enc.encode(domain + '\n' + bsp.canon(record)), s);
 }
 
+const bit = (v) => (v == null ? null : (v ? 1 : 0));          // a flag as SQLite keeps it: 1, 0 or NULL
+const unbit = (v) => (v == null ? null : v === 1);
 const byteLength = (text) => (text.length > MAX_BODY ? text.length : enc.encode(text).length);
 const day = (t) => new Date(t * 1000).toISOString().slice(0, 10);
 
@@ -335,7 +342,7 @@ async function store(env, { mint, report, text, sig, received_at, pruned_at }) {
   ];
   for (const n of report.nodes) {
     for (const w of n.history || []) {
-      stmts.push(env.DB.prepare(SQL.putWindow).bind(mint, n.name, n.role, w.t_first, w.t_last, w.bytes, w.settled_bytes ?? null, w.disputed == null ? null : (w.disputed ? 1 : 0)));
+      stmts.push(env.DB.prepare(SQL.putWindow).bind(mint, n.name, n.role, w.t_first, w.t_last, w.bytes, w.settled_bytes ?? null, bit(w.disputed), bit(w.covered)));
     }
   }
   const c = report.commitment;
@@ -422,7 +429,7 @@ async function getHistory(env, mint, hoursParam) {
     env.DB.prepare(SQL.windowsSince).bind(mint, since).all(),
     env.DB.prepare(SQL.commitmentsSince).bind(mint, since).all(),
   ]);
-  const windows = w.results.map((x) => ({ ...x, disputed: x.disputed === null ? null : x.disputed === 1 }));
+  const windows = w.results.map((x) => ({ ...x, disputed: unbit(x.disputed), covered: unbit(x.covered) }));
   return json({ mint, hours, since, windows, commitments: c.results }, 200, { 'Cache-Control': 'public, max-age=60' });
 }
 
