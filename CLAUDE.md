@@ -25,6 +25,7 @@ Site: https://bandwidthswap.com, served by GitHub Pages from `main` of this repo
 | `SHOPPING-LIST.md` | Parts to turn the three Pi 3 boards into nodes, by phase, with budget. |
 | `PHASE0-SETUP.md` | **The hands-on handoff for Phase 0**: what is already set up on the Mac, how to flash the three cards, how to check the nodes, and the exact work the next session does over SSH. |
 | `PUNCH-LIST.md` | **Open work, set aside with where it stopped and what blocks it.** Read it first. The kit keeps its own for the kit and the lab. |
+| `BUILD-ORDER.md` | **What is left to build, in the order it is meant to be done, one item at a time** (since Nov 23, 2026): each item with who does it and what done means, what is parked, what blocks without being a build item, and what was done with its date and commit. The punch lists keep the detail; this keeps the order. |
 | `OPEN-QUESTIONS.md` | **The build backlog.** 20 numbered questions (A1 to A6, B1 to B10, C1 to C4), each with options, what a build reveals, and a default. Section D is what the copyedit left open; section E defines the pilot. |
 | `PRESSURE-TESTS.md` | The ledger of what the Captain's Notes essays on commerce across infinite time and distance found: per essay, what held, what strained, what the paper should say. Oct 17, 2026. |
 | `INSTALLATIONS.md` | Five example installations (bench, valley, Moon, Mars, Proxima) walked through those findings, with bench-emulable tests and the matrix that orders the alignment pass on the paper. |
@@ -158,7 +159,7 @@ Rollout recipe, unchanged: `cd kit && export SSH_SUFFIX=-ts && UPDATE_HOSTS="bw-
 
 ### The punch lists
 
-Open work lives in two punch lists; read them after the steps above.
+Open work lives in two punch lists; read them after the steps above. The order to take it in is `BUILD-ORDER.md`: the first item under Next is the one to start, and a finished item moves to its Done list with the date and the commit.
 
 - `PUNCH-LIST.md` here: the site, the paper and the status Worker. Its first item records the multi-tenant Worker, live and complete through P3 since Oct 19, 2026, with the one thing left of it: a sentence for the paper's Section 9, drafted there as a before/after card for the proof sheet.
 - `PUNCH-LIST.md` in the kit: the kit and the lab, grouped by when each item can be done, with "The operator track" (Nov 1, 2026) as the next build in order. Its dated items are done (the margin Oct 30, the purchase's reconciliation Oct 30, the invoice Nov 1); the October payment to the neighbor is the one thing left of them.
