@@ -4,6 +4,14 @@ What is left to build, in the order it is meant to be done, one item at a time. 
 
 When an item is done, move it to "Done" with its date and the commit, and the next one is the one to start. An item that turns out to need something else first says so and waits; it is not skipped silently.
 
+## In progress
+
+More than one item can be in hand at once; the rules are in `CLAUDE.md`, "More than one session at a time". One line per item: the item, the session's name, the date it started, what it holds.
+
+- **Item 1, the forfeiture test.** Session `lab` (the `stephen` account's session of Nov 23, 2026), since Nov 23, 22:54 CST. *Holds the nodes.*
+- **Item 8, the *covered* mark.** Session `covered-mark`, since Nov 23, 2026. *Holds `bwkit.py`.* Builds and tests on the Mac; the rollout and the Worker's deploy are handed over.
+- **Item 9, the plan for a second Mint and reconciliation.** Session `mint-plan`, since Nov 23, 2026. A document only: no code, no nodes.
+
 ## Next
 
 1. **The forfeiture test.** The last step of the prepayment rollout: stop the payer's hourly job for two windows and watch the hop claim the window on its own count, up to the lock. *Who:* a session, on the owner's go-ahead; about three hours of watching. *Done when:* the Mint's ledger shows the window settled *claimed*, the hop's page shows it, and the payer's job is running again.
@@ -26,7 +34,7 @@ When an item is done, move it to "Done" with its date and the commit, and the ne
 
 ## Not build items, and they block
 
-- **The prepaid balance.** The hop requires a lock, so the hourly purchase stops when the balance cannot cover one. A deposit on the Mint, on the owner's word.
+- **The prepaid balance.** The hop requires a lock, so the hourly purchase stops when the balance cannot cover one. A deposit on the Mint, on the owner's word. *A third dollar went in on Nov 23, 2026, 23:45 CST: about a hundred windows, into Nov 28.*
 - **What the neighbor link is now.** The map, the neighbor's guide and the page's *at two houses* wait on it, and so does item 7.
 - **October's $3.65 to the neighbor**, if it is still owed, and its paid mark on the Mint.
 - **Power.** A supply or powered hub for `bw-house` that carries the board and the dongle; stronger supplies for `bw-cabin` and `bw-mint2`.

@@ -47,6 +47,15 @@ Site: https://bandwidthswap.com, served by GitHub Pages from `main` of this repo
 
 The build is deterministic: running it on an unchanged source produces no git diff. If it does, something changed in the tools, not the content.
 
+### More than one session at a time (since Nov 23, 2026)
+
+The owner wants the build list worked in parallel where it can be. Four rules keep sessions off each other; `BUILD-ORDER.md` has the list and who holds what.
+
+1. **One session per item, claimed in the list.** Before starting, a session adds its line under *In progress* in `BUILD-ORDER.md` (the item, a short session name, the date, and what it holds) in a commit of its own, and at the end moves the item to *Done* with the date and commit, or back to *Next* with where it stopped.
+2. **Its own pair of worktrees, side by side.** A parallel session never edits the main checkouts at `~/Documents/GitHub/bandwidthswap/kit` and `.../bandwidthswap.github.io`. It makes `~/Documents/GitHub/bandwidthswap/work/<name>/kit` and `.../work/<name>/bandwidthswap.github.io` with `git -C <main checkout> worktree add <path> -b <name> origin/main` (side by side, so `tools/check-vectors.mjs` finds the kit beside the site), runs the kit's tests there with the main checkout's interpreter (`~/Documents/GitHub/bandwidthswap/kit/venv/bin/python`), and lands its work with `git pull --rebase origin main` then `git push origin HEAD:main`. Never a force-push. On a conflict in a punch list, the handoff or the build list, keep both sides. When it is done it removes its worktrees and branches.
+3. **One writer at a time in `bwkit.py`.** Nearly every code item edits that file and `test_bwkit.py` with it. The *In progress* line says *holds `bwkit.py`* while a session edits it, and another code session waits or does the part of its item that is elsewhere. Plans, a spec section of an item's own, `worker/`, `index.html` and the dashboard can be worked at the same time as anything.
+4. **One session holds the nodes.** Rollouts, timers, configuration, and any test on the live link belong to the session whose line says *holds the nodes*. Every other session builds and tests on the Mac and hands over a commit to roll; reading a node is fine, changing one is not, and bulk transfers through `bw-house`'s tailnet address count as the payer's bytes. The State bullets and Pick up here above are that session's to write; another session writes its own item's notes under its own heading in a punch list. A Worker deploy is still the owner's.
+
 ## Conventions and decisions already made
 
 - **v0.1 text stays as published**, spelling included. v0.2 was copyedited on Oct 8, 2026 (44 fixes); new text is written clean.
