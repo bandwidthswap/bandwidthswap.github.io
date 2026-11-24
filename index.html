@@ -121,9 +121,15 @@ figcaption{font-size:14px;color:var(--muted);margin-top:6px;max-width:65ch}
 .lab-ledger .rl.m{height:48px}.lab-ledger .cell.m{height:48px;border-bottom:0;align-items:center;justify-content:center}
 .lab-ledger .pip{width:12px;height:12px;border-radius:50%;background:var(--accent)}
 .lab-ledger .pip.disputed{background:var(--panel);border:3px solid var(--signal);box-sizing:border-box}
+/* Under a settled dot, what stood behind the window: a solid bar for a lock (covered), a hollow one for credit, split in proportion when a cell holds several windows. Placed without moving the dot, so a cell with no mark is as it always was. */
+.lab-ledger .cell.m{position:relative}
+.lk{display:inline-flex;gap:1px;width:18px;height:6px}.lk i{display:block;box-sizing:border-box;min-width:3px;border-radius:1px}
+.lk .cov{background:var(--accent)}.lk .cred{border:1px solid var(--signal)}
+.lab-ledger .lk{position:absolute;left:50%;top:calc(50% + 11px);margin-left:-9px}
 .lab-ledger .hl{font:400 11px/1.4 var(--mono);color:var(--muted);text-align:center}.lab-ledger .hl.now{color:var(--accent)}.lab-ledger .hl.first{text-align:left;white-space:nowrap}
 .lab-legend{display:flex;justify-content:space-between;gap:6px 24px;flex-wrap:wrap;font:400 12px/1.5 var(--mono);color:var(--muted);max-width:none;margin:0 0 14px}
 .lab-legend .sw{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:middle;background:repeating-linear-gradient(45deg,var(--signal) 0 2px,var(--panel) 2px 4px);border:1px solid var(--signal)}
+.lab-legend .lk{vertical-align:middle}
 .lab-legend .up{color:var(--accent)}.lab-legend .stale{color:var(--signal)}.lab-legend .idle{color:var(--muted)}
 .lab .note{font:400 13px/1.5 var(--mono);color:var(--muted);margin:10px 0 8px;max-width:none}
 @media (max-width:1000px){.lab-map{height:auto;display:flex;flex-direction:column;gap:10px}.lab .node,.lab .node.mint,.lab .node.quiet{position:static;width:100%;min-height:0;margin:0}
@@ -304,10 +310,10 @@ signed by payer</code></pre>
   <div class="lab-map" id="lab-map" role="img" aria-label="The nodes the Mint reports: the payer, the hop it pays over the tunnel, any idle hop, and the Mint below, which settles each window at the smaller count"></div>
   <p class="lab-span" id="lab-span" hidden><span>the ledger over</span><button type="button" class="on" data-span="12h">the last 12 hours</button><button type="button" data-span="7d">the last 7 days</button></p>
   <div class="tablewrap"><div class="lab-ledger" id="lab-ledger" role="table" aria-label="The ledger: one row per node with windows in the span shown, one column per hour of the last twelve or per day of the last seven"></div></div>
-  <p class="lab-legend"><span><span class="up">●</span> up: receipt within 90 min &nbsp; <span class="stale">●</span> stale &nbsp; <span class="idle">○</span> idle: a hop not in use &nbsp; <span class="sw"></span> disputed: the two counts differed by more than the link's margin; settled at the smaller</span><span>covered: settled against a lock posted ahead · empty: no receipt · bars are log scale</span></p>
+  <p class="lab-legend"><span><span class="up">●</span> up: receipt within 90 min &nbsp; <span class="stale">●</span> stale &nbsp; <span class="idle">○</span> idle: a hop not in use &nbsp; <span class="sw"></span> disputed: the two counts differed by more than the link's margin; settled at the smaller</span><span>under a settled dot: <span class="lk"><i class="cov" style="flex:1"></i></span> covered: settled against a lock posted ahead &nbsp; <span class="lk"><i class="cred" style="flex:1"></i></span> on credit: no lock · empty: no receipt · bars are log scale</span></p>
   <p class="note" id="lab-note" aria-live="polite">Loading the status feed…</p>
   <noscript><p class="note">The map and the ledger need JavaScript. The feed itself is plain JSON at <a href="https://status.bandwidthswap.com/status">status.bandwidthswap.com/status</a>.</p></noscript>
-  <p>A node is <strong>up</strong> when the Mint has a receipt from it within the last 90 minutes (receipts are hourly); the Mint is up when its report is under fifteen minutes old (it posts every ten) and its ledger service answers. A hop is <strong>idle</strong> when it is not the one the house pays and has had no receipt in that time. A <strong>disputed</strong> window is one where the two signed counts differed by more than the link's announced margin (three percent on the neighbor link since October 30, 2026; one percent is the pilot's default); it settles at the smaller count, like every other window. Under the payer is its <strong>prepayment</strong>, when it has one: the balance it holds at the Mint, what is locked ahead for the window open now, and how many windows were <strong>covered</strong>, settled against a lock the payer posted before the window opened; a window with no lock settles <strong>on credit</strong>, on the month's invoice, and the page says so when no lock is open. Under the Mint is its latest <strong>commitment</strong>, a signed root over the hour's settlements that anyone holding the receipts can rebuild with the kit and check. The report itself is <strong>signed</strong> by the Mint, and this page checks that signature and the commitment's proof in your browser with <code>docs/bsp.js</code>, so the feed that relays the report has nothing to be trusted with: it can delay a report or drop one, and cannot alter one. The feed carries names, roles, times and byte counts, since November 2 each payer's prepaid balance, and nothing about the networks the boards sit on.</p>
+  <p>A node is <strong>up</strong> when the Mint has a receipt from it within the last 90 minutes (receipts are hourly); the Mint is up when its report is under fifteen minutes old (it posts every ten) and its ledger service answers. A hop is <strong>idle</strong> when it is not the one the house pays and has had no receipt in that time. A <strong>disputed</strong> window is one where the two signed counts differed by more than the link's announced margin (three percent on the neighbor link since October 30, 2026; one percent is the pilot's default); it settles at the smaller count, like every other window. Under the payer is its <strong>prepayment</strong>, when it has one: the balance it holds at the Mint, what is locked ahead for the window open now, and how many windows were <strong>covered</strong>, settled against a lock the payer posted before the window opened; a window with no lock settles <strong>on credit</strong>, on the month's invoice, and the page says so when no lock is open. On the Mint's row of the ledger a short bar under each settled dot says which the window was: solid when it was covered, hollow in the signal colour when it settled on credit, and split in their proportion where a cell holds several windows, as a day does. The mark is the Mint's own, one word on each window in the report it signs; a window from before its reports carried that word has no bar. Under the Mint is its latest <strong>commitment</strong>, a signed root over the hour's settlements that anyone holding the receipts can rebuild with the kit and check. The report itself is <strong>signed</strong> by the Mint, and this page checks that signature and the commitment's proof in your browser with <code>docs/bsp.js</code>, so the feed that relays the report has nothing to be trusted with: it can delay a report or drop one, and cannot alter one. The feed carries names, roles, times and byte counts, since November 2 each payer's prepaid balance, and nothing about the networks the boards sit on.</p>
   <p><a href="docs/verify.html">Check a proof in your browser</a>: paste a proof from the Mint's <code>bwkit prove</code> and a second implementation of the rules, sharing no code with the kit, checks the Mint's signature on the hour's root and each settlement's place in it, sending nothing anywhere.</p>
   <p><a href="docs/steward.html">The Steward's book</a>: the rule that takes five percent of every fee and can only spend it as offers to buy bandwidth on links the network wants; its balances, open offers and payouts, drawn from the feed once it runs.</p>
   <p><a href="docs/network.html">The network</a>: every Mint the map lists, with its domain, its places and its last report, and the map itself, a record signed by the Mint that keeps it. One Mint so far; the feed takes any Mint's signed report, and the map says who is listed.</p>
@@ -608,11 +614,30 @@ signed by payer</code></pre>
   function buckets(n){
     var b={};(n&&n.history||[]).forEach(function(w){
       if(!w||typeof w.t_last!=='number')return;
-      var k=Math.floor(w.t_last/H), o=b[k]||(b[k]={bytes:0,settled:0,disputed:false,count:0,anySettled:false});
+      var k=Math.floor(w.t_last/H), o=b[k]||(b[k]={bytes:0,settled:0,disputed:false,count:0,anySettled:false,cov:0,cred:0});
       o.bytes+=w.bytes||0;o.count++;
-      if(w.settled_bytes!=null){o.settled+=w.settled_bytes;o.anySettled=true;}
+      if(w.settled_bytes!=null){o.settled+=w.settled_bytes;o.anySettled=true;marked(o,w);}
       if(w.disputed===true)o.disputed=true;
     });return b;
+  }
+  function marked(o,w){
+    /* A settled window's `covered` (the kit's report since Nov 23, 2026; spec Section 16): true when it settled against a lock, false when it settled on credit. Anything else, a report from before that day above all, counts as neither. */
+    if(w.covered===true)o.cov++;else if(w.covered===false)o.cred++;
+  }
+  function lockMark(o){
+    /* The bar under a settled dot on the Mint's row: solid for covered, hollow for on credit, the two in proportion when the cell holds several windows. Nothing when no window in the cell says which, so the cell draws as it always did. */
+    if(!o.cov&&!o.cred)return null;
+    var m=el('span','lk');
+    if(o.cov){var a=el('i','cov');a.style.flex=o.cov+' 1 0';m.appendChild(a);}
+    if(o.cred){var c=el('i','cred');c.style.flex=o.cred+' 1 0';m.appendChild(c);}
+    return m;
+  }
+  function lockWords(o){
+    var n=o.cov+o.cred, p=[];
+    if(!n)return '';
+    if(o.count===1)return o.cov?', covered':', on credit';
+    if(o.cov)p.push(o.cov+' covered');if(o.cred)p.push(o.cred+' on credit');if(o.count>n)p.push((o.count-n)+' not marked');
+    return '; '+p.join(', ');
   }
   function drawLedger(now,A){
     /* One row per node with windows in the last twelve hours, in the map's order, from the report itself. */
@@ -630,7 +655,8 @@ signed by payer</code></pre>
         var o=per[i][k], cell=el('div','cell'+(isMint?' m':'')), label=hm(k*H)+' window';
         if(o&&isMint&&o.anySettled){
           cell.appendChild(el('span','pip'+(o.disputed?' disputed':'')));
-          cell.title=label+': settled '+bytes(o.settled)+(o.disputed?', disputed':'')+(o.count>1?' ('+o.count+' windows)':'');
+          var lk=lockMark(o);if(lk)cell.appendChild(lk);
+          cell.title=label+': settled '+bytes(o.settled)+(o.disputed?', disputed':'')+(o.count>1?' ('+o.count+' windows)':'')+lockWords(o);
         }else if(o&&!isMint&&o.bytes>0){
           var bar=el('div','bar'+(o.disputed?' disputed':''));
           bar.style.height=Math.max(3,Math.round(60*Math.log(o.bytes+1)/Math.log(max+1)))+'px';
@@ -645,15 +671,15 @@ signed by payer</code></pre>
   }
   function dayKey(t){var d=new Date(t*1000);return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();}
   function drawWeek(now,A,h){
-    /* One row per node with windows in the last seven days, one column per local day, from the feed's /history (the Worker keeps a month of every node's windows). Bars sum the day's bytes; the Mint's row is a dot per day with settled windows. */
+    /* One row per node with windows in the last seven days, one column per local day, from the feed's /history (the Worker keeps a month of every node's windows). Bars sum the day's bytes; the Mint's row is a dot per day with settled windows, and under it the day's covered and on-credit windows in proportion, when the history says which they were. */
     var days=[];for(var i=6;i>=0;i--){var d=new Date(now*1000);d.setHours(0,0,0,0);d.setDate(d.getDate()-i);days.push(d);}
     var keys=days.map(function(d){return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();});
     var order=A.items.map(function(it){return it.n.name;}), roles={};A.items.forEach(function(it){roles[it.n.name]=it.n.role;});
     var per={};(h&&h.windows||[]).forEach(function(w){
       if(!w||typeof w.t_last!=='number'||!w.node)return;
-      var k=dayKey(w.t_last), row=per[w.node]||(per[w.node]={}), o=row[k]||(row[k]={bytes:0,settled:0,disputed:false,count:0,anySettled:false,disputes:0});
+      var k=dayKey(w.t_last), row=per[w.node]||(per[w.node]={}), o=row[k]||(row[k]={bytes:0,settled:0,disputed:false,count:0,anySettled:false,disputes:0,cov:0,cred:0});
       o.bytes+=w.bytes||0;o.count++;
-      if(w.settled_bytes!=null){o.settled+=w.settled_bytes;o.anySettled=true;}
+      if(w.settled_bytes!=null){o.settled+=w.settled_bytes;o.anySettled=true;marked(o,w);}
       if(w.disputed===true){o.disputed=true;o.disputes++;}
       if(!roles[w.node])roles[w.node]=w.role;
     });
@@ -671,7 +697,8 @@ signed by payer</code></pre>
         var o=per[n][k], cell=el('div','cell'+(isMint?' m':'')), label=days[i].toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
         if(o&&isMint&&o.anySettled){
           cell.appendChild(el('span','pip'+(o.disputed?' disputed':'')));
-          cell.title=label+': '+plural(o.count,'window')+' settled, '+bytes(o.settled)+(o.disputes?', '+o.disputes+' disputed':'');
+          var lk=lockMark(o);if(lk)cell.appendChild(lk);
+          cell.title=label+': '+plural(o.count,'window')+' settled, '+bytes(o.settled)+(o.disputes?', '+o.disputes+' disputed':'')+lockWords(o);
         }else if(o&&!isMint&&o.bytes>0){
           var bar=el('div','bar'+(o.disputed?' disputed':''));
           bar.style.height=Math.max(3,Math.round(60*Math.log(o.bytes+1)/Math.log(max+1)))+'px';
