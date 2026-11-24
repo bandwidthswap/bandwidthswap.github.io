@@ -441,20 +441,21 @@ signed by payer</code></pre>
   function money(u){return u>=1e6?'$'+(u/1e6).toFixed(2):(u/1e4).toFixed(1)+'¢';}   /* micro-units of a dollar, as the prepayment records carry them */
   function exact(u){return '$'+(u/1e6).toFixed(6);}
   function prepaidOf(rep,payer){
-    /* The payer's line of the report's prepayment book (spec Section 16; bwkit 0.5.1 since Nov 2, 2026): integers in micro-units. Nothing when the report has none, the book is empty, or a field is not a whole number. */
+    /* The payer's line of the report's prepayment book (spec Section 16; bwkit 0.5.1 since Nov 2, 2026): integers in micro-units. Nothing when the report has none, the book is empty, or a field is not a whole number. The balance alone may be below zero: a covered window settles in full, and what it drew past the balance is owed (the kit's spec, Section 16, since Nov 23, 2026). */
     var b=rep&&payer&&rep.prepaid&&rep.prepaid[payer.name], ks=['deposits','locked','debited','balance','covered'];
     if(!b||typeof b!=='object')return null;
-    for(var i=0;i<ks.length;i++)if(typeof b[ks[i]]!=='number'||b[ks[i]]%1!==0||b[ks[i]]<0)return null;
+    for(var i=0;i<ks.length;i++)if(typeof b[ks[i]]!=='number'||b[ks[i]]%1!==0||(b[ks[i]]<0&&ks[i]!=='balance'))return null;
     if(!b.deposits&&!b.locked&&!b.covered)return null;
     /* What a covered window has drawn on average says about how many more the balance and the open lock will carry. An estimate: the next lock must also fit, and it is larger than the draw. */
     var per=b.covered>0?b.debited/b.covered:0;
-    return {deposits:b.deposits,locked:b.locked,debited:b.debited,balance:b.balance,covered:b.covered,released:typeof b.released==='number'?b.released:0,per:per,left:per>0?Math.floor((b.balance+b.locked)/per):null};
+    return {deposits:b.deposits,locked:b.locked,debited:b.debited,balance:b.balance,covered:b.covered,released:typeof b.released==='number'?b.released:0,per:per,left:per>0&&b.balance>=0?Math.floor((b.balance+b.locked)/per):null};
   }
   function prepaidLines(P,payer){
     /* Under the payer's card: the balance at the Mint, what is locked ahead (or that nothing is, so the window open now settles on credit), how many windows were covered and about how many more the balance carries. */
     var box=el('div','lbl pp'), open=payer.window_t_last?' The window open now began '+hm(payer.window_t_last)+'.':'';
-    var a=el('span',null,money(P.balance)+' at the Mint');
-    a.title='balance at the Mint: '+exact(P.deposits)+' deposited, less '+exact(P.debited)+' that covered windows drew and '+exact(P.locked)+' that open locks hold = '+exact(P.balance)+(P.released?'; '+exact(P.released)+' released from locks unspent':'');
+    var owed=P.balance<0, a=owed?el('span','bad',money(-P.balance)+' owed to the Mint'):el('span',null,money(P.balance)+' at the Mint');
+    a.title=owed?'owed to the Mint: '+exact(P.deposits)+' deposited, less '+exact(P.debited)+' that covered windows drew and '+exact(P.locked)+' that open locks hold leaves '+exact(-P.balance)+' owed. A window both sides closed settles in full, even past the balance; the next deposit pays this first, and the Mint takes no lock until the balance covers one.'
+      :'balance at the Mint: '+exact(P.deposits)+' deposited, less '+exact(P.debited)+' that covered windows drew and '+exact(P.locked)+' that open locks hold = '+exact(P.balance)+(P.released?'; '+exact(P.released)+' released from locks unspent':'');
     var b=P.locked>0?el('span','ok',money(P.locked)+' locked ahead'):el('span','bad','no lock open: on credit');
     b.title=(P.locked>0?exact(P.locked)+' held by open locks. After each receipt the payer locks the value of the window that just opened, the Mint countersigns it, and the hop holds it before the bytes move.':'No lock is open, so the window running now settles on credit, on the month\'s invoice. A lock is refused when the balance is smaller than the lock.')+open;
     var c=el('span',null,plural(P.covered,'window')+' covered');
