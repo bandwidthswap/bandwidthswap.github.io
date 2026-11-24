@@ -10,7 +10,6 @@ More than one item can be in hand at once; the rules are in `CLAUDE.md`, "More t
 
 - **Item 1, the forfeiture test.** Session `lab` (the `stephen` account's session of Nov 23, 2026), since Nov 23, 22:54 CST. *Holds the nodes.*
 - **Item 8, the *covered* mark.** Session `covered-mark`, since Nov 23, 2026. The kit's half is on `main` (kit e7fac95: `covered` on each window of the report's history; `bwkit.py` is free again). The Worker and the page are being built on the Mac; the rollout and the Worker's deploy are handed over.
-- **Item 9, the plan for a second Mint and reconciliation.** Session `mint-plan`, since Nov 23, 2026. A document only: no code, no nodes.
 
 ## Next
 
@@ -22,7 +21,7 @@ More than one item can be in hand at once; the rules are in `CLAUDE.md`, "More t
 6. **A real forest node.** `bw-cabin` on solar and a battery at the cabin spot. *Who:* the owner; hardware. *Done when:* the node runs a week on its own power and its windows settle.
 7. **A second operator.** The neighbor's own key on a node, one change to the link's terms made by them, and a dispute nobody forced, resolved from the two signed copies. This is what Phase 2 and the pilot's success test wait on, and it is people, not code. *Who:* the owner and the neighbor. *Needs first:* the owner's word on what the neighbor link is now that the nodes are at the house. *Done when:* the pilot's sentence is true: two parties who are not the authors settle a month, dispute one receipt, and resolve it from the receipt data alone.
 8. **The *covered* mark on the public Lab status.** Each settled window marked covered or on credit: `covered` on each history entry of the kit's report, the Worker's shape check and its database column, then the dot on the page. *Who:* a session; the Worker's deploy is the owner's. *Done when:* the page marks each window and its tests pass.
-9. **A second Mint, and reconciliation between two Mints.** `bw-mint2` exists and is empty. *Needs first:* the plan, which has not been written. *Done when:* two Mints each settle their own windows and agree on what crossed between them.
+9. **A second Mint, and reconciliation between two Mints.** `bw-mint2` exists and is empty. *The plan is written* (Nov 24, 2026): the kit's `mints/PLAN.md`, with fourteen steps in order, each with its check. *Needs first:* the owner's seven decisions at the end of that plan. Its steps 1 to 3 need no new protocol code and give a second bench on `bw-mint2`, `bw-forest` and a second payer, so forced tests can leave the live link; its steps 2 and 3 change nodes and belong to the session that holds them. *Done when:* two Mints each settle their own windows and agree on what crossed between them.
 10. **A public bounty board and a payment rail.** Today posting needs a key the Mint already knows and money moves by hand. This is what makes Phase 3 real. *Done when:* someone the Mint has never met posts a purchase, funds it, and a relay is paid from it.
 11. **What profile 1 left out.** Announcements over a gossip layer, places that buy service through an anchor, and proving allowances that pay. Each is marked in the kit's spec as not in the first profile.
 12. **The light-delay features.** Carry, contact plans and receipt lifetimes: in the paper and the simulator only.
