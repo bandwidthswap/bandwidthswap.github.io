@@ -8,7 +8,8 @@ When an item is done, move it to "Done" with its date and the commit, and the ne
 
 More than one item can be in hand at once; the rules are in `CLAUDE.md`, "More than one session at a time". One line per item: the item, the session's name, the date it started, what it holds.
 
-- **The nodes.** Session `lab` (the `stephen` account's session of Nov 23, 2026) *holds the nodes*; it has no item in hand since the forfeiture test ended on Nov 24, 01:00 CST.
+- **The nodes.** Session `lab` (the `stephen` account's session of Nov 23, 2026) *holds the nodes*; it has item 13 in hand.
+- **Item 13, the rebuild and a claimed window.** Session `lab`, Nov 24, 2026; **Built, on `main` (kit e948443):** the rebuild reads which came first, a claim or the receipt for its window, from the claim's `posted_at` and the receipt's `t_last` under the link's clock tolerance; the spec's Section 16 says the rule; three tests and the vectors hold both cases. Rebuilt from the lab's own November records on the Mac it matches the Mint's ledger record for record, where the code before it was two claims short. **It waits on one thing:** the kit's rollout onto `bw-house` and `bw-neighbor`, after which `bwkit owed 2026-11` on both should read *matches* and the item moves to Done. It holds nothing: `bwkit.py` is free.
 
 ## Next
 
