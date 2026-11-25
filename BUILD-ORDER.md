@@ -8,13 +8,12 @@ When an item is done, move it to "Done" with its date and the commit, and the ne
 
 More than one item can be in hand at once; the rules are in `CLAUDE.md`, "More than one session at a time". One line per item: the item, the session's name, the date it started, what it holds.
 
-- **The nodes.** Session `lab` (the `stephen` account's session of Nov 23, 2026) *holds the nodes*; it has no item in hand since item 13 was rolled out on Nov 24, 22:02 CST.
+- **The nodes.** Session `lab` (the `stephen` account's session of Nov 23, 2026) *holds the nodes*; it has no item in hand since item 2 closed on Nov 25, 00:42 CST.
 
 ## Next
 
 An item keeps its number when the ones before it are done; a new item takes the next number and is placed where its priority puts it.
 
-2. **The bytes that arrive wrong through `bw-house`.** About one file in ten fetched through that node's SSH tunnel arrived with bytes changed, while the same file fetched on the node itself or over the radio was right every time (the kit's `PUNCH-LIST.md`, Kit fixes). *Who:* a session to measure; the owner if it comes down to a power supply. *Done when:* the cause is named, and the count is clean or the path is one the data plane does not use.
 3. **The HaLow data plane, finished on the bench.** A tunnel over the link's two fixed addresses, `bw-house` metering it, and `bw-cabin`'s first paid window. *Who:* a session. *Done when:* a window between the house and the cabin settles on the Mint with the bytes having crossed the radio.
 4. **The full unplug test.** Pull the house's uplink at five to the hour and show the window still settles by radio. This is the test that defines Phase 1. *Who:* the owner's hands, a session watching. *Needs first:* the LoRa board back on `bw-house`'s USB, on a supply that carries it and the dongle. *Done when:* the hour is settled and committed on the Mint and, once the uplink is back, the public page verifies its proof.
 5. **Range.** The HaLow link between two buildings, where it did not associate on Nov 2, and the LoRa range numbers. *Who:* the owner, for placement and antennas; a session to read the figures. *Done when:* the link holds between two buildings at a stated width, with the numbers written down.
@@ -38,10 +37,11 @@ An item keeps its number when the ones before it are done; a new item takes the 
 - **Power.** A supply or powered hub for `bw-house` that carries the board and the dongle; stronger supplies for `bw-cabin` and `bw-mint2`.
 - **The dongles' own 2.4 GHz networks.** A passphrase of their own, or off. It needs a sign-in to each dongle.
 - **Two sentences for the paper**, waiting for approval on a proof sheet.
-- **A reboot of `bw-house` and `bw-cabin`**, to see the HaLow addresses come back by themselves.
+- **A reboot of `bw-house` and `bw-cabin`**, to see the HaLow addresses come back by themselves, and on `bw-house` the kernel's check on `eth1` with them (item 2).
 
 ## Done
 
+- **Nov 25, 2026. Item 2, the bytes that arrive wrong through `bw-house`.** The cause is named: a packet received on `eth1` is damaged on the board's one USB bus while `eth0` is busy, after the adapter has passed it, and the kernel trusted the adapter. Wrong copies followed `eth0`'s traffic (none in 800 with it quiet, 22 in 800 with it sending hard, about one in ten through SSH). The kernel now checks every packet on that port (`bw-house`'s `halow` profile, since 00:42 CST, the owner's word), and the count is clean: 0 of 640 through SSH, with 45 damaged packets refused and sent again. The paper's Section 3.4 is the reason it matters: damage has to read as loss for a window's count to price it. Kit a5f317e: the record is in the kit's `PUNCH-LIST.md`, Kit fixes, and the rule in `radio/PLAN.md`. Not shown: whether the weak supply has a part.
 - **Nov 24, 2026. Item 13, the rebuild and a claimed window.** The rebuild reads which came first, a hop's claim or the payer's late receipt for the same window, from the two signed times under the link's clock tolerance, and keeps the claim that came first; the spec's Section 16 says the rule and the vectors hold both cases. Kit e948443; on `bw-house` and `bw-neighbor` since 22:02 CST, where `bwkit owed 2026-11` reads *matches* on both. The record is in the kit's `PUNCH-LIST.md`, Kit fixes.
 - **Nov 24, 2026. Item 8, the *covered* mark on the public Lab status.** Each settled window on the Mint's row carries a bar, solid for covered and hollow for on credit. Kit e7fac95 (the report says `covered`), site 80eca26 (the Worker keeps and serves it; deployed by the owner at 01:03 CST) and site 0317f11 (the page); on `bw-mint` since 03:06 CST, and the page marked its windows from the next report. Session `covered-mark` built it; the record is in `PUNCH-LIST.md`.
 - **Nov 24, 2026. Item 1, the forfeiture test.** The payer's hourly job stopped for two windows; the hop claimed the locked window on its own count and was paid to the lock, $0.021868 for 218.68 MB of the 222.61 MB it counted; the payer's first receipt back settled at the hop's count on credit, nothing paid twice. The record is in the kit's `PUNCH-LIST.md`, Protocol. It closes the prepayment rollout's six steps, and it found item 13.

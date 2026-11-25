@@ -58,6 +58,7 @@ The owner wants the build list worked in parallel where it can be. Four rules ke
 
 ## Conventions and decisions already made
 
+- **The white paper is the authority** (the owner, Nov 24, 2026: "always be doing things to the spec or intent of the white paper"). Before building, fixing or deciding anything here or in the kit, read the paper section and the spec section it touches, and say in the note how the change fits them. Where the paper is silent, follow its intent and say that it is silent. Where a working fix would depart from the paper, stop and put the departure to the owner; the paper itself changes only through a proof-sheet card.
 - **v0.1 text stays as published**, spelling included. v0.2 was copyedited on Oct 8, 2026 (44 fixes); new text is written clean.
 - **Three edits in v0.2 went beyond spelling** and were flagged to the author: "forfeit" inserted in Section 4's slashing sentence, "with against" became "for or against" in Section 6, and "Governer Mark Godin" became "Governor Mark Gordon". Left deliberately: "Stasoshi Dex" (declared fictional), "securities and exchange act of 1933" (1933 is the Securities Act, 1934 the Exchange Act; author's call), "Kathrine Long" and "BI laws" (unverified), "retarded" in the Introduction (word choice, not an error).
 - **The pilot has no token and no chain.** Dollars, one Mint, signed receipts, hourly prepaid windows, monthly invoice. See OPEN-QUESTIONS.md section E. Token and DAO questions are deferred until there is paying traffic.
